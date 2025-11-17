@@ -1,0 +1,299 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2109439848857336541
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2967188236170913124}
+  - component: {fileID: 8225558881310205363}
+  - component: {fileID: 8856911382076710789}
+  - component: {fileID: 8724136037250057148}
+  m_Layer: 0
+  m_Name: Spline
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2967188236170913124
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2109439848857336541}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.18462741, y: 1.4300008, z: -12.475552}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8225558881310205363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2109439848857336541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Splines::UnityEngine.Splines.SplineContainer
+  m_Spline:
+    m_EditModeType: 1
+    m_Knots: []
+    m_MetaData: []
+    m_Closed: 0
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Splines:
+  - m_EditModeType: 1
+    m_Knots:
+    - Position:
+        x: 0
+        y: 0.1
+        z: 0
+      TangentIn:
+        x: -0
+        y: -0
+        z: -0.15383203
+      TangentOut:
+        x: 0
+        y: 0
+        z: 0.15383203
+      Rotation:
+        value:
+          x: -0.00000041977884
+          y: 0.5986925
+          z: -0.00000056161383
+          w: 0.80097896
+    - Position:
+        x: 1.4753726
+        y: 0.1
+        z: 0.43555164
+      TangentIn:
+        x: 0
+        y: 0
+        z: -0.38001442
+      TangentOut:
+        x: 0
+        y: 0
+        z: 0.4965882
+      Rotation:
+        value:
+          x: -0.000000033483044
+          y: 0.21658391
+          z: -0.00000015092655
+          w: 0.976264
+    - Position:
+        x: 1.4189117
+        y: 0.1
+        z: 1.652772
+      TangentIn:
+        x: -0
+        y: -0
+        z: -0.12185291
+      TangentOut:
+        x: 0
+        y: 0
+        z: 0.12185291
+      Rotation:
+        value:
+          x: 0.000000009212506
+          y: -0.023173854
+          z: -0.0000003974321
+          w: 0.99973154
+    m_MetaData:
+    - Mode: 0
+      Tension: 0.5
+    - Mode: 3
+      Tension: 0.5
+    - Mode: 0
+      Tension: 0.5
+    m_Closed: 0
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Knots:
+    m_KnotsLink: []
+--- !u!120 &8856911382076710789
+LineRenderer:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2109439848857336541}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: cdd522cf37b9e064fbc7f07973dfae35, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Positions:
+  - {x: 0.18462741, y: 1.5300008, z: -12.475552}
+  - {x: 0.25523776, y: 1.5300008, z: -12.462387}
+  - {x: 0.3267518, y: 1.5300008, z: -12.452972}
+  - {x: 0.39874107, y: 1.5300008, z: -12.44426}
+  - {x: 0.47037566, y: 1.5300008, z: -12.435668}
+  - {x: 0.5422855, y: 1.5300008, z: -12.426811}
+  - {x: 0.6141643, y: 1.5300008, z: -12.417536}
+  - {x: 0.6857963, y: 1.5300008, z: -12.407726}
+  - {x: 0.7572816, y: 1.5300008, z: -12.397244}
+  - {x: 0.8286855, y: 1.5300008, z: -12.385955}
+  - {x: 0.89995563, y: 1.5300008, z: -12.37373}
+  - {x: 0.9710424, y: 1.5300008, z: -12.360424}
+  - {x: 1.0418906, y: 1.5300008, z: -12.345866}
+  - {x: 1.1124289, y: 1.5300008, z: -12.329848}
+  - {x: 1.1825572, y: 1.5300008, z: -12.312111}
+  - {x: 1.2521268, y: 1.5300008, z: -12.292327}
+  - {x: 1.3209039, y: 1.5300008, z: -12.270066}
+  - {x: 1.3885064, y: 1.5300008, z: -12.244763}
+  - {x: 1.4545883, y: 1.5300008, z: -12.215515}
+  - {x: 1.5183641, y: 1.5300008, z: -12.180999}
+  - {x: 1.5773882, y: 1.5300008, z: -12.139851}
+  - {x: 1.62895, y: 1.5300008, z: -12.089033}
+  - {x: 1.6657434, y: 1.5300008, z: -12.027382}
+  - {x: 1.6918774, y: 1.5300008, z: -11.960025}
+  - {x: 1.7119149, y: 1.5300008, z: -11.890593}
+  - {x: 1.726344, y: 1.5300008, z: -11.819795}
+  - {x: 1.7357262, y: 1.5300008, z: -11.748121}
+  - {x: 1.7406081, y: 1.5300008, z: -11.676009}
+  - {x: 1.7415099, y: 1.5300008, z: -11.603728}
+  - {x: 1.7389024, y: 1.5300008, z: -11.531505}
+  - {x: 1.733199, y: 1.5300008, z: -11.459401}
+  - {x: 1.7247812, y: 1.5300008, z: -11.387645}
+  - {x: 1.7139562, y: 1.5300008, z: -11.316107}
+  - {x: 1.7010553, y: 1.5300008, z: -11.245022}
+  - {x: 1.6863168, y: 1.5300008, z: -11.174154}
+  - {x: 1.670112, y: 1.5300008, z: -11.103864}
+  - {x: 1.6526664, y: 1.5300008, z: -11.033626}
+  - {x: 1.6345348, y: 1.5300008, z: -10.963646}
+  - {x: 1.6166465, y: 1.5300008, z: -10.893426}
+  - {x: 1.6035391, y: 1.5300008, z: -10.82278}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0.0056381226
+        value: 0.04425049
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_ColorSpace: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    textureScale: {x: 1, y: 1}
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_MaskInteraction: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
+  m_ApplyActiveColorSpace: 1
+--- !u!114 &8724136037250057148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2109439848857336541}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4500384dec6f1a4ebc1aa29b4f7c0bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SplinePathSegment
+  nodeA: {fileID: 0}
+  nodeB: {fileID: 0}
+  lineResolution: 40
