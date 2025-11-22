@@ -6,16 +6,20 @@ public class HealAllAlliesSkill : Skill
 {
     public int healAmount = 10;
 
-    public override void Execute(BattleCharacter user, BattleCharacter _)
+    public override void Execute(BattleCharacter user, BattleCharacter target)
     {
-        if (BattleTurnManager.Instance == null) return;
+        if (BattleTurnManager.Instance == null || user == null) return;
 
-        foreach (var ally in BattleTurnManager.Instance.GetAlliesOf(user))
+        var center = target != null ? target : user;
+        var group = BattleTurnManager.Instance.GetAlliesOf(center);
+
+        foreach (var ally in group)
         {
             if (ally == null || ally.IsDead) continue;
             ally.Heal(healAmount);
         }
 
-        Debug.Log($"{user.name} used {skillName} to heal all allies by {healAmount}.");
+        ExecuteFollowUps(user, target);
     }
+
 }

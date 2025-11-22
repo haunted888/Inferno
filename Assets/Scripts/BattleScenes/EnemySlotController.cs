@@ -5,28 +5,54 @@ public class EnemySlotController : MonoBehaviour
     public BattleSlots battleSlots;
     private BattleCharacter[] enemies;
     private Transform[] enemyHomes;
+    public GameObject enemyHealthBarPrefab;
+
 
     //Awake is called when the script instance is being loaded
     void Awake()
     {
-        var defs = MapCombatTransfer.Instance.ConsumeEnemies();
+        var defs = MapCombatTransfer.Instance.GetEnemies();
 
         foreach (var def in defs)
         {
+            if (def == null) continue;
+
+            // Initialize enemy stats/skills from asset once
+            def.EnsureInitializedFromAsset();
+
             var inst = Instantiate(def.enemyPrefab, this.transform);
             Debug.Log("Instantiated enemy prefab: " + def.enemyPrefab.name);
             var chr = inst.GetComponent<BattleCharacter>();
             if (chr == null) continue;
 
-            chr.SetStats(def.health, def.speed);   
+            CombatStats stats = def.GetEffectiveStats();
+            int maxHp = stats.maxHealth;
+            int currentHp = maxHp;
+            
+            // SP for enemies: always full at start of each battle
+            int maxSp = def.GetMaxSp();     
+            int currentSp = maxSp;          
+
+            chr.ApplyStats(stats, currentHp);
+            chr.setName(def.GetDisplayName());
+
             chr.ClearSkills();
-            foreach (var s in def.skills)
+            foreach (var s in def.GetEffectiveSkills())
+                if (s != null) chr.AddSkill(s);
+            // Spawn health bar
+            if (enemyHealthBarPrefab != null)
             {
-                if (s != null)
-                    chr.AddSkill(s);
+                var barObj = Instantiate(enemyHealthBarPrefab);
+                var bar    = barObj.GetComponent<WorldSpaceStatusUI>();
+                if (bar != null)
+                    bar.Initialize(chr);
+
+                // Optional: parent to enemy so it moves with them
+                barObj.transform.SetParent(chr.transform);
             }
         }
     }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

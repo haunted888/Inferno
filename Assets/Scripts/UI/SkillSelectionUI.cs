@@ -29,12 +29,23 @@ public class SkillSelectionUI : MonoBehaviour
             Button btn = buttonObj.GetComponent<Button>();
             TMP_Text  text = buttonObj.GetComponentInChildren<TMP_Text>();
 
+            int cost = skill.spCost;
+
             if (text != null)
-                text.text = skill.skillName;
+            {
+                text.text = cost > 0
+                    ? $"{skill.skillName} (SP: {cost})"
+                    : skill.skillName;
+            }
+
+            // Disable if not enough SP
+            if (character.CurrentSp < cost)
+                btn.interactable = false;
 
             int index = i; // capture for lambda
             btn.onClick.AddListener(() => OnButtonClicked(index));
         }
+
     }
 
     public void Hide()

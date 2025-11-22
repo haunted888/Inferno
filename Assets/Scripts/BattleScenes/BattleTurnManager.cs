@@ -5,6 +5,8 @@ using NUnit.Framework;
 using Unity.VisualScripting;
 using UnityEngine.Events;
 using UnityEngine;
+using UnityEngine.SceneManagement; // at top if not present
+
 
 
 public class BattleTurnManager : MonoBehaviour
@@ -24,9 +26,12 @@ public class BattleTurnManager : MonoBehaviour
 
     [Header("UI")]
     public SkillSelectionUI skillSelectionUI;
-    public BattleCommandUI commandUI;   // NEW
+    public BattleCommandUI commandUI;   
+    
+    public IReadOnlyList<BattleCharacter> PlayerParty => playerParty;
 
-    private List<BattleCharacter> commandOrder = new List<BattleCharacter>(); // NEW
+
+    private List<BattleCharacter> commandOrder = new List<BattleCharacter>(); 
 
 
     private enum TurnState { Idle, CommandSelect, ActionResolve }
@@ -44,6 +49,7 @@ public class BattleTurnManager : MonoBehaviour
     private class QueuedAction
     {
         public BattleCharacter user;
+        public int skillIndex;
         public Skill skill;
         public BattleCharacter target;
     }
@@ -192,24 +198,84 @@ public class BattleTurnManager : MonoBehaviour
                 Skill chosenSkill = chr.Skills[chosenIndex];
 
                 BattleCharacter chosenTarget = null;
-                bool waitingForTarget = true;
-                UnityAction<BattleCharacter> handler = null;
 
+                bool waitingForTarget = true;
+                bool cancelToCommand = false;
+                BattleCommandType cmdAfterSkill = BattleCommandType.Skills;
+
+                // Re-wire the command UI so buttons affect the targeting phase
+                commandUI.ShowForCharacter(chr, hasPrevious, cmd =>
+                {
+                    cmdAfterSkill = cmd;
+                    cancelToCommand = true;
+                });
+
+                UnityAction<BattleCharacter> handler = null;
                 handler = (clicked) =>
                 {
                     if (!IsTargetValidForSkill(chosenSkill, chr, clicked))
                         return;
+                    if (cancelToCommand)
+                        return; // command menu already took over
 
                     chosenTarget = clicked;
                     waitingForTarget = false;
-                    ClickManagerBattle.OnCharacterClicked.RemoveListener(handler);
                 };
 
                 ClickManagerBattle.OnCharacterClicked.AddListener(handler);
 
-                while (waitingForTarget)
+                // Wait until either a valid target is clicked OR a command is chosen
+                while (waitingForTarget && !cancelToCommand)
                     yield return null;
 
+                ClickManagerBattle.OnCharacterClicked.RemoveListener(handler);
+
+                if (cancelToCommand)
+                {
+                    // Handle commands pressed during targeting
+
+                    if (cmdAfterSkill == BattleCommandType.Items)
+                    {
+                        Debug.Log("Items not implemented yet.");
+                        // stay on same character
+                        continue;
+                    }
+
+                    if (cmdAfterSkill == BattleCommandType.Skip)
+                    {
+                        chosenSkillIndices[chr] = -1;
+                        chosenTargets[chr] = null;
+
+                        if (!commandOrder.Contains(chr))
+                            commandOrder.Add(chr);
+
+                        currentPlayerIndex++;
+                        continue;
+                    }
+
+                    if (cmdAfterSkill == BattleCommandType.Back)
+                    {
+                        if (hasPrevious)
+                        {
+                            var lastChar = commandOrder[commandOrder.Count - 1];
+                            commandOrder.RemoveAt(commandOrder.Count - 1);
+                            chosenSkillIndices.Remove(lastChar);
+                            chosenTargets.Remove(lastChar);
+
+                            int idx = playerParty.IndexOf(lastChar);
+                            currentPlayerIndex = Mathf.Max(0, idx);
+                        }
+                        continue;
+                    }
+
+                    if (cmdAfterSkill == BattleCommandType.Skills)
+                    {
+                        // restart skill selection for this character
+                        continue;
+                    }
+                }
+
+                // Normal case: target successfully chosen
                 chosenSkillIndices[chr] = chosenIndex;
                 chosenTargets[chr] = chosenTarget;
 
@@ -219,6 +285,7 @@ public class BattleTurnManager : MonoBehaviour
                 currentPlayerIndex++;
                 continue;
             }
+
 
             // Otherwise, a non-Skills command was pressed while the skills UI was open
 
@@ -265,7 +332,7 @@ public class BattleTurnManager : MonoBehaviour
 
     private IEnumerator ActionResolutionPhase()
     {
-        List<QueuedAction> actions = new List<QueuedAction>();
+        var actions = new List<QueuedAction>();
 
         foreach (var kvp in chosenSkillIndices)
         {
@@ -281,34 +348,30 @@ public class BattleTurnManager : MonoBehaviour
             actions.Add(new QueuedAction
             {
                 user = user,
+                skillIndex = skillIndex,  // NEW
                 skill = skill,
                 target = target
             });
         }
 
-        // Sort by speed (descending)
+        // Sort by speed (desc), tiebreak random
         actions = actions
             .OrderByDescending(a => a.user.Speed)
             .ThenBy(_ => Random.value)
             .ToList();
 
-        // Execute in order
         foreach (var action in actions)
         {
-            // Check if either side is already wiped; end battle immediately
-            if (IsSideDefeated(playerParty) || IsSideDefeated(enemyParty))
-            {
-                Debug.Log("Battle ended (one side defeated).");
-                yield break;
-            }
+            if (IsSideDefeated(playerParty)) { OnBattleEnd(false); yield break; }
+            if (IsSideDefeated(enemyParty))  { OnBattleEnd(true);  yield break; }
 
             if (action.user == null || action.user.IsDead) continue;
             if (action.skill == null) continue;
 
-            // Resolve target (may retarget if original target died)
+            // Resolve target (may retarget)
             BattleCharacter effectiveTarget = ResolveEffectiveTarget(action);
 
-            // For single-target skills, if we have no valid target, skip the action
+            // For single-target skills, require a valid target
             if ((action.skill.targetType == SkillTargetType.SingleEnemy ||
                 action.skill.targetType == SkillTargetType.SingleAlly) &&
                 effectiveTarget == null)
@@ -316,19 +379,23 @@ public class BattleTurnManager : MonoBehaviour
                 continue;
             }
 
-            action.skill.Execute(action.user, effectiveTarget);
-
-            // After executing, check again if a side is wiped
-            if (IsSideDefeated(playerParty) || IsSideDefeated(enemyParty))
+            // Players spend SP via UseSkill; enemies ignore SP and execute directly
+            if (playerParty.Contains(action.user))
             {
-                Debug.Log("Battle ended (one side defeated).");
-                yield break;
+                action.user.UseSkill(action.skillIndex, effectiveTarget);
             }
+            else
+            {
+                action.skill.Execute(action.user, effectiveTarget);
+            }
+
+            if (IsSideDefeated(playerParty)) { OnBattleEnd(false); yield break; }
+            if (IsSideDefeated(enemyParty))  { OnBattleEnd(true);  yield break; }
 
             yield return new WaitForSeconds(0.3f);
         }
-
     }
+
 
 
     private BattleCharacter GetFirstAliveEnemy()
@@ -340,19 +407,21 @@ public class BattleTurnManager : MonoBehaviour
         }
         return null;
     }
+
     public IEnumerable<BattleCharacter> GetAlliesOf(BattleCharacter c)
     {
-        if (playerParty.Contains(c)) return playerParty;
-        if (enemyParty.Contains(c))  return enemyParty;
+        if (playerParty.Contains(c)) return new List<BattleCharacter>(playerParty);
+        if (enemyParty.Contains(c))  return new List<BattleCharacter>(enemyParty);
         return new List<BattleCharacter>();
     }
 
     public IEnumerable<BattleCharacter> GetEnemiesOf(BattleCharacter c)
     {
-        if (playerParty.Contains(c)) return enemyParty;
-        if (enemyParty.Contains(c))  return playerParty;
+        if (playerParty.Contains(c)) return new List<BattleCharacter>(enemyParty);
+        if (enemyParty.Contains(c))  return new List<BattleCharacter>(playerParty);
         return new List<BattleCharacter>();
     }
+
 
     private bool IsTargetValidForSkill(Skill skill, BattleCharacter user, BattleCharacter clicked)
     {
@@ -381,11 +450,9 @@ public class BattleTurnManager : MonoBehaviour
     {
         if (c == null) return;
 
-        playerParty.Remove(c);
-        enemyParty.Remove(c);
-
-        Destroy(c.gameObject);
+        c.gameObject.SetActive(false); // disable, don’t destroy immediately
     }
+
 
     private bool IsSideDefeated(IEnumerable<BattleCharacter> group)
     {
@@ -565,6 +632,15 @@ public class BattleTurnManager : MonoBehaviour
                 bestTarget       = skillBestTarget;
             }
         }
+    }
+
+    private void OnBattleEnd(bool playerWon)
+    {
+        // Persist results into MapCombatTransfer (HP, party/camp updates, etc.)
+        MapCombatTransfer.Instance.ApplyBattleResult(playerWon, playerParty);
+
+        // Return to map scene (replace with your actual map scene name)
+        SceneManager.LoadScene("Scenes/Map Scene");
     }
 
 

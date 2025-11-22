@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class PathfindingManager : MonoBehaviour
 {
+    
+    public static PathfindingManager Instance { get; private set; }
+
     [Tooltip("Node to treat as the starting point for pathfinding.")]
     public PathNode startNode;
 
@@ -14,6 +17,8 @@ public class PathfindingManager : MonoBehaviour
     [Tooltip("Units per second along the spline.")]
     public float moveSpeed = 3f;
 
+    public PathNode LastNodeBeforeMove { get; private set; }
+
     private SplinePathSegment[] SplinePathSegments;
 
     private HashSet<PathNode> visitedNodes = new HashSet<PathNode>();
@@ -22,14 +27,26 @@ public class PathfindingManager : MonoBehaviour
 
     void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
         // Cache all spline edges in the scene
         SplinePathSegments = FindObjectsByType<SplinePathSegment>(FindObjectsSortMode.None);
         visitedNodes.Clear();
-        if (startNode != null)
+        if (startNode != null){
             visitedNodes.Add(startNode);
+            LastNodeBeforeMove = startNode;
+        }
+        RestorePathStateFromTransfer();
+        PersistPathStateToTransfer();
 
         ClickManager.OnNodeClicked.AddListener(HandleNodeClicked);
     }
+
 
     void OnDestroy()
     {
@@ -43,6 +60,13 @@ public class PathfindingManager : MonoBehaviour
         if (startNode == null || clickedNode == null)
             return;
         
+        if (IsCombatNode(clickedNode) && !HasLivingParty())
+        {
+            Debug.Log("Cannot move to combat node: party is empty or all members are dead.");
+            return;
+        }
+
+
         if (!IsNodeUnlocked(clickedNode))
         {
             Debug.Log("Node " + clickedNode.name + " is locked (no visited neighbors).");
@@ -57,6 +81,8 @@ public class PathfindingManager : MonoBehaviour
         }
 
         PrintPath(path);
+
+        LastNodeBeforeMove = startNode;
 
         // Move player along path of splines
         StopAllCoroutines();
@@ -150,6 +176,7 @@ public class PathfindingManager : MonoBehaviour
         
         startNode = path[path.Count - 1];
         OnArrivedAtNode?.Invoke(startNode);
+        PersistPathStateToTransfer();
     }
 
     SplinePathSegment FindEdge(PathNode from, PathNode to)
@@ -204,5 +231,99 @@ public class PathfindingManager : MonoBehaviour
         return false;
     }
 
-   
+   public void ForceSetPlayerNode(PathNode node)
+    {
+        if (node == null) return;
+
+        // Update lastNodeBeforeMove EVERY time we explicitly set the player node
+        LastNodeBeforeMove = node;
+
+        startNode = node;
+        player.position = node.transform.position;
+        PersistPathStateToTransfer();
+    }
+
+    public void MarkNodeUnvisited(PathNode node)
+    {
+        if (node == null) return;
+        visitedNodes.Remove(node);
+        PersistPathStateToTransfer();
+    }
+    private bool HasLivingParty()
+    {
+        var transfer = MapCombatTransfer.Instance;
+        if (transfer == null || transfer.party == null) return false;
+
+        foreach (var def in transfer.party)
+        {
+            if (def != null && def.health > 0)
+                return true;
+        }
+        return false;
+    }
+
+    private bool IsCombatNode(PathNode node)
+    {
+        if (node == null) return false;
+
+        var triggers = FindObjectsByType<MapCombatTrigger>(FindObjectsSortMode.None);
+        foreach (var trig in triggers)
+        {
+            if (trig != null && trig.IsOnNode(node))
+                return true;
+        }
+        return false;
+    }
+
+    void RestorePathStateFromTransfer()
+    {
+        var transfer = MapCombatTransfer.Instance;
+        if (transfer == null || !transfer.HasPathState)
+            return;
+
+        var allNodes = FindObjectsByType<PathNode>(FindObjectsSortMode.None);
+        var lookup = new Dictionary<string, PathNode>();
+        foreach (var node in allNodes)
+        {
+            if (node == null) continue;
+            if (!lookup.ContainsKey(node.name))
+                lookup.Add(node.name, node);
+        }
+
+        visitedNodes.Clear();
+        var visitedNames = transfer.GetVisitedNodeNames();
+        if (visitedNames != null)
+        {
+            foreach (var name in visitedNames)
+            {
+                if (string.IsNullOrEmpty(name)) continue;
+                if (lookup.TryGetValue(name, out var node))
+                    visitedNodes.Add(node);
+            }
+        }
+
+        PathNode current = null;
+        if (!string.IsNullOrEmpty(transfer.currentMapNodeName))
+            lookup.TryGetValue(transfer.currentMapNodeName, out current);
+
+        if (current == null && startNode != null)
+            current = startNode;
+
+        if (current != null)
+        {
+            startNode = current;
+            LastNodeBeforeMove = current;
+            visitedNodes.Add(current);
+            if (player != null)
+                player.position = current.transform.position;
+        }
+    }
+
+    void PersistPathStateToTransfer()
+    {
+        var transfer = MapCombatTransfer.Instance;
+        if (transfer == null) return;
+        transfer.SavePathState(visitedNodes, startNode);
+    }
+
 }

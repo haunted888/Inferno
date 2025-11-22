@@ -15,4 +15,10 @@ MonoBehaviour:
   skillName: Explosion
   description: 
   targetType: 1
-  power: 10
+  spCost: 5
+  followUpSkills: []
+  power: 30
+  damageType: 0
+  subType: 0
+  skillCritChance: 0
+  skillCritDamage: 0

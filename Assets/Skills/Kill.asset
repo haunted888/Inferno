@@ -13,6 +13,12 @@ MonoBehaviour:
   m_Name: Kill
   m_EditorClassIdentifier: Assembly-CSharp::DamageSkill
   skillName: Kill
-  description: 
+  description: One percent chance to critically hit. Critical hits do 1000000% damage.
   targetType: 0
-  power: 100000
+  spCost: 10
+  followUpSkills: []
+  power: 1
+  damageType: 0
+  subType: 0
+  skillCritChance: 0
+  skillCritDamage: 1000000

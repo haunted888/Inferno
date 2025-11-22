@@ -14,4 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DamageSkill
   skillName: Shoot
   description: Shoots at an enemy
-  power: 10
+  targetType: 0
+  spCost: 0
+  followUpSkills: []
+  power: 50
+  damageType: 0
+  subType: 3
+  skillCritChance: 0
+  skillCritDamage: 0

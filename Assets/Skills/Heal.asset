@@ -15,4 +15,6 @@ MonoBehaviour:
   skillName: Heal
   description: 
   targetType: 2
+  spCost: 5
+  followUpSkills: []
   healAmount: 20

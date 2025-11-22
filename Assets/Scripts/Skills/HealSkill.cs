@@ -11,6 +11,8 @@ public class HealAllySkill : Skill
         if (target == null || target.IsDead) return;
 
         target.Heal(healAmount);
-        Debug.Log($"{user.name} used {skillName} on {target.name}, healing {healAmount}.");
+
+        ExecuteFollowUps(user, target);
     }
 }
+
