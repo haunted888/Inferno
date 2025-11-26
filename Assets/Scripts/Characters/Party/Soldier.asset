@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e42da5fb73250d943a2c4e7959d4e8c9, type: 3}
   m_Name: Soldier
   m_EditorClassIdentifier: Assembly-CSharp::CharacterTemplate
-  displayName: Unnamed
+  displayName: Soldier
   baseStats:
     maxHealth: 20
     maxSp: 10

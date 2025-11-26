@@ -333,5 +333,14 @@ public class MapCombatTransfer : MonoBehaviour
             camp.Add(def);
         }
     }
+    public void RemoveItem(ItemDefinition item, int qty)
+    {
+        if (item == null || qty <= 0) return;
+        var stack = inventory.Find(s => s.item == item);
+        if (stack == null) return;
+        stack.quantity -= qty;
+        if (stack.quantity <= 0) inventory.Remove(stack);
+    }
+
 
 }

@@ -8,6 +8,7 @@ public class CampCharacterUI : MonoBehaviour,
     IPointerClickHandler, IBeginDragHandler, IEndDragHandler
 {
     public TMP_Text nameText;
+    public Slider healthBar;
 
     [HideInInspector] public MapPartyMemberDefinition definition;
     CampUIManager manager;
@@ -38,6 +39,10 @@ public class CampCharacterUI : MonoBehaviour,
                 nameText.text = "Unnamed";
             }
         }
+        if (healthBar != null && definition != null)
+        {
+            UpdateHealthBar(definition.health, definition.GetMaxHealth());
+        }
     }
 
 
@@ -54,5 +59,12 @@ public class CampCharacterUI : MonoBehaviour,
     public void OnEndDrag(PointerEventData eventData)
     {
         currentDragged = null;
+    }
+    public void UpdateHealthBar(int health, int maxHealth)
+    {
+        if (healthBar != null)
+        {
+            healthBar.value = maxHealth > 0 ? (float)health / (float)maxHealth : 0f;
+        }
     }
 }

@@ -131,6 +131,14 @@ public class CampUIManager : MonoBehaviour
     // click in camp grid
     public void OnCampCharacterClicked(MapPartyMemberDefinition def)
     {
+        if (pendingItemTarget != null)
+        {
+            var cb = pendingItemTarget;
+            pendingItemTarget = null;   // consume once
+            cb?.Invoke(def);
+            return;
+        }
+
         if (def == null || def.health <= 0) return;
 
         int existing = FindSlotIndex(def);
@@ -246,5 +254,41 @@ public class CampUIManager : MonoBehaviour
         transfer.SyncCampMembers(campMembers);
     }
     
+    private System.Action<MapPartyMemberDefinition> pendingItemTarget;  // NEW
 
+    public bool IsItemTargetMode => pendingItemTarget != null;   // NEW
+
+    // Begin a one-click item target selection
+    public void BeginItemTargeting(System.Action<MapPartyMemberDefinition> onChosen) // NEW
+    {
+        if (onChosen == null)
+        {
+            pendingItemTarget = null;
+            return;
+        }
+
+        pendingItemTarget = def =>
+        {
+            onChosen(def);
+            RefreshCampHealthBars();
+        };
+    }
+
+    public void CancelItemTargeting() // NEW
+    {
+        pendingItemTarget = null;
+    }
+
+    void RefreshCampHealthBars()
+    {
+        var entries = campGridParent.GetComponentsInChildren<CampCharacterUI>(true);
+        foreach (var entry in entries)
+        {
+            if (entry == null) continue;
+            var def = entry.definition;
+            if (def == null) continue;
+            entry.UpdateHealthBar(def.health, def.GetMaxHealth());
+        }
+    }
+   
 }
