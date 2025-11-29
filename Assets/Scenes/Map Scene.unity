@@ -8091,7 +8091,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00048774751}
+  m_AnchoredPosition: {x: 0, y: -0.000021081745}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2078211892
@@ -8237,7 +8237,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 277122056}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.99998975
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -8928,7 +8928,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: rewardGroups.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: enemies.Array.data[0].speed
@@ -9011,6 +9011,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: rewardGroups.Array.data[2].options.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: rewards.Array.data[0].partyMember.displayName
       value: Caesar
       objectReference: {fileID: 0}
@@ -9031,6 +9035,14 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: rewardGroups.Array.data[2].options.Array.data[0].item
+      value: 
+      objectReference: {fileID: 11400000, guid: 06bf30dea9f30304e9b8562ccc0db33e, type: 2}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: rewardGroups.Array.data[2].options.Array.data[0].type
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: 'rewards.Array.data[0].partyMember.skills.Array.data[0]'
       value: 
       objectReference: {fileID: 11400000, guid: 08cae2a978420734c8aa7a056471542b, type: 2}
@@ -9041,6 +9053,10 @@ PrefabInstance:
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: rewardGroups.Array.data[1].options.Array.data[0].itemQuantity
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: rewardGroups.Array.data[2].options.Array.data[0].itemQuantity
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: rewardGroups.Array.data[0].options.Array.data[0].partyMember.speed
@@ -9059,6 +9075,10 @@ PrefabInstance:
       value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: rewardGroups.Array.data[2].options.Array.data[0].partyMember.health
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: rewardGroups.Array.data[0].options.Array.data[0].partyMember.displayName
       value: Caesar
       objectReference: {fileID: 0}
@@ -9068,6 +9088,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: rewardGroups.Array.data[1].options.Array.data[1].partyMember.displayName
+      value: Caesar
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: rewardGroups.Array.data[2].options.Array.data[0].partyMember.displayName
       value: Caesar
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
@@ -9083,6 +9107,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: e5bb5e1434eb6fb448c074528a794ed4, type: 2}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: rewardGroups.Array.data[2].options.Array.data[0].partyMember.characterAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: e5bb5e1434eb6fb448c074528a794ed4, type: 2}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: rewardGroups.Array.data[0].options.Array.data[0].partyMember.characterPrefab
       value: 
       objectReference: {fileID: 7271643811276314771, guid: 732c50153c41f6348bd5949fc883bb1a, type: 3}
@@ -9095,6 +9123,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7271643811276314771, guid: 732c50153c41f6348bd5949fc883bb1a, type: 3}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: rewardGroups.Array.data[2].options.Array.data[0].partyMember.characterPrefab
+      value: 
+      objectReference: {fileID: 7271643811276314771, guid: 732c50153c41f6348bd5949fc883bb1a, type: 3}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: rewardGroups.Array.data[0].options.Array.data[0].partyMember.skills.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -9104,6 +9136,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: rewardGroups.Array.data[1].options.Array.data[1].partyMember.skills.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: rewardGroups.Array.data[2].options.Array.data[0].partyMember.skills.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
@@ -9128,6 +9164,14 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 08cae2a978420734c8aa7a056471542b, type: 2}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: 'rewardGroups.Array.data[1].options.Array.data[1].partyMember.skills.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 5df21aa61a790354d8c1e268ecb8d35b, type: 2}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: 'rewardGroups.Array.data[2].options.Array.data[0].partyMember.skills.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 08cae2a978420734c8aa7a056471542b, type: 2}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: 'rewardGroups.Array.data[2].options.Array.data[0].partyMember.skills.Array.data[1]'
       value: 
       objectReference: {fileID: 11400000, guid: 5df21aa61a790354d8c1e268ecb8d35b, type: 2}
     m_RemovedComponents: []

@@ -84,10 +84,24 @@ public class InventoryUI : MonoBehaviour
 
         if(campUIManager != null)
             campUIManager.Open();
+        else
+        {
+            return;
+        }
 
         // Only map consumables act here (battle use comes later)
         if (item.mapConsumable != null)
             item.mapConsumable.BeginUseOnMap(item, this);
+        if (item.heldEquippable != null)
+    {
+        
+        campUIManager.BeginEquipTargeting(item, onFinished: () =>
+        {
+            // After equip/unequip/move, refresh inventory counts
+            Refresh();
+        });
+        return;
+    }
     }
 
 }

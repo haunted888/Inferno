@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class CampUIManager : MonoBehaviour
 {
@@ -24,7 +25,7 @@ public class CampUIManager : MonoBehaviour
     
 
     private List<MapPartyMemberDefinition> runtimeCampList = new List<MapPartyMemberDefinition>();
-
+    
 
     bool initialized = false;
 
@@ -131,6 +132,41 @@ public class CampUIManager : MonoBehaviour
     // click in camp grid
     public void OnCampCharacterClicked(MapPartyMemberDefinition def)
     {
+        //Check if in equip mode
+        if (pendingEquipItem != null)
+        {
+            var transfer = MapCombatTransfer.Instance;
+            if (transfer != null && pendingEquipItem.heldEquippable != null &&
+                pendingEquipItem.heldEquippable.CanEquip(def))
+            {
+                var currentOnMember = transfer.GetEquippedItem(def);
+                var currentHolderOfItem = transfer.GetItemHolder(pendingEquipItem);
+
+                if (currentOnMember == pendingEquipItem)
+                {
+                    // Clicking same member that already holds this item → UNEQUIP
+                    transfer.UnequipHeldItemFromMember(def);
+                }
+                else
+                {
+                    // Equip/move the item to this member (handles moving from previous holder and inventory)
+                    transfer.EquipHeldItem(def, pendingEquipItem);
+                }
+            }
+
+            // Finish equip mode
+            var cb = onEquipFinished;  // snapshot
+            CancelEquipTargeting();
+
+            // Refresh camp lists/slots if needed
+            RefreshPartySlots();   // or your existing refresh call(s)
+            RefreshCampEquipmentIcons();
+
+            cb?.Invoke();
+            return;
+        }
+
+        // Check if in item-targeting mode
         if (pendingItemTarget != null)
         {
             var cb = pendingItemTarget;
@@ -139,6 +175,7 @@ public class CampUIManager : MonoBehaviour
             return;
         }
 
+        //Party management mode
         if (def == null || def.health <= 0) return;
 
         int existing = FindSlotIndex(def);
@@ -151,7 +188,7 @@ public class CampUIManager : MonoBehaviour
         else
         {
             // add to leftmost empty slot
-            int empty = System.Array.FindIndex(partyDefs, d => d == null);
+            int empty = Array.FindIndex(partyDefs, d => d == null);
             if (empty >= 0)
                 partyDefs[empty] = def;
         }
@@ -254,12 +291,16 @@ public class CampUIManager : MonoBehaviour
         transfer.SyncCampMembers(campMembers);
     }
     
-    private System.Action<MapPartyMemberDefinition> pendingItemTarget;  // NEW
+    private Action<MapPartyMemberDefinition> pendingItemTarget;  // NEW
 
+    private ItemDefinition pendingEquipItem;
+    private Action onEquipFinished;
+
+    public bool IsEquipSelectMode => pendingEquipItem != null;
     public bool IsItemTargetMode => pendingItemTarget != null;   // NEW
 
     // Begin a one-click item target selection
-    public void BeginItemTargeting(System.Action<MapPartyMemberDefinition> onChosen) // NEW
+    public void BeginItemTargeting(Action<MapPartyMemberDefinition> onChosen) // NEW
     {
         if (onChosen == null)
         {
@@ -289,6 +330,26 @@ public class CampUIManager : MonoBehaviour
             if (def == null) continue;
             entry.UpdateHealthBar(def.health, def.GetMaxHealth());
         }
+    }
+
+    void RefreshCampEquipmentIcons()
+    {
+        var entries = campGridParent.GetComponentsInChildren<CampCharacterUI>(true);
+        foreach (var entry in entries)
+        {
+            if (entry == null || entry.definition == null) continue;
+            entry.RefreshEquippedIcon();
+        }
+    }
+     public void BeginEquipTargeting(ItemDefinition item, Action onFinished = null)
+    {
+        pendingEquipItem = item;
+        onEquipFinished = onFinished;
+    }
+    public void CancelEquipTargeting()
+    {
+        pendingEquipItem = null;
+        onEquipFinished = null;
     }
    
 }

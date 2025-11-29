@@ -7,7 +7,7 @@ public class ItemDefinition : ScriptableObject
     [TextArea] public string description;
     public Sprite icon;
 
-    // Behaviors
-    public ItemConsumableInMap mapConsumable;   // used on map (camp)
-    public ItemConsumableInBattle battleConsumable; // placeholder for later
+    public ItemConsumableInMap    mapConsumable;     // already added earlier (was Map… renamed)
+    public ItemConsumableInBattle battleConsumable;  // already added earlier
+    public ItemHeldEquippable     heldEquippable;    // NEW: mark as equippable (held)
 }

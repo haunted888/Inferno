@@ -9,6 +9,7 @@ public class CampCharacterUI : MonoBehaviour,
 {
     public TMP_Text nameText;
     public Slider healthBar;
+    public Image ItemEquippedIcon;
 
     [HideInInspector] public MapPartyMemberDefinition definition;
     CampUIManager manager;
@@ -43,6 +44,8 @@ public class CampCharacterUI : MonoBehaviour,
         {
             UpdateHealthBar(definition.health, definition.GetMaxHealth());
         }
+
+        RefreshEquippedIcon();
     }
 
 
@@ -66,5 +69,36 @@ public class CampCharacterUI : MonoBehaviour,
         {
             healthBar.value = maxHealth > 0 ? (float)health / (float)maxHealth : 0f;
         }
+    }
+    public void UpdateEquippedIcon(Sprite icon)
+    {
+        if (ItemEquippedIcon != null)
+        {
+            if (icon != null)
+            {
+                ItemEquippedIcon.sprite = icon;
+                ItemEquippedIcon.gameObject.SetActive(true);
+            }
+            else
+            {
+                ItemEquippedIcon.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    public void RefreshEquippedIcon()
+    {
+        Debug.Log("Refreshing equipped icon");
+        if (definition == null) return;
+
+        Sprite icon = null;
+        var transfer = MapCombatTransfer.Instance;
+        if (transfer != null)
+        {
+            var equipped = transfer.GetEquippedItem(definition);
+            icon = equipped != null ? equipped.icon : null;
+        }
+
+        UpdateEquippedIcon(icon);
     }
 }

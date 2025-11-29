@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4540b4f6112e62048abc7574651509c2, type: 3}
-  m_Name: Test Potion
+  m_Name: AllUp
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
-  displayName: Test Potion
-  description: Testing
+  displayName: Item
+  description: 
   icon: {fileID: 21300000, guid: cb3fff705000a7640bebc8eee6860961, type: 3}
-  mapConsumable: {fileID: 11400000, guid: 2caed1907b26cd744bf9f65de24c388a, type: 2}
-  battleConsumable: {fileID: 11400000, guid: c47da8ea17531dd488cc683fa1559d04, type: 2}
-  heldEquippable: {fileID: 0}
+  mapConsumable: {fileID: 0}
+  battleConsumable: {fileID: 0}
+  heldEquippable: {fileID: 11400000, guid: 5e4d9c18bfe510a49897176a85193fd2, type: 2}

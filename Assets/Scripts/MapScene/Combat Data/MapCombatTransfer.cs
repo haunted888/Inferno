@@ -341,6 +341,67 @@ public class MapCombatTransfer : MonoBehaviour
         stack.quantity -= qty;
         if (stack.quantity <= 0) inventory.Remove(stack);
     }
+    
+    // Held-item equip state: one-to-one between member and item
+    private readonly Dictionary<MapPartyMemberDefinition, ItemDefinition> equippedByMember
+        = new Dictionary<MapPartyMemberDefinition, ItemDefinition>();
+    private readonly Dictionary<ItemDefinition, MapPartyMemberDefinition> equippedToMember
+        = new Dictionary<ItemDefinition, MapPartyMemberDefinition>();
+
+    public ItemDefinition GetEquippedItem(MapPartyMemberDefinition member)
+    {
+        if (member == null) return null;
+        equippedByMember.TryGetValue(member, out var item);
+        return item;
+    }
+    public MapPartyMemberDefinition GetItemHolder(ItemDefinition item)
+    {
+        if (item == null) return null;
+        equippedToMember.TryGetValue(item, out var who);
+        return who;
+    }
+
+    // Equip: ensure bijection, adjust inventory counts appropriately
+    public void EquipHeldItem(MapPartyMemberDefinition member, ItemDefinition item)
+    {
+        if (member == null || item == null) return;
+
+        // If item is equipped on someone else, detach from them (no inventory change)
+        if (equippedToMember.TryGetValue(item, out var previousHolder) && previousHolder != null && previousHolder != member)
+        {
+            equippedByMember.Remove(previousHolder);
+            equippedToMember[item] = member; // reassign mapping
+        }
+        else
+        {
+            // Item is not currently equipped — must consume from inventory
+            RemoveItem(item, 1); // will no-op if not present (author your data so stacks exist)
+            equippedToMember[item] = member;
+        }
+
+        // If member had a different item, return that to inventory
+        if (equippedByMember.TryGetValue(member, out var oldItem) && oldItem != null && oldItem != item)
+        {
+            equippedToMember.Remove(oldItem);
+            AddItem(oldItem, 1);
+        }
+
+        // Finalize mapping
+        equippedByMember[member] = item;
+    }
+
+    public void UnequipHeldItemFromMember(MapPartyMemberDefinition member)
+    {
+        if (member == null) return;
+        if (!equippedByMember.TryGetValue(member, out var item) || item == null) return;
+
+        // Break mapping and return to inventory
+        equippedByMember.Remove(member);
+        if (equippedToMember.TryGetValue(item, out var holder) && holder == member)
+            equippedToMember.Remove(item);
+
+        AddItem(item, 1);
+    }
 
 
 }
