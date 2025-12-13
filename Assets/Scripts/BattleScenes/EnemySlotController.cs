@@ -39,6 +39,10 @@ public class EnemySlotController : MonoBehaviour
             chr.ClearSkills();
             foreach (var s in def.GetEffectiveSkills())
                 if (s != null) chr.AddSkill(s);
+
+            chr.ClearPassives();
+            foreach (var p in def.passives)
+                if (p != null) chr.AddPassive(p);
             // Spawn health bar
             if (enemyHealthBarPrefab != null)
             {

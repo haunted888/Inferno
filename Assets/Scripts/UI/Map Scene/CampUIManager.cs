@@ -19,10 +19,10 @@ public class CampUIManager : MonoBehaviour
     public Button confirmButton;
     public Button campButton;   // assign your Camp button here
 
-
     MapPartyMemberDefinition[] partyDefs = new MapPartyMemberDefinition[4];
     PartySlotUI[] partySlots;
     
+    public StatScreenUI statScreenUI; 
 
     private List<MapPartyMemberDefinition> runtimeCampList = new List<MapPartyMemberDefinition>();
     
@@ -33,6 +33,7 @@ public class CampUIManager : MonoBehaviour
     {
         InitOnce();
         PullCampMembersFromTransfer();
+        ClickManager.OnUIObjectRightClicked.AddListener(OnUIObjectRightClicked);  // subscribe
         gameObject.SetActive(false);            // camp screen hidden at start
     }
 
@@ -83,10 +84,20 @@ public class CampUIManager : MonoBehaviour
     {
         InitOnce();
 
+        // If already open, don't rebuild/overwrite current unsaved partyDefs.
+        if (gameObject.activeSelf)
+        {
+            campButton.interactable = false;
+            if (statScreenUI != null)
+                statScreenUI.gameObject.SetActive(false);
+            return;
+        }
+
         // get current party from MapCombatTransfer
         var currentParty = MapCombatTransfer.Instance.GetParty(); // List<MapPartyMemberDefinition>
 
         // 1) Build a working list from existing campMembers
+        PullCampMembersFromTransfer();
         var campList = new List<MapPartyMemberDefinition>(campMembers);
 
         // 2) Ensure all party members are permanently in the camp list
@@ -115,18 +126,53 @@ public class CampUIManager : MonoBehaviour
         BuildCampGrid();
         RefreshPartySlots();
         RefreshConfirmInteractable();
-        
+
         campButton.interactable = false;
+        if (statScreenUI != null)
+            statScreenUI.gameObject.SetActive(false);
         gameObject.SetActive(true);
     }
 
 
 
+
     void Close()
     {
+        CancelEquipTargeting();
+        CancelItemTargeting();
         gameObject.SetActive(false);
+        if (statScreenUI != null)
+            statScreenUI.gameObject.SetActive(false);
         campButton.interactable = true;
 
+    }
+
+    // Call this before opening the CampEditorScreen.
+    public void SaveAndCloseForEditorOpen()
+    {
+        InitOnce();
+
+        // Ensure at least one member in partyDefs; if empty, pick first camp member (prefer alive)
+        bool hasAny = partyDefs != null && System.Linq.Enumerable.Any(partyDefs, d => d != null);
+        if (!hasAny)
+        {
+            var transfer = MapCombatTransfer.Instance; // source of truth for camp list 
+            var campList = transfer != null ? transfer.camp : runtimeCampList; // fallback to current runtime list 
+            MapPartyMemberDefinition pick = null;
+
+            if (campList != null && campList.Count > 0)
+                pick = campList.FirstOrDefault(c => c != null && c.health > 0) ?? campList[0];
+
+            if (pick != null)
+            {
+                if (partyDefs == null || partyDefs.Length == 0)
+                    partyDefs = new MapPartyMemberDefinition[4];
+                partyDefs[0] = pick;
+            }
+        }
+
+        // Reuse existing confirm flow to persist (updates PartyDefinition + MapCombatTransfer and closes) 
+        OnConfirm();
     }
 
     // click in camp grid
@@ -195,6 +241,16 @@ public class CampUIManager : MonoBehaviour
 
         RefreshPartySlots();
         RefreshConfirmInteractable();
+    }
+
+    // right-click in camp grid
+    public void OnCampCharacterRightClicked(MapPartyMemberDefinition def)
+    {
+        if (statScreenUI != null)
+        {
+            statScreenUI.gameObject.SetActive(true);
+            statScreenUI.UpdateStats(def.stats);
+        }
     }
 
     // drag onto party slot
@@ -351,5 +407,24 @@ public class CampUIManager : MonoBehaviour
         pendingEquipItem = null;
         onEquipFinished = null;
     }
-   
+    
+    private void OnUIObjectRightClicked(GameObject uiObject)
+    {
+        // If in equip mode, cancel it on any UI click
+        if (IsEquipSelectMode)
+        {
+            CancelEquipTargeting();
+        }
+
+        // If in item-target mode, cancel it on any UI click
+        if (IsItemTargetMode)
+        {
+            CancelItemTargeting();
+        }
+    }
+
+    void OnDestroy()
+    {
+        ClickManager.OnUIObjectRightClicked.RemoveListener(OnUIObjectRightClicked);  // unsubscribe
+    }
 }

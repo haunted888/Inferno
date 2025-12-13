@@ -36,6 +36,8 @@ public class MapEnemyDefinition
     [HideInInspector] public bool initializedFromAssetStats  = false;
     [HideInInspector] public bool initializedFromAssetSkills = false;
 
+    public PassivesDefinition[] passives; // optional; can be empty
+
     public void EnsureInitializedFromAsset()
     {
         if (characterAsset == null)

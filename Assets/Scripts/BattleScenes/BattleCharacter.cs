@@ -32,6 +32,10 @@ public class BattleCharacter : MonoBehaviour
     [SerializeField] private int critDamage = 150;   // percent multiplier
     
 
+    public List<PassivesDefinition> passives
+    = new List<PassivesDefinition>();
+
+
     public int Speed                => speed;
     public int PhysicalAttack       => physicalAttack;
     public int ElementalPower       => elementalPower;
@@ -94,6 +98,7 @@ public class BattleCharacter : MonoBehaviour
 
     void Awake()
     {
+        
         // Initialize current health at full
         currentHealth = Mathf.Max(1, maxHealth);
 
@@ -183,6 +188,12 @@ public class BattleCharacter : MonoBehaviour
         }
 
         skill.Execute(this, target);
+    }
+
+    public void ClearPassives() => passives.Clear();
+    public void AddPassive(PassivesDefinition p)
+    {
+        if (p != null) passives.Add(p);
     }
 
     public void ClearSkills() => skills.Clear();

@@ -127,6 +127,9 @@ public class BattleTurnManager : MonoBehaviour
     {
         playerParty = playerPartyParent.GetComponentsInChildren<BattleCharacter>(false).ToList();
         enemyParty  = enemyPartyParent.GetComponentsInChildren<BattleCharacter>(false).ToList();
+
+        Trigger_BattleStart();
+
         StartCoroutine(TurnLoop());
     }
 
@@ -161,6 +164,7 @@ public class BattleTurnManager : MonoBehaviour
 
     private IEnumerator CommandSelectionPhase()
     {
+        Trigger_CommandPhaseStart();
         while (currentPlayerIndex < playerParty.Count)
         {
             BattleCharacter chr = playerParty[currentPlayerIndex];
@@ -295,6 +299,7 @@ public class BattleTurnManager : MonoBehaviour
 
     private IEnumerator ActionResolutionPhase()
     {
+        Trigger_ResolvePhaseStart();
         var actions = EnumerateQueuedActions()
             .OrderByDescending(a => a.user.Speed)
             .ThenBy(_ => Random.value)
@@ -572,6 +577,12 @@ public class BattleTurnManager : MonoBehaviour
 
     public void RegisterDamage(BattleCharacter source, BattleCharacter target, int amount)
     {
+        if (source != null)
+            foreach (var p in source.passives) p.OnAfterDealDamage(source, target, amount);
+
+        if (target != null)
+            foreach (var p in target.passives) p.OnAfterTakeDamage(target, source, amount);
+            
         if (source == null || amount <= 0) return;
         if (playerParty.Contains(source))
             source.AddThreat(amount);
@@ -699,4 +710,26 @@ public class BattleTurnManager : MonoBehaviour
             (list[i], list[j]) = (list[j], list[i]);
         }
     }
+
+    void ForEachCombatant(System.Action<BattleCharacter> action)
+    {
+        if (playerParty != null) foreach (var c in playerParty) { if (c != null) action(c); }
+        if (enemyParty  != null) foreach (var c in enemyParty)  { if (c != null) action(c); }
+    }
+
+    void Trigger_BattleStart()
+    {
+        ForEachCombatant(c => { foreach (var p in c.passives) p.OnBattleStart(c); });
+    }
+
+    void Trigger_CommandPhaseStart()
+    {
+        ForEachCombatant(c => { foreach (var p in c.passives) p.OnCommandPhaseStart(c); });
+    }
+
+    void Trigger_ResolvePhaseStart()
+    {
+        ForEachCombatant(c => { foreach (var p in c.passives) p.OnResolvePhaseStart(c); });
+    }
+
 }

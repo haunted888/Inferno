@@ -240,7 +240,7 @@ public class MapCombatTransfer : MonoBehaviour
 
         starterChoiceCompleted = false;
     }
-        public void SetPendingRewards(IEnumerable<MapRewardDefinition> rewards)
+    public void SetPendingRewards(IEnumerable<MapRewardDefinition> rewards)
     {
         pendingRewards.Clear();
         if (rewards == null) return;
@@ -317,13 +317,16 @@ public class MapCombatTransfer : MonoBehaviour
     {
         if (def == null) return;
 
+        
+        Debug.Log($"Camp member {def.displayName} has health {def.health}");
         // Initialize from asset only the first time this definition enters the camp
         def.EnsureInitializedFromAsset();
+        def.InitializeTalentPointsIfFresh(5); // default 5 talent points
 
         // If current HP has never been set, start at full
         if (def.health < 0)
             def.health = def.GetMaxHealth();
-        Debug.Log($"Added camp member {def.displayName} with health {def.health}");
+
         // If current SP has never been set, start at full
         if (def.sp < 0)
             def.sp = def.GetMaxSp();
@@ -339,7 +342,7 @@ public class MapCombatTransfer : MonoBehaviour
         var stack = inventory.Find(s => s.item == item);
         if (stack == null) return;
         stack.quantity -= qty;
-        if (stack.quantity <= 0) inventory.Remove(stack);
+        if (stack.quantity <= 0) stack.quantity = 0;
     }
     
     // Held-item equip state: one-to-one between member and item
@@ -357,37 +360,50 @@ public class MapCombatTransfer : MonoBehaviour
     public MapPartyMemberDefinition GetItemHolder(ItemDefinition item)
     {
         if (item == null) return null;
-        equippedToMember.TryGetValue(item, out var who);
-        return who;
+        equippedToMember.TryGetValue(item, out var holder);
+        return holder;
     }
 
-    // Equip: ensure bijection, adjust inventory counts appropriately
     public void EquipHeldItem(MapPartyMemberDefinition member, ItemDefinition item)
     {
         if (member == null || item == null) return;
+        var held = item.heldEquippable;
+        if (held == null) return;
 
-        // If item is equipped on someone else, detach from them (no inventory change)
+        // If this item is already equipped on someone else, unequip from them (stat removal, no inventory change)
         if (equippedToMember.TryGetValue(item, out var previousHolder) && previousHolder != null && previousHolder != member)
         {
-            equippedByMember.Remove(previousHolder);
-            equippedToMember[item] = member; // reassign mapping
-        }
-        else
-        {
-            // Item is not currently equipped — must consume from inventory
-            RemoveItem(item, 1); // will no-op if not present (author your data so stacks exist)
-            equippedToMember[item] = member;
+            var prevItem = GetEquippedItem(previousHolder);
+            if (prevItem == item)
+            {
+                equippedByMember.Remove(previousHolder);
+                equippedToMember.Remove(item);
+                prevItem.heldEquippable?.OnUnequip(previousHolder);
+            }
         }
 
-        // If member had a different item, return that to inventory
+        // If the member already has a *different* item, unequip that and return it to inventory
         if (equippedByMember.TryGetValue(member, out var oldItem) && oldItem != null && oldItem != item)
         {
+            equippedByMember.Remove(member);
             equippedToMember.Remove(oldItem);
-            AddItem(oldItem, 1);
+
+            oldItem.heldEquippable?.OnUnequip(member);
+            AddItem(oldItem, 1);   // return previous item to inventory
         }
 
-        // Finalize mapping
+        // If this item is not currently equipped on anyone (no previousHolder),
+        // consume one from inventory for equipping
+        var currentHolder = GetItemHolder(item);
+        if (currentHolder == null)
+        {
+            RemoveItem(item, 1);   // you’ve already changed this to clamp at 0, not remove
+        }
+
+        // Final mapping + stat apply
         equippedByMember[member] = item;
+        equippedToMember[item]   = member;
+        held.OnEquip(member);
     }
 
     public void UnequipHeldItemFromMember(MapPartyMemberDefinition member)
@@ -395,13 +411,14 @@ public class MapCombatTransfer : MonoBehaviour
         if (member == null) return;
         if (!equippedByMember.TryGetValue(member, out var item) || item == null) return;
 
-        // Break mapping and return to inventory
         equippedByMember.Remove(member);
         if (equippedToMember.TryGetValue(item, out var holder) && holder == member)
             equippedToMember.Remove(item);
 
+        // Stat removal
+        item.heldEquippable?.OnUnequip(member);
+
+        // Return one copy to inventory
         AddItem(item, 1);
     }
-
-
 }

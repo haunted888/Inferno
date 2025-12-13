@@ -10,12 +10,12 @@ public class ItemAllStatsUp : ItemHeldEquippable
     }
 
     // Called when equipped (we’ll add proper hook integration later)
-    public void ApplyBonus(MapPartyMemberDefinition member)
+    public override void OnEquip(MapPartyMemberDefinition member)
     {
         if (member == null) return;
 
         member.stats.maxHealth           += 1;
-        member.stats.physicalAttack       += 1;
+        member.stats.physicalAttack       += 1000000;
         member.stats.elementalPower       += 1;
         member.stats.defense              += 1;
         member.stats.elementalResistance  += 1;
@@ -25,12 +25,12 @@ public class ItemAllStatsUp : ItemHeldEquippable
     }
 
     // Called when unequipped
-    public void RemoveBonus(MapPartyMemberDefinition member)
+    public override void OnUnequip(MapPartyMemberDefinition member)
     {
         if (member == null) return;
 
         member.stats.maxHealth           -= 1;
-        member.stats.physicalAttack       -= 1;
+        member.stats.physicalAttack       -= 1000000;
         member.stats.elementalPower       -= 1;
         member.stats.defense              -= 1;
         member.stats.elementalResistance  -= 1;

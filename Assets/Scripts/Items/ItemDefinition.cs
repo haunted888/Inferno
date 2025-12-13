@@ -1,9 +1,19 @@
 using UnityEngine;
 
+public enum ItemType
+{
+    Equippable,
+    Consumable,
+    Battle,
+    Scroll,
+    KeyItem
+}
+
 [CreateAssetMenu(menuName = "Items/Item Definition")]
 public class ItemDefinition : ScriptableObject
 {
     public string displayName = "Item";
+    public ItemType[] itemTypes;
     [TextArea] public string description;
     public Sprite icon;
 

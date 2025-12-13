@@ -5,7 +5,6 @@ using TMPro;
 
 public class InventoryUI : MonoBehaviour
 {
-    [Header("Wiring")]
     public GameObject panelRoot;        // set inactive by default
     public Toggle openToggle;           // toggle inventory open/closed
     public Button closeButton;          // still supported
@@ -44,6 +43,11 @@ public class InventoryUI : MonoBehaviour
     public void Close()
     {
         // Close via button should ALSO toggle the toggle OFF
+        if (campUIManager != null)
+        {
+            campUIManager.CancelEquipTargeting();
+            campUIManager.CancelItemTargeting();
+        }
         if (openToggle != null) openToggle.isOn = false;
         SetPanelActive(false);
     }
@@ -72,7 +76,7 @@ public class InventoryUI : MonoBehaviour
 
         foreach (var stack in items)
         {
-            if (stack == null || stack.item == null || stack.quantity <= 0) continue;
+            if (stack == null || stack.item == null) continue;
             var row = Instantiate(itemEntryPrefab, contentParent);
             var entry = row.GetComponent<InventoryItemEntry>();
             if (entry != null) entry.Set(stack.item, stack.quantity, OnItemClicked);
@@ -93,15 +97,15 @@ public class InventoryUI : MonoBehaviour
         if (item.mapConsumable != null)
             item.mapConsumable.BeginUseOnMap(item, this);
         if (item.heldEquippable != null)
-    {
-        
-        campUIManager.BeginEquipTargeting(item, onFinished: () =>
         {
-            // After equip/unequip/move, refresh inventory counts
-            Refresh();
-        });
-        return;
-    }
+            
+            campUIManager.BeginEquipTargeting(item, onFinished: () =>
+            {
+                // After equip/unequip/move, refresh inventory counts
+                Refresh();
+            });
+            return;
+        }
     }
 
 }

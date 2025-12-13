@@ -44,14 +44,22 @@ public class CampCharacterUI : MonoBehaviour,
         {
             UpdateHealthBar(definition.health, definition.GetMaxHealth());
         }
-
+        if (ItemEquippedIcon != null)
+        {
+            RectTransform rt = ItemEquippedIcon.GetComponent<RectTransform>();
+            Vector2 cellSize = manager != null ? manager.campGridParent.GetComponent<GridLayoutGroup>().cellSize : new Vector2(64, 64);
+            rt.sizeDelta = cellSize * 0.3f;
+            rt.anchoredPosition = new Vector2(- rt.sizeDelta.x / 2f, rt.sizeDelta.y / 2f);
+            ItemEquippedIcon.gameObject.SetActive(false);
+        }
         RefreshEquippedIcon();
     }
 
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        manager.OnCampCharacterClicked(definition);
+        if(eventData.button == PointerEventData.InputButton.Left) manager.OnCampCharacterClicked(definition);
+        if(eventData.button == PointerEventData.InputButton.Right) manager.OnCampCharacterRightClicked(definition);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -88,7 +96,6 @@ public class CampCharacterUI : MonoBehaviour,
 
     public void RefreshEquippedIcon()
     {
-        Debug.Log("Refreshing equipped icon");
         if (definition == null) return;
 
         Sprite icon = null;

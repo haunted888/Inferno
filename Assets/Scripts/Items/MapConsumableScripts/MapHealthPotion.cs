@@ -27,5 +27,18 @@ public class HealthPotionMap : ItemConsumableInMap
             invUI.Refresh();
         });
     }
+    public override void UseInCamp(ItemDefinition item, MapPartyMemberDefinition member)
+    {
+        if (member == null) return;
+            
+        if (member.health <= 0) return; // can't heal dead
+        if (member.health >= member.GetMaxHealth()) return; // already full
+        
+        // Full heal
+        member.health = member.GetMaxHealth();
+
+        // Consume 1 from inventory
+        MapCombatTransfer.Instance.RemoveItem(item, 1);
+    }
 
 }

@@ -17,7 +17,7 @@ MonoBehaviour:
     maxHealth: 20
     maxSp: 10
     speed: 10
-    physicalAttack: 20
+    physicalAttack: 1
     elementalPower: 20
     defense: 20
     elementalResistance: 20

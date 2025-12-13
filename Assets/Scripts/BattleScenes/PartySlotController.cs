@@ -38,6 +38,10 @@ public class PartySlotController : MonoBehaviour
             chr.SetMaxSp(maxSp, fillToMax: false);
             chr.SetSp(currentSp);
 
+            chr.ClearPassives();
+            foreach (var p in def.passives)
+                if (p != null) chr.AddPassive(p);
+
             chr.ClearSkills();
             foreach (var s in def.GetEffectiveSkills())
                 if (s != null) chr.AddSkill(s);
