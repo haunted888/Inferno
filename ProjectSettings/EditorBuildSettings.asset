@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Limbo Battle.unity
     guid: 961fb333840ee9746b7214caa889a15a
+  - enabled: 1
+    path: Assets/Scenes/Start Screen.unity
+    guid: 844d4191087da4a4f930648a3c9d58d0
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}
   m_UseUCBPForAssetBundles: 0
