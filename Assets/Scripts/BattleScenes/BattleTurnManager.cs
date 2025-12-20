@@ -328,6 +328,18 @@ public class BattleTurnManager : MonoBehaviour
                         effectiveTarget == null)
                         break;
 
+                    // Apply passive effects
+                    if (action.user.passives != null)
+                    {
+                        for (int i = 0; i < action.user.passives.Count; i++)
+                        {
+                            var p = action.user.passives[i];
+                            if (p == null) continue;
+                            p.OnSkillUsed(action.user, action.skill);
+                            Debug.Log(p.name);
+                        }
+                    }
+
                     // Players spend SP via UseSkill; enemies ignore SP
                     if (playerParty.Contains(action.user))
                         action.user.UseSkill(action.skillIndex, effectiveTarget);
@@ -732,28 +744,11 @@ public class BattleTurnManager : MonoBehaviour
     {
         ForEachCombatant(c => { foreach (var p in c.passives) p.OnResolvePhaseStart(c); });
 
-        var Actions = EnumerateQueuedActions().ToList();
-        foreach (var a in Actions)
-        {
-            if (a.user == null) continue;
-            foreach (var t in a.user.Traits)
-            {
-                t.onActionResolveStart(a.user, a.skill, a.target);
-            }
-        }
     }
 
     void Trigger_ResolvePhaseEnd()
     {
-        var Actions = EnumerateQueuedActions().ToList();
-        foreach (var a in Actions)
-        {
-            if (a.user == null) continue;
-            foreach (var t in a.user.Traits)
-            {
-                t.onActionResolveStart(a.user, a.skill, a.target);
-            }
-        }
+        return;
     }
 
 }

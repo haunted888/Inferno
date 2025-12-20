@@ -47,6 +47,7 @@ public class DamageSkill : Skill
     DamageSubType subType)
     {
         CombatStats userStats = user.GetEffectiveStats();
+        Debug.Log(userStats.defense);
         CombatStats targetStats = target.GetEffectiveStats();
         // Base offense/defense (physical or elemental)
         int baseOff = (type == SkillDamageType.Physical)

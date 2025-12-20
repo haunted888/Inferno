@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24c0b65711f6e50498f300e10158209a, type: 3}
   m_Name: Fighter Test
   m_EditorClassIdentifier: Assembly-CSharp::FighterTraitDefinition
-  traitName: 
+  traitName: Fighter
   description: 
   traitType: 4
-  elementalResistanceBonus: 0.3
-  physicalDefenseBonus: 0.3
+  defensePassive: {fileID: 11400000, guid: ca9f3fbcccf49e54b8a3a761458b9557, type: 2}
+  defenseBonusPercent: 0.3
+  elementalResistanceBonusPercent: 0.3

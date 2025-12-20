@@ -141,6 +141,10 @@ public class BattleCharacter : MonoBehaviour
     {
         if (p != null) passives.Add(p);
     }
+    public void RemovePassive(PassivesDefinition p)
+    {
+        if (p != null) passives.Remove(p);
+    }
 
     public void ClearSkills() => skills.Clear();
     public void AddSkill(Skill s)
@@ -165,7 +169,13 @@ public class BattleCharacter : MonoBehaviour
 
     public CombatStats GetEffectiveStats()
     {
-        Debug.Log("Bonus defense GetEffectiveStats" + bonusStats.defense);
+        bonusStats = new CombatStats();
+        foreach (var p in passives)
+        {
+            if (p == null) continue;
+            p.getStatBoosts(this);
+        }
+        Debug.Log(bonusStats.defense);
         CombatStats result = new CombatStats();
         result.maxHealth      = baseStats.maxHealth      + bonusStats.maxHealth;
         result.maxSp          = baseStats.maxSp          + bonusStats.maxSp;

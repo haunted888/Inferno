@@ -29,15 +29,4 @@ public abstract class TraitDefinition : ScriptableObject
         ref int damage)
     { }
 
-    public virtual void onActionResolveStart(
-        BattleCharacter user,
-        Skill skill,
-        BattleCharacter target)
-    { }
-
-    public virtual void OnActionResolveEnd(
-        BattleCharacter user,
-        Skill skill,
-        BattleCharacter target)
-    { }
 }
