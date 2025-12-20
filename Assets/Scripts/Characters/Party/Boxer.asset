@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Boxer
   m_EditorClassIdentifier: Assembly-CSharp::CharacterTemplate
   displayName: Boxer
+  traits:
+  - {fileID: 11400000, guid: 2a16b74eacbb580499fe9930d904a7ec, type: 2}
   baseStats:
     maxHealth: 30
     maxSp: 10

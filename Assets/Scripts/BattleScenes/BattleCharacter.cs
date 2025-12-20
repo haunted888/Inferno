@@ -1,11 +1,15 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
+using System.Xml.XPath;
 
 public class BattleCharacter : MonoBehaviour
 {
     [Min(1)]
     public int slotSize = 1;   // how many slots this character “occupies”
 
+
+    //NOTE: Check later to see if these need to be serialized
     [Header("Health")]
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private int currentHealth;
@@ -20,81 +24,20 @@ public class BattleCharacter : MonoBehaviour
 
     public int MaxSp => maxSp;
     public int CurrentSp => currentSp;
-
-
-    [Header("Stats")]
-    [SerializeField] private int speed = 10;
-    [SerializeField] private int physicalAttack = 100;
-    [SerializeField] private int elementalPower = 100;
-    [SerializeField] private int defense = 0;
-    [SerializeField] private int elementalResistance = 0;
-    [SerializeField] private int critChance = 5;     // percent
-    [SerializeField] private int critDamage = 150;   // percent multiplier
     
 
     public List<PassivesDefinition> passives
     = new List<PassivesDefinition>();
 
 
-    public int Speed                => speed;
-    public int PhysicalAttack       => physicalAttack;
-    public int ElementalPower       => elementalPower;
-    public int Defense              => defense;
-    public int ElementalResistance  => elementalResistance;
-    public int CritChance           => critChance;
-    public int CritDamage           => critDamage;
+    [NonSerialized] public CombatStats baseStats = new CombatStats();
 
-
-    [Header("Physical Sub-Attack")]
-    [SerializeField] private int bludgeoningAttack;
-    [SerializeField] private int slashingAttack;
-    [SerializeField] private int piercingAttack;
-
-    [Header("Physical Sub-Defense")]
-    [SerializeField] private int bludgeoningDefense;
-    [SerializeField] private int slashingDefense;
-    [SerializeField] private int piercingDefense;
-
-    [Header("Elemental Sub-Attack")]
-    [SerializeField] private int fireAttack;
-    [SerializeField] private int iceAttack;
-    [SerializeField] private int stormAttack;
-    [SerializeField] private int acidAttack;
-    [SerializeField] private int psychicAttack;
-    [SerializeField] private int bloodAttack;
-
-    [Header("Elemental Sub-Defense")]
-    [SerializeField] private int fireDefense;
-    [SerializeField] private int iceDefense;
-    [SerializeField] private int stormDefense;
-    [SerializeField] private int acidDefense;
-    [SerializeField] private int psychicDefense;
-    [SerializeField] private int bloodDefense;
-
-    // Optional read-only accessors if you want:
-    public int BludgeoningAttack => bludgeoningAttack;
-    public int SlashingAttack    => slashingAttack;
-    public int PiercingAttack    => piercingAttack;
-    
-    public int BludgeoningDefense => bludgeoningDefense;
-    public int SlashingDefense    => slashingDefense;
-    public int PiercingDefense    => piercingDefense;
-
-    public int FireAttack        => fireAttack;
-    public int IceAttack         => iceAttack;
-    public int StormAttack       => stormAttack;
-    public int AcidAttack        => acidAttack;
-    public int PsychicAttack     => psychicAttack;
-    public int BloodAttack       => bloodAttack;
-
-    public int FireDefense        => fireDefense;
-    public int IceDefense         => iceDefense;
-    public int StormDefense       => stormDefense;
-    public int AcidDefense        => acidDefense;
-    public int PsychicDefense     => psychicDefense;
-    public int BloodDefense       => bloodDefense;
+    [NonSerialized] public CombatStats bonusStats = new CombatStats();
 
     public MapPartyMemberDefinition sourceDefinition;  // null for enemies created from MapEnemyDefinition
+
+    public List<TraitDefinition> Traits { get; } = new List<TraitDefinition>();
+    public List<CharacterTrait> traitTypes = new List<CharacterTrait>();
 
     void Awake()
     {
@@ -187,6 +130,9 @@ public class BattleCharacter : MonoBehaviour
             return;
         }
 
+        // Trait tests
+        if(!HasEnoughAmmoFor(skill)) return;
+
         skill.Execute(this, target);
     }
 
@@ -202,74 +148,84 @@ public class BattleCharacter : MonoBehaviour
         if (s != null) skills.Add(s);
     }
 
-    public void SetStats(
-        int currentHp,
-        int spd,
-        int physAtk,
-        int elemPower,
-        int def,
-        int elemRes,
-        int critChance,
-        int critDamage)
-    {
-        currentHealth       = Mathf.Clamp(currentHp, 0, maxHealth);
-        speed               = Mathf.Max(1, spd);
-        physicalAttack      = Mathf.Max(0, physAtk);
-        elementalPower      = Mathf.Max(0, elemPower);
-        defense             = Mathf.Max(0, def);
-        elementalResistance = Mathf.Max(0, elemRes);
-        this.critChance     = Mathf.Max(0, critChance);
-        this.critDamage     = Mathf.Max(0, critDamage);
+    public void ClearTraits() { 
+        Traits.Clear(); 
+        traitTypes.Clear();    
     }
+
+    
     public void ApplyStats(CombatStats stats, int currentHp)
     {
+        baseStats = stats;
         SetMaxHealth(stats.maxHealth, fillToMax: false);
 
         currentHealth       = Mathf.Clamp(currentHp, 0, maxHealth);
-        speed               = Mathf.Max(1, stats.speed);
-        physicalAttack      = Mathf.Max(0, stats.physicalAttack);
-        elementalPower      = Mathf.Max(0, stats.elementalPower);
-        defense             = Mathf.Max(0, stats.defense);
-        elementalResistance = Mathf.Max(0, stats.elementalResistance);
-        critChance          = Mathf.Max(0, stats.critChance);
-        critDamage          = Mathf.Max(0, stats.critDamage);
-        bludgeoningAttack   = Mathf.Max(0, stats.bludgeoningAttack);
-        slashingAttack      = Mathf.Max(0, stats.slashingAttack);
-        piercingAttack      = Mathf.Max(0, stats.piercingAttack);
-        bludgeoningDefense  = Mathf.Max(0, stats.bludgeoningDefense);
-        slashingDefense     = Mathf.Max(0, stats.slashingDefense);
-        piercingDefense     = Mathf.Max(0, stats.piercingDefense);
-        fireAttack          = Mathf.Max(0, stats.fireAttack);
-        iceAttack           = Mathf.Max(0, stats.iceAttack);
-        stormAttack         = Mathf.Max(0, stats.stormAttack);
-        acidAttack          = Mathf.Max(0, stats.acidAttack);
-        psychicAttack       = Mathf.Max(0, stats.psychicAttack);
-        bloodAttack         = Mathf.Max(0, stats.bloodAttack);
-        fireDefense         = Mathf.Max(0, stats.fireDefense);
-        iceDefense          = Mathf.Max(0, stats.iceDefense);
-        stormDefense        = Mathf.Max(0, stats.stormDefense);
-        acidDefense         = Mathf.Max(0, stats.acidDefense);
-        psychicDefense      = Mathf.Max(0, stats.psychicDefense);
-        bloodDefense        = Mathf.Max(0, stats.bloodDefense);
+        bonusStats = new CombatStats();
     }
+
+    public CombatStats GetEffectiveStats()
+    {
+        Debug.Log("Bonus defense GetEffectiveStats" + bonusStats.defense);
+        CombatStats result = new CombatStats();
+        result.maxHealth      = baseStats.maxHealth      + bonusStats.maxHealth;
+        result.maxSp          = baseStats.maxSp          + bonusStats.maxSp;
+        result.physicalAttack = baseStats.physicalAttack + bonusStats.physicalAttack;
+        result.elementalPower = baseStats.elementalPower + bonusStats.elementalPower;
+        result.defense        = baseStats.defense        + bonusStats.defense;
+        result.elementalResistance = baseStats.elementalResistance + bonusStats.elementalResistance;
+        result.speed          = baseStats.speed          + bonusStats.speed;
+        result.critChance     = baseStats.critChance     + bonusStats.critChance;
+        result.critDamage = baseStats.critDamage + bonusStats.critDamage;
+
+        result.piercingAttack = baseStats.piercingAttack + bonusStats.piercingAttack;
+        result.bludgeoningAttack = baseStats.bludgeoningAttack + bonusStats.bludgeoningAttack;
+        result.slashingAttack = baseStats.slashingAttack + bonusStats.slashingAttack;
+
+        result.fireAttack = baseStats.fireAttack + bonusStats.fireAttack;
+        result.iceAttack  = baseStats.iceAttack  + bonusStats.iceAttack;
+        result.stormAttack  = baseStats.stormAttack  + bonusStats.stormAttack;
+        result.acidAttack   = baseStats.acidAttack   + bonusStats.acidAttack;
+        result.psychicAttack = baseStats.psychicAttack + bonusStats.psychicAttack;
+        result.bloodAttack    = baseStats.bloodAttack    + bonusStats.bloodAttack;
+
+        result.piercingDefense = baseStats.piercingDefense + bonusStats.piercingDefense;
+        result.bludgeoningDefense = baseStats.bludgeoningDefense + bonusStats.bludgeoningDefense;
+        result.slashingDefense  = baseStats.slashingDefense  + bonusStats.slashingDefense;
+
+        result.fireDefense  = baseStats.fireDefense  + bonusStats.fireDefense;
+        result.iceDefense   = baseStats.iceDefense   + bonusStats.iceDefense;
+        result.stormDefense = baseStats.stormDefense + bonusStats.stormDefense;
+        result.acidDefense    = baseStats.acidDefense    + bonusStats.acidDefense;
+        result.psychicDefense = baseStats.psychicDefense + bonusStats.psychicDefense;
+        result.bloodDefense     = baseStats.bloodDefense     + bonusStats.bloodDefense;
+
+        return result;
+    }
+
     public void setName(string newName)
     {
         this.name = newName;
     }
+
+    public int getSpeed()
+    {
+        return baseStats.speed + bonusStats.speed;
+    }
+
     public int GetSubAttack(DamageSubType subType)
     {
         switch (subType)
         {
-            case DamageSubType.Bludgeoning: return bludgeoningAttack;
-            case DamageSubType.Slashing:    return slashingAttack;
-            case DamageSubType.Piercing:    return piercingAttack;
+            case DamageSubType.Bludgeoning: return baseStats.bludgeoningAttack + bonusStats.bludgeoningAttack;
+            case DamageSubType.Slashing:    return baseStats.slashingAttack + bonusStats.slashingAttack;
+            case DamageSubType.Piercing:    return baseStats.piercingAttack + bonusStats.piercingAttack;
 
-            case DamageSubType.Fire:        return fireAttack;
-            case DamageSubType.Ice:         return iceAttack;
-            case DamageSubType.Storm:       return stormAttack;
-            case DamageSubType.Acid:        return acidAttack;
-            case DamageSubType.Psychic:     return psychicAttack;
-            case DamageSubType.Blood:       return bloodAttack;
+            case DamageSubType.Fire:        return baseStats.fireAttack + bonusStats.fireAttack;
+            case DamageSubType.Ice:         return baseStats.iceAttack + bonusStats.iceAttack;
+            case DamageSubType.Storm:       return baseStats.stormAttack + bonusStats.stormAttack;
+            case DamageSubType.Acid:        return baseStats.acidAttack + bonusStats.acidAttack;
+            case DamageSubType.Psychic:     return baseStats.psychicAttack + bonusStats.psychicAttack;
+            case DamageSubType.Blood:       return baseStats.bloodAttack + bonusStats.bloodAttack;
 
             default: return 0;
         }
@@ -279,16 +235,16 @@ public class BattleCharacter : MonoBehaviour
     {
         switch (subType)
         {
-            case DamageSubType.Bludgeoning: return bludgeoningDefense;
-            case DamageSubType.Slashing:    return slashingDefense;
-            case DamageSubType.Piercing:    return piercingDefense;
+            case DamageSubType.Bludgeoning: return baseStats.bludgeoningDefense + bonusStats.bludgeoningDefense;
+            case DamageSubType.Slashing:    return baseStats.slashingDefense + bonusStats.slashingDefense;
+            case DamageSubType.Piercing:    return baseStats.piercingDefense + bonusStats.piercingDefense;
 
-            case DamageSubType.Fire:        return fireDefense;
-            case DamageSubType.Ice:         return iceDefense;
-            case DamageSubType.Storm:       return stormDefense;
-            case DamageSubType.Acid:        return acidDefense;
-            case DamageSubType.Psychic:     return psychicDefense;
-            case DamageSubType.Blood:       return bloodDefense;
+            case DamageSubType.Fire:        return baseStats.fireDefense + bonusStats.fireDefense;
+            case DamageSubType.Ice:         return baseStats.iceDefense + bonusStats.iceDefense;
+            case DamageSubType.Storm:       return baseStats.stormDefense + bonusStats.stormDefense;
+            case DamageSubType.Acid:        return baseStats.acidDefense + bonusStats.acidDefense;
+            case DamageSubType.Psychic:     return baseStats.psychicDefense + bonusStats.psychicDefense;
+            case DamageSubType.Blood:       return baseStats.bloodDefense + bonusStats.bloodDefense;
 
             default: return 0;
         }
@@ -318,5 +274,63 @@ public class BattleCharacter : MonoBehaviour
         return true;
     }
 
+    
+    //TRAITS
+    
+    // Called by skills to run trait hooks
+    public int ApplyTraitDamageModifiers(Skill skill, BattleCharacter target, int baseDamage)
+    {
+        int damage = baseDamage;
+        if (Traits != null)
+        {
+            for (int i = 0; i < Traits.Count; i++)
+            {
+                var t = Traits[i];
+                if (t == null) continue;
+                t.OnModifySkillDamage(this, skill, target, ref damage);
+            }
+        }
+        return damage;
+    }
+
+    
+    // Marksman ammo
+    public int ConstantMaxAmmo { get; set; }   // “design” max used for % cost
+    public int MaxAmmo         { get; set; }
+    public int CurrentAmmo     { get; private set; }
+
+    public void SetAmmo(int max, int current, int constantMax)
+    {
+        ConstantMaxAmmo = Mathf.Max(0, constantMax);
+        MaxAmmo         = Mathf.Max(0, max);
+        CurrentAmmo     = Mathf.Clamp(current, 0, MaxAmmo);
+    }
+
+    public void SpendAmmo(int amount)
+    {
+        if (amount <= 0) return;
+        CurrentAmmo = Mathf.Max(0, CurrentAmmo - amount);
+    }
+    
+    public bool HasEnoughAmmoFor(Skill skill)
+    {
+        if (skill == null) return true;
+
+        if (traitTypes.Contains(CharacterTrait.Marksman) == false)
+            return true;
+
+        // If the skill has no ammo requirement, it's always usable.
+        if (skill.ammoCost <= 0f)
+            return true;
+
+        if (ConstantMaxAmmo <= 0)
+            return false;
+
+        // Required ammo = ceil(percent * constantMaxAmmo)
+        float percent = Mathf.Clamp01(skill.ammoCost);
+        int needed = Mathf.CeilToInt(percent * ConstantMaxAmmo);
+
+        return CurrentAmmo >= needed;
+    }
 
 }

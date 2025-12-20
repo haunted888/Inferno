@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: Thief
   m_EditorClassIdentifier: Assembly-CSharp::CharacterTemplate
   displayName: Thief
+  traits:
+  - {fileID: 0}
+  - {fileID: 0}
   baseStats:
     maxHealth: 15
     maxSp: 10

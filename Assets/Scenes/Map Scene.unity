@@ -12868,8 +12868,10 @@ MonoBehaviour:
     characterPrefab: {fileID: 4799697552140676651, guid: 0dba49ad358f4ec4c936d4c17c01a903, type: 3}
     displayName: Soldier
     characterAsset: {fileID: 11400000, guid: 7f16c618bd9bee143a4232d19431f3b1, type: 2}
+    overrideTraits: 0
     overrideStats: 0
     overrideSkills: 0
+    traits: []
     stats:
       maxHealth: 100
       maxSp: 10
@@ -12907,8 +12909,10 @@ MonoBehaviour:
     characterPrefab: {fileID: 5127181298365848242, guid: e392b95a1ef160f4fbae2c4f896a4f65, type: 3}
     displayName: Thief
     characterAsset: {fileID: 11400000, guid: 00eecafd525129e42b0bda91abd494ef, type: 2}
+    overrideTraits: 0
     overrideStats: 0
     overrideSkills: 0
+    traits: []
     stats:
       maxHealth: 100
       maxSp: 10
@@ -12946,8 +12950,10 @@ MonoBehaviour:
     characterPrefab: {fileID: 4494123611944530687, guid: 363e86cd7d6abe040b6cfbe14da0adf8, type: 3}
     displayName: Boxer
     characterAsset: {fileID: 11400000, guid: cfaede81f10351842beb43d7ab443494, type: 2}
+    overrideTraits: 0
     overrideStats: 0
     overrideSkills: 0
+    traits: []
     stats:
       maxHealth: 100
       maxSp: 10
@@ -15765,7 +15771,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.7833315}
+  m_AnchoredPosition: {x: 0, y: 0.00038735475}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2078211892
@@ -15911,7 +15917,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 277122056}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.8951461
+  m_Size: 0.99919474
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -16883,6 +16889,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: c5a87f31f7dec4f409ba0877ecdc9a8b, type: 2}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
+      propertyPath: enemies.Array.data[1].characterAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: c5a87f31f7dec4f409ba0877ecdc9a8b, type: 2}
+    - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: enemies.Array.data[0].skills.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -16909,7 +16919,7 @@ PrefabInstance:
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: 'enemies.Array.data[1].skills.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: d33082149cf62bd4689fabc8db06acda, type: 2}
+      objectReference: {fileID: 11400000, guid: 08cae2a978420734c8aa7a056471542b, type: 2}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: 'enemies.Array.data[2].skills.Array.data[0]'
       value: 

@@ -6,7 +6,7 @@ public class CampSkillListUI : MonoBehaviour
     public Transform skillListContainer;
     public GameObject skillEntryPrefab;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public void UpdateSkillList(Skill[] skills)
+    public void UpdateSkillList(List<Skill> skills)
     {
         foreach (Transform child in skillListContainer)
         {

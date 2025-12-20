@@ -301,7 +301,7 @@ public class BattleTurnManager : MonoBehaviour
     {
         Trigger_ResolvePhaseStart();
         var actions = EnumerateQueuedActions()
-            .OrderByDescending(a => a.user.Speed)
+            .OrderByDescending(a => a.user.getSpeed())
             .ThenBy(_ => Random.value)
             .ToList();
 
@@ -359,6 +359,7 @@ public class BattleTurnManager : MonoBehaviour
 
             yield return new WaitForSeconds(0.3f);
         }
+        Trigger_ResolvePhaseEnd();
     }
 
     private IEnumerable<QueuedAction> EnumerateQueuedActions()
@@ -730,6 +731,29 @@ public class BattleTurnManager : MonoBehaviour
     void Trigger_ResolvePhaseStart()
     {
         ForEachCombatant(c => { foreach (var p in c.passives) p.OnResolvePhaseStart(c); });
+
+        var Actions = EnumerateQueuedActions().ToList();
+        foreach (var a in Actions)
+        {
+            if (a.user == null) continue;
+            foreach (var t in a.user.Traits)
+            {
+                t.onActionResolveStart(a.user, a.skill, a.target);
+            }
+        }
+    }
+
+    void Trigger_ResolvePhaseEnd()
+    {
+        var Actions = EnumerateQueuedActions().ToList();
+        foreach (var a in Actions)
+        {
+            if (a.user == null) continue;
+            foreach (var t in a.user.Traits)
+            {
+                t.onActionResolveStart(a.user, a.skill, a.target);
+            }
+        }
     }
 
 }

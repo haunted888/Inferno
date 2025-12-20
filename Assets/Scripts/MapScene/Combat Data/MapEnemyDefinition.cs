@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -31,7 +32,7 @@ public class MapEnemyDefinition
     };
 
     [Header("Skills (used if overrideSkills = true or no asset)")]
-    public Skill[] skills;
+    public List<Skill> skills;
 
     [HideInInspector] public bool initializedFromAssetStats  = false;
     [HideInInspector] public bool initializedFromAssetSkills = false;
@@ -52,9 +53,9 @@ public class MapEnemyDefinition
         }
 
         if (!initializedFromAssetSkills && !overrideSkills &&
-            characterAsset.skills != null && characterAsset.skills.Length > 0)
+            characterAsset.skills != null && characterAsset.skills.Count > 0)
         {
-            skills = (Skill[])characterAsset.skills.Clone();
+            skills = new List<Skill>(characterAsset.skills);
             initializedFromAssetSkills = true;
         }
     }
@@ -71,9 +72,9 @@ public class MapEnemyDefinition
         return result;
     }
 
-    public Skill[] GetEffectiveSkills()
+    public List<Skill> GetEffectiveSkills()
     {
-        return skills ?? System.Array.Empty<Skill>();
+        return skills ?? new List<Skill>();
     }
 
     public int GetMaxSp()

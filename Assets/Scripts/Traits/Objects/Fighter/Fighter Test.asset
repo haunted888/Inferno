@@ -9,15 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fbde3643f7ca6542980ad85591a83a9, type: 3}
-  m_Name: Heal
-  m_EditorClassIdentifier: Assembly-CSharp::HealAllySkill
-  skillName: Heal
+  m_Script: {fileID: 11500000, guid: 24c0b65711f6e50498f300e10158209a, type: 3}
+  m_Name: Fighter Test
+  m_EditorClassIdentifier: Assembly-CSharp::FighterTraitDefinition
+  traitName: 
   description: 
-  targetType: 2
-  damageType: 2
-  spCost: 5
-  followUpSkills: []
-  traitTags: 
-  ammoCost: 0
-  healAmount: 20
+  traitType: 4
+  elementalResistanceBonus: 0.3
+  physicalDefenseBonus: 0.3

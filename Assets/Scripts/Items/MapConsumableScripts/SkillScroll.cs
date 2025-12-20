@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Items/Map Consumable/Teach Skill")]
@@ -19,13 +20,14 @@ public class TeachSkillMap : ItemConsumableInMap
         {
             if (member == null) return;
             if (member.health <= 0) return; // cannot teach dead
+            if (!member.traitTypes.Intersect(skillToTeach.traitTags).Any()) return; // Ensure member has required traits
 
             // Ensure member.skills exists and avoid duplicates
             var current = member.skills != null ? new List<Skill>(member.skills) : new List<Skill>();
             if (current.Contains(skillToTeach)) return;
 
             current.Add(skillToTeach);
-            member.skills = current.ToArray();
+            member.skills = current;
 
             // Consume item (keeps zero-qty entries)
             MapCombatTransfer.Instance.RemoveItem(item, 1);
@@ -45,8 +47,11 @@ public class TeachSkillMap : ItemConsumableInMap
         var current = member.skills != null ? new List<Skill>(member.skills) : new List<Skill>();
         if (current.Contains(skillToTeach)) return;
 
+
+        if (!member.traitTypes.Intersect(skillToTeach.traitTags).Any()) return; // Ensure member has required traits
+
         current.Add(skillToTeach);
-        member.skills = current.ToArray();
+        member.skills = current;
 
         // Consume item (keeps zero-qty entries)
         MapCombatTransfer.Instance.RemoveItem(item, 1);

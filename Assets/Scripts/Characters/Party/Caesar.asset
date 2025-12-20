@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Caesar
   m_EditorClassIdentifier: Assembly-CSharp::CharacterTemplate
   displayName: Caesar
+  traits: []
   baseStats:
     maxHealth: 20
     maxSp: 10

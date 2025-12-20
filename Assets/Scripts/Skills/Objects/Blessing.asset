@@ -15,6 +15,9 @@ MonoBehaviour:
   skillName: Blessing
   description: 
   targetType: 3
+  damageType: 2
   spCost: 5
   followUpSkills: []
+  traitTags: 
+  ammoCost: 0
   healAmount: 10

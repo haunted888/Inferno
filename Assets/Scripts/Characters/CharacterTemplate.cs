@@ -1,9 +1,13 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Characters/Character Template")]
 public class CharacterTemplate : ScriptableObject
 {
     public string displayName = "Unnamed";
+
+    [Header("Traits")]
+    public List<TraitDefinition> traits = new List<TraitDefinition>();
 
     [Header("Stats")]
     public CombatStats baseStats = new CombatStats
@@ -46,5 +50,5 @@ public class CharacterTemplate : ScriptableObject
     };
 
     [Header("Skills")]
-    public Skill[] skills;
+    public List<Skill> skills;
 }

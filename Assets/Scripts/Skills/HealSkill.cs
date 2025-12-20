@@ -4,6 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Battle/Skills/Heal Ally")]
 public class HealAllySkill : Skill
 {
+    [Header("Heal Skill")]
     public int healAmount = 15;
 
     public override void Execute(BattleCharacter user, BattleCharacter target)

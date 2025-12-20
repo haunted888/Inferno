@@ -3,8 +3,8 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Battle/Skills/Damage Skill")]
 public class DamageSkill : Skill
 {
+    [Header("Damage Skill")]
     public int power = 10;
-    public SkillDamageType damageType = SkillDamageType.Physical;
     public DamageSubType subType = DamageSubType.None;
     public int skillCritChance = 0;
     public int skillCritDamage = 0;
@@ -27,6 +27,7 @@ public class DamageSkill : Skill
             skillCritDamage,
             subType);
 
+        damage = user.ApplyTraitDamageModifiers(this, target, damage);
         int dealt = target.TakeDamage(damage);
         BattleTurnManager.Instance?.RegisterDamage(user, target, dealt);
 
@@ -45,14 +46,16 @@ public class DamageSkill : Skill
     int skillCritDamage,
     DamageSubType subType)
     {
+        CombatStats userStats = user.GetEffectiveStats();
+        CombatStats targetStats = target.GetEffectiveStats();
         // Base offense/defense (physical or elemental)
         int baseOff = (type == SkillDamageType.Physical)
-            ? user.PhysicalAttack
-            : user.ElementalPower;
+            ? userStats.physicalAttack
+            : userStats.elementalPower;
 
         int baseDef = (type == SkillDamageType.Physical)
-            ? target.Defense
-            : target.ElementalResistance;
+            ? targetStats.defense
+            : targetStats.elementalResistance;
 
         // Sub-type bonuses
         int subOff = user.GetSubAttack(subType);
@@ -68,8 +71,8 @@ public class DamageSkill : Skill
             ? (targetDef / (100f + targetDef))
             : 0f;
 
-        int totalCritChance = Mathf.Max(0, user.CritChance + skillCritChance);
-        int totalCritDamage = Mathf.Max(0, user.CritDamage + skillCritDamage);
+        int totalCritChance = Mathf.Max(0, userStats.critChance + skillCritChance);
+        int totalCritDamage = Mathf.Max(0, userStats.critDamage + skillCritDamage);
 
         bool isCrit = Random.Range(0f, 100f) < totalCritChance;
 
@@ -96,14 +99,16 @@ public class DamageSkill : Skill
     int skillCritDamage,
     DamageSubType subType)
     {
+        CombatStats userStats = user.GetEffectiveStats();
+        CombatStats targetStats = target.GetEffectiveStats();
         // Base offense/defense (physical or elemental)
         int baseOff = (type == SkillDamageType.Physical)
-            ? user.PhysicalAttack
-            : user.ElementalPower;
+            ? userStats.physicalAttack
+            : userStats.elementalPower;
 
         int baseDef = (type == SkillDamageType.Physical)
-            ? target.Defense
-            : target.ElementalResistance;
+            ? targetStats.defense
+            : targetStats.elementalResistance;
 
         // Sub-type bonuses
         int subOff = user.GetSubAttack(subType);
@@ -121,8 +126,8 @@ public class DamageSkill : Skill
 
         float afterDef = baseDamage * (1f - defMitigation);
 
-        int totalCritChance = Mathf.Max(0, user.CritChance + skillCritChance);
-        int totalCritDamage = Mathf.Max(0, user.CritDamage + skillCritDamage);
+        int totalCritChance = Mathf.Max(0, userStats.critChance + skillCritChance);
+        int totalCritDamage = Mathf.Max(0, userStats.critDamage + skillCritDamage);
 
         float critMultiplier;
 

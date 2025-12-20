@@ -45,6 +45,25 @@ public class PartySlotController : MonoBehaviour
             chr.ClearSkills();
             foreach (var s in def.GetEffectiveSkills())
                 if (s != null) chr.AddSkill(s);
+                // Copy traits
+            
+            chr.ClearTraits();
+            if (def.traits != null)
+                chr.Traits.AddRange(def.traits);
+                foreach (var t in chr.Traits)
+                {
+                    if (t != null)
+                        chr.traitTypes.Add(t.traitType);
+                }
+
+            // Allow traits to configure battle state (ammo, etc.)
+            for (int i = 0; i < chr.Traits.Count; i++)
+            {
+                var t = chr.Traits[i];
+                if (t != null)
+                    t.SetupForBattle(def, chr);
+            }
+
         }
     }
 

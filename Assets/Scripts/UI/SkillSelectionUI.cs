@@ -41,6 +41,11 @@ public class SkillSelectionUI : MonoBehaviour
             // Disable if not enough SP
             if (character.CurrentSp < cost)
                 btn.interactable = false;
+            
+            // Trait check
+            // Disable if not enough Ammo for marksman
+            if(!character.HasEnoughAmmoFor(skill))
+                btn.interactable = false;
 
             int index = i; // capture for lambda
             btn.onClick.AddListener(() => OnButtonClicked(index));

@@ -1,6 +1,6 @@
 using System;
-using System.ComponentModel;
 using UnityEngine;
+using System.Collections.Generic;
 
 [System.Serializable]
 public class MapPartyMemberDefinition
@@ -9,12 +9,19 @@ public class MapPartyMemberDefinition
 
     public string displayName = "Unnamed";
 
-    [Header("Optional Character Asset")]
+    [Header("Character Asset")]
     public CharacterTemplate characterAsset;
 
+    [Header("Traits")]
+
     [Header("Inspector Overrides")]
+    public bool overrideTraits = false;
     public bool overrideStats  = false;
     public bool overrideSkills = false;
+
+    [Header("Traits (used if overrideTraits = true or no asset)")]
+    public List<TraitDefinition> traits = new List<TraitDefinition>();
+    [NonSerialized] public List<CharacterTrait> traitTypes = new List<CharacterTrait>();
 
     [Header("Stats (max values, editable)")]
     public CombatStats stats = new CombatStats
@@ -31,11 +38,13 @@ public class MapPartyMemberDefinition
     };
 
     [Header("Skills (used if overrideSkills = true or no asset)")]
-    public Skill[] skills;
+    public List<Skill> skills;
 
     [NonSerialized] public int health = -1;
     [NonSerialized] public int sp     = -1; 
 
+    
+    [NonSerialized] public bool initializedFromAssetTraits  = false;
     [NonSerialized] public bool initializedFromAssetStats  = false;
     [NonSerialized] public bool initializedFromAssetSkills = false;
 
@@ -48,8 +57,8 @@ public class MapPartyMemberDefinition
 
     [Header("Talents")]
     public int talentPoints = 5;                             // default pool per character
-    public System.Collections.Generic.List<string> learnedTalentIds
-        = new System.Collections.Generic.List<string>();
+    public List<string> learnedTalentIds
+        = new List<string>();
 
     public bool HasTalent(string talentId) =>
         !string.IsNullOrEmpty(talentId) && learnedTalentIds.Contains(talentId);
@@ -62,6 +71,15 @@ public class MapPartyMemberDefinition
         if (characterAsset == null)
             return;
 
+        if (!initializedFromAssetTraits && !overrideTraits)
+        {
+            traits = new List<TraitDefinition>(characterAsset.traits);
+            traitTypes = new List<CharacterTrait>();
+            foreach (var t in traits)
+                traitTypes.Add(t.traitType);
+            initializedFromAssetTraits  = true;
+        }
+
         if (!initializedFromAssetStats && !overrideStats)
         {
             stats = characterAsset.baseStats;
@@ -72,9 +90,9 @@ public class MapPartyMemberDefinition
         }
 
         if (!initializedFromAssetSkills && !overrideSkills &&
-            characterAsset.skills != null && characterAsset.skills.Length > 0)
+            characterAsset.skills != null && characterAsset.skills.Count > 0)
         {
-            skills = (Skill[])characterAsset.skills.Clone();
+            skills = new List<Skill>(characterAsset.skills);
             initializedFromAssetSkills = true;
         }
     }
@@ -99,15 +117,25 @@ public class MapPartyMemberDefinition
     {
         return Mathf.Max(0, stats.maxSp);
     }
+    
+    public bool HasTrait(CharacterTrait trait)
+    {
+        return traitTypes != null && traitTypes.Contains(trait);
+    }
+    public List<CharacterTrait> GetEffectiveTraits()
+    {
+        return traitTypes ?? new List<CharacterTrait>();
+    }
+
     public CombatStats GetEffectiveStats()
     {
         var result = stats;
         result.maxHealth = Mathf.Max(1, result.maxHealth);
         return result;
     }
-    public Skill[] GetEffectiveSkills()
+    public List<Skill> GetEffectiveSkills()
     {
-        return skills ?? System.Array.Empty<Skill>();
+        return skills ?? new List<Skill>();
     }
 
 
@@ -121,18 +149,18 @@ public class MapPartyMemberDefinition
         // skills
         if (t.grantSkills != null && t.grantSkills.Length > 0)
         {
-            var list = skills != null ? new System.Collections.Generic.List<Skill>(skills)
-                                    : new System.Collections.Generic.List<Skill>();
+            var list = skills != null ? new List<Skill>(skills)
+                                    : new List<Skill>();
             foreach (var s in t.grantSkills)
                 if (s != null && !list.Contains(s)) list.Add(s);
-            skills = list.ToArray();
+            skills = list;
         }
 
         // passives (array may not exist yet)
         if (t.grantPassives != null && t.grantPassives.Length > 0)
         {
-            var list = passives != null ? new System.Collections.Generic.List<PassivesDefinition>(passives)
-                                        : new System.Collections.Generic.List<PassivesDefinition>();
+            var list = passives != null ? new List<PassivesDefinition>(passives)
+                                        : new List<PassivesDefinition>();
             foreach (var p in t.grantPassives)
                 if (p != null && !list.Contains(p)) list.Add(p);
             passives = list.ToArray();
@@ -152,13 +180,13 @@ public class MapPartyMemberDefinition
         // remove granted skills/passives if present
         if (t.grantSkills != null && t.grantSkills.Length > 0 && skills != null)
         {
-            var list = new System.Collections.Generic.List<Skill>(skills);
+            var list = new List<Skill>(skills);
             foreach (var s in t.grantSkills) if (s != null) list.Remove(s);
-            skills = list.ToArray();
+            skills = list;
         }
         if (t.grantPassives != null && t.grantPassives.Length > 0 && passives != null)
         {
-            var list = new System.Collections.Generic.List<PassivesDefinition>(passives);
+            var list = new List<PassivesDefinition>(passives);
             foreach (var p in t.grantPassives) if (p != null) list.Remove(p);
             passives = list.ToArray();
         }
