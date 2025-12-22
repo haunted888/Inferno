@@ -139,11 +139,18 @@ public class BattleCharacter : MonoBehaviour
     public void ClearPassives() => passives.Clear();
     public void AddPassive(PassivesDefinition p)
     {
-        if (p != null) passives.Add(p);
+        if (p != null) {
+            passives.Add(p);
+            p.OnCreated(this);
+        }
     }
     public void RemovePassive(PassivesDefinition p)
     {
-        if (p != null) passives.Remove(p);
+        if (p != null)
+        {
+            p.OnDestroyed(this);
+            passives.Remove(p);
+        } 
     }
 
     public void ClearSkills() => skills.Clear();

@@ -343,11 +343,20 @@ public class BattleTurnManager : MonoBehaviour
                     // Apply passive effects
                     if (action.user.passives != null)
                     {
-                        for (int i = 0; i < action.user.passives.Count; i++)
+                        foreach (var p in action.user.passives)
                         {
-                            var p = action.user.passives[i];
                             if (p == null) continue;
                             p.OnSkillUsed(action.user, action.skill);
+                        }
+                    }
+
+                    List<BattleCharacter> targets = GetTargetsForSkill(action.skill, action.user, action.target);
+                    foreach (var t in targets)
+                    {
+                        if (t.passives == null) continue;
+                        foreach (var p in t.passives)
+                        {
+                            p.OnSkillReceived(action.target, action.user, action.skill);
                         }
                     }
 
@@ -356,6 +365,27 @@ public class BattleTurnManager : MonoBehaviour
                         action.user.UseSkill(action.skillIndex, effectiveTarget);
                     else
                         action.skill.Execute(action.user, effectiveTarget);
+
+                    // Apply passive effects
+                    if (action.user.passives != null)
+                    {
+                        foreach (var p in action.user.passives)
+                        {
+                            if (p == null) continue;
+                            p.OnSkillUsedEnd(action.user, action.skill);
+                        }
+                    }
+
+                    foreach (var t in targets)
+                    {
+                        if (t.passives == null) continue;
+                        foreach (var p in t.passives)
+                        {
+                            if (p == null) continue;
+                            p.OnSkillReceivedEnd(action.target, action.user, action.skill);
+                        }
+                    }
+                    
 
                     break;
                 }
@@ -640,6 +670,42 @@ public class BattleTurnManager : MonoBehaviour
         }
     }
 
+    private List<BattleCharacter> GetTargetsForSkill(Skill skill, BattleCharacter user, BattleCharacter target)
+    {
+        if (skill == null || user == null) return new List<BattleCharacter>();
+
+        IEnumerable<BattleCharacter> targetsEnum;
+        switch (skill.targetType)
+        {
+            case SkillTargetType.SingleEnemy:
+            case SkillTargetType.AllEnemies:
+                targetsEnum = GetEnemiesOf(user);
+                break;
+            case SkillTargetType.SingleAlly:
+            case SkillTargetType.AllAllies:
+                targetsEnum = GetAlliesOf(user);
+                break;
+            case SkillTargetType.Self:
+                targetsEnum = new List<BattleCharacter> { user };
+                break;
+            default:
+                targetsEnum = new List<BattleCharacter> { target };
+                break;
+        }
+
+        foreach (var followUpSkill in skill.followUpSkills)
+        {
+            if (followUpSkill == null) continue;
+            var followUpTargets = GetTargetsForSkill(followUpSkill, user, target);
+            targetsEnum = targetsEnum.Union(followUpTargets).ToList();
+        }
+
+        var candidates = new List<BattleCharacter>();
+        foreach (var c in targetsEnum)
+            if (c != null && !c.IsDead) candidates.Add(c);
+        return candidates;
+    }
+
     private void EvaluateEnemyAction(BattleCharacter enemy, out int bestSkillIndex, out BattleCharacter bestTarget)
     {
         bestSkillIndex = -1;
@@ -673,6 +739,9 @@ public class BattleTurnManager : MonoBehaviour
                 case SkillTargetType.SingleAlly:
                 case SkillTargetType.AllAllies:
                     candidatesEnum = GetAlliesOf(enemy);
+                    break;
+                case SkillTargetType.Self:
+                    candidatesEnum = new List<BattleCharacter> { enemy };
                     break;
                 default:
                     continue;

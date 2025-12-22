@@ -23,9 +23,5 @@ public class FighterPassiveDefinition : PassivesDefinition
             fighterDefenseBoost.setStatBoosts(defenseBoostAmount, resistanceBoostAmount);
             self.AddPassive(fighterDefenseBoost);
         }
-        else if(skill.damageType == SkillDamageType.None && self.passives.Contains(fighterDefenseBoost))
-        {
-            self.RemovePassive(fighterDefenseBoost);
-        }
     }
 }

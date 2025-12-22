@@ -17,4 +17,12 @@ public class FighterDefenseBoostPassive : PassivesDefinition
         self.bonusStats.defense += Mathf.CeilToInt(self.baseStats.defense * defenseBoost);
         self.bonusStats.elementalResistance += Mathf.CeilToInt(self.baseStats.elementalResistance * resistanceBoost);
     }
+
+    public override void OnSkillUsed(BattleCharacter self, Skill skill)
+    {
+        if(skill.damageType == SkillDamageType.None)
+        {
+            self.RemovePassive(this);
+        }
+    }
 }
