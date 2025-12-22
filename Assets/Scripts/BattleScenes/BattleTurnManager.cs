@@ -5,6 +5,24 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
+// Action queue
+public enum ActionKind { Skill, Item }
+public class QueuedAction
+{
+    public ActionKind       kind;
+    public BattleCharacter  user;
+
+    // Skill
+    public int   skillIndex;
+    public Skill skill;
+
+    // Item
+    public ItemDefinition item;
+
+    // Target (may be null; resolved later for skills; self for self-use items)
+    public BattleCharacter target;
+}
+
 public class BattleTurnManager : MonoBehaviour
 {
     public static BattleTurnManager Instance { get; private set; }
@@ -100,23 +118,7 @@ public class BattleTurnManager : MonoBehaviour
         }
     }
 
-    // Action queue
-    private enum ActionKind { Skill, Item }
-    private class QueuedAction
-    {
-        public ActionKind       kind;
-        public BattleCharacter  user;
-
-        // Skill
-        public int   skillIndex;
-        public Skill skill;
-
-        // Item
-        public ItemDefinition item;
-
-        // Target (may be null; resolved later for skills; self for self-use items)
-        public BattleCharacter target;
-    }
+    
 
     void Awake()
     {
@@ -305,6 +307,16 @@ public class BattleTurnManager : MonoBehaviour
             .ThenBy(_ => Random.value)
             .ToList();
 
+        // Let passives modify order:
+        var actionsArray = actions.ToArray();
+        foreach(var a in actionsArray)
+        {
+            foreach (var p in a.user.passives)
+            {
+                p.OnActionOrdered(a, actions);
+            }
+        }
+
         // Execute
         foreach (var action in actions)
         {
@@ -336,7 +348,6 @@ public class BattleTurnManager : MonoBehaviour
                             var p = action.user.passives[i];
                             if (p == null) continue;
                             p.OnSkillUsed(action.user, action.skill);
-                            Debug.Log(p.name);
                         }
                     }
 
@@ -531,6 +542,7 @@ public class BattleTurnManager : MonoBehaviour
 
         bool clickedIsAlly  = GetAlliesOf(user).Contains(clicked);
         bool clickedIsEnemy = GetEnemiesOf(user).Contains(clicked);
+        bool clickedIsSelf   = (user == clicked);
 
         switch (skill.targetType)
         {
@@ -542,6 +554,9 @@ public class BattleTurnManager : MonoBehaviour
             case SkillTargetType.AllAllies:
                 return clickedIsAlly;
 
+            case SkillTargetType.Self:
+                return clickedIsSelf;
+
             default:
                 return false;
         }
@@ -550,6 +565,7 @@ public class BattleTurnManager : MonoBehaviour
     public void HandleCharacterDeath(BattleCharacter c)
     {
         if (c == null) return;
+        foreach (var t in c.Traits) t.OnDeath(c);
         c.gameObject.SetActive(false);
     }
 
@@ -732,6 +748,7 @@ public class BattleTurnManager : MonoBehaviour
 
     void Trigger_BattleStart()
     {
+        ForEachCombatant(c => { foreach (var t in c.Traits) t.OnBattleStart(c); });
         ForEachCombatant(c => { foreach (var p in c.passives) p.OnBattleStart(c); });
     }
 

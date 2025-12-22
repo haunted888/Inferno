@@ -175,7 +175,6 @@ public class BattleCharacter : MonoBehaviour
             if (p == null) continue;
             p.getStatBoosts(this);
         }
-        Debug.Log(bonusStats.defense);
         CombatStats result = new CombatStats();
         result.maxHealth      = baseStats.maxHealth      + bonusStats.maxHealth;
         result.maxSp          = baseStats.maxSp          + bonusStats.maxSp;
@@ -284,6 +283,11 @@ public class BattleCharacter : MonoBehaviour
         return true;
     }
 
+    public void RecoverSp(int amount)
+    {
+        currentSp = Mathf.Min(maxSp, currentSp + amount);
+        Debug.Log($"{name} recovered {amount} SP. SP: {currentSp}/{maxSp}");
+    }
     
     //TRAITS
     
@@ -320,6 +324,12 @@ public class BattleCharacter : MonoBehaviour
     {
         if (amount <= 0) return;
         CurrentAmmo = Mathf.Max(0, CurrentAmmo - amount);
+    }
+
+    public void AddAmmo(int amount)
+    {
+        if (amount <= 0) return;
+        CurrentAmmo = Mathf.Min(MaxAmmo, CurrentAmmo + amount);
     }
     
     public bool HasEnoughAmmoFor(Skill skill)

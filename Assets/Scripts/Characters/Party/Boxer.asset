@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Boxer
   traits:
   - {fileID: 11400000, guid: 2a16b74eacbb580499fe9930d904a7ec, type: 2}
+  - {fileID: 11400000, guid: b9f98cf8fd41cd1479c7f6f024c5a92c, type: 2}
   baseStats:
     maxHealth: 30
     maxSp: 10

@@ -29,4 +29,8 @@ public abstract class TraitDefinition : ScriptableObject
         ref int damage)
     { }
 
+    public virtual void OnBattleStart(BattleCharacter user) { }
+
+    public virtual void OnDeath(BattleCharacter user) { }
+
 }

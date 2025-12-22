@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Soldier
   traits:
   - {fileID: 11400000, guid: c64b8cac7f30a914d92c085dec4f8fca, type: 2}
+  - {fileID: 11400000, guid: d6b0b9f1a1109694282dded06e7ddf47, type: 2}
   baseStats:
     maxHealth: 20
     maxSp: 10
@@ -47,3 +48,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 08cae2a978420734c8aa7a056471542b, type: 2}
   - {fileID: 11400000, guid: 1356d001a331fe944a4176fe2ef7d9e0, type: 2}
   - {fileID: 11400000, guid: 5f385232cd912f74598497c32e9dad7e, type: 2}
+  - {fileID: 11400000, guid: 0952be139618b86419beddc160bfac33, type: 2}

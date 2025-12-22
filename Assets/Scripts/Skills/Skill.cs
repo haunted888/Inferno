@@ -32,7 +32,8 @@ public enum SkillTargetType
     SingleEnemy,
     AllEnemies,
     SingleAlly,
-    AllAllies
+    AllAllies,
+    Self
 }
 
 public abstract class Skill : ScriptableObject

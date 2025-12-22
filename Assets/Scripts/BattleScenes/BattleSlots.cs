@@ -106,7 +106,6 @@ public class BattleSlots : MonoBehaviour
 
             indices[i] = Mathf.Clamp(idx, 0, totalSlots - 1);
         }
-        Debug.Log("Slot indices: " + string.Join(",", indices));
         return indices;
     }
 

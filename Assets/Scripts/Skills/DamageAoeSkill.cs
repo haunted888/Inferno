@@ -79,6 +79,7 @@ public class DamageAllEnemiesSkill : Skill
         bool isCrit = Random.Range(0f, 100f) < totalCritChance;
 
         if (isCrit)
+            //crit ignores 50% of defense mitigation
             defMitigation *= 0.5f;
 
         float afterDef = baseDamage * (1f - defMitigation);
@@ -125,7 +126,6 @@ public class DamageAllEnemiesSkill : Skill
             ? (targetDef / (100f + targetDef))
             : 0f;
 
-        float afterDef = baseDamage * (1f - defMitigation);
 
         int totalCritChance = Mathf.Max(0, userStats.critChance + skillCritChance);
         int totalCritDamage = Mathf.Max(0, userStats.critDamage + skillCritDamage);
@@ -135,12 +135,16 @@ public class DamageAllEnemiesSkill : Skill
         if (totalCritChance >= 100)
         {
             critMultiplier = totalCritDamage * 0.01f;
+            defMitigation *= 0.5f;
         }
         else
         {
             critMultiplier = 1f;
         }
 
+        float afterDef = baseDamage * (1f - defMitigation);
+
+        
         float expected = afterDef * critMultiplier;
         return Mathf.Max(0, Mathf.RoundToInt(expected));
     }

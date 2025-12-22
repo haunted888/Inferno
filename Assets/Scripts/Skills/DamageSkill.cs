@@ -47,7 +47,6 @@ public class DamageSkill : Skill
     DamageSubType subType)
     {
         CombatStats userStats = user.GetEffectiveStats();
-        Debug.Log(userStats.defense);
         CombatStats targetStats = target.GetEffectiveStats();
         // Base offense/defense (physical or elemental)
         int baseOff = (type == SkillDamageType.Physical)
@@ -78,6 +77,7 @@ public class DamageSkill : Skill
         bool isCrit = Random.Range(0f, 100f) < totalCritChance;
 
         if (isCrit)
+            // Crits ignore 50% of defense mitigation
             defMitigation *= 0.5f;
 
         float afterDef = baseDamage * (1f - defMitigation);
@@ -125,7 +125,7 @@ public class DamageSkill : Skill
             ? (targetDef / (100f + targetDef))
             : 0f;
 
-        float afterDef = baseDamage * (1f - defMitigation);
+
 
         int totalCritChance = Mathf.Max(0, userStats.critChance + skillCritChance);
         int totalCritDamage = Mathf.Max(0, userStats.critDamage + skillCritDamage);
@@ -136,12 +136,17 @@ public class DamageSkill : Skill
         {
             // Guaranteed crit: use full crit multiplier
             critMultiplier = totalCritDamage * 0.01f;
+            defMitigation *= 0.5f;
         }
         else
         {
             // Crit is not guaranteed: ignore crit for expectation
             critMultiplier = 1f;
         }
+
+        float afterDef = baseDamage * (1f - defMitigation);
+
+        
 
         float expected = afterDef * critMultiplier;
         return Mathf.Max(0, Mathf.RoundToInt(expected));
