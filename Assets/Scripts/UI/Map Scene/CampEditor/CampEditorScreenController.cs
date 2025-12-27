@@ -40,7 +40,8 @@ public class CampEditorScreenController : MonoBehaviour
 
     [Header("LevelUp Stats Screen")]
     public GameObject levelUpStatsScreenRoot;
-    
+    public GameObject levelUpStatsOptionParent;
+    public LevelUpStatsUIPrefab levelUpStatsPrefab;
 
     //Option buttons
     [Header("Option Buttons")]
@@ -105,7 +106,11 @@ public class CampEditorScreenController : MonoBehaviour
             {
                 if(current != null)
                 {
-                    current.tryToLevelUp();
+                    if (current.tryToLevelUp())
+                    {
+                        Debug.Log($"Opening level up screen for {current.displayName}");
+                        OpenLevelUpScreen();
+                    }
                     Refresh();
                 }
             });
@@ -144,6 +149,10 @@ public class CampEditorScreenController : MonoBehaviour
                 currentScreen = CurrentScreen.Stat;
                 if (talentScreenRoot != null) talentScreenRoot.gameObject.SetActive(false);
                 OpenStatScreen();
+            }
+            else if(currentScreen == CurrentScreen.LevelUp)
+            {
+                
             }
             else
             {
@@ -224,6 +233,35 @@ public class CampEditorScreenController : MonoBehaviour
         if (talentScreenRoot != null) talentScreenRoot.gameObject.SetActive(true);
         talentScreenRoot.ShowFor(current);
     }
+    
+    void OpenLevelUpScreen()
+    {
+        currentScreen = CurrentScreen.LevelUp;
+        if (levelUpStatsScreenRoot != null) levelUpStatsScreenRoot.SetActive(true);
+        if (levelUpStatsPrefab != null && current != null)
+        {
+            foreach(Transform child in levelUpStatsOptionParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            List<CombatStats> levelUpOptions = current.GetLevelUpBonusStats(3);
+            Debug.Log($"Generated {levelUpOptions.Count} level up options for {current.displayName}");
+            foreach(var option in levelUpOptions)
+            {
+                LevelUpStatsUIPrefab statOptionUI = Instantiate(levelUpStatsPrefab, levelUpStatsOptionParent.transform);
+                statOptionUI.setStatBonus(option);
+                statOptionUI.button.onClick.AddListener(() => OnLevelUpOptionSelected(statOptionUI));
+            }
+        }
+    }
+
+    void OnLevelUpOptionSelected(LevelUpStatsUIPrefab selectedOption)
+    {
+        current.ApplyLevelUpBonusStats(selectedOption.getStatBonus());
+        currentScreen = CurrentScreen.Stat;
+        if(levelUpStatsScreenRoot != null) levelUpStatsScreenRoot.SetActive(false);
+        OpenStatScreen();
+    }
 
     void Refresh(){
         if(current == null) return;
@@ -238,6 +276,9 @@ public class CampEditorScreenController : MonoBehaviour
             inventoryScreenRoot.SetActive(false);
         if(talentScreenRoot != null && currentScreen != CurrentScreen.Talent) 
             talentScreenRoot.gameObject.SetActive(false);
+        if(levelUpStatsScreenRoot != null && currentScreen != CurrentScreen.LevelUp)
+            levelUpStatsScreenRoot.SetActive(false);
+        
         // Refresh current screen
         if(currentScreen == CurrentScreen.Stat)
         {

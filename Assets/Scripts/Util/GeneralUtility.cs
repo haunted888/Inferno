@@ -13,7 +13,7 @@ public static class GeneralUtility
         for(int i = 0; i < numSplit; i++)
         {
             //setup index array
-            indexArray[i] = i;
+            indexArray.Add(i);
         
             //put in min values in return array
             returnArray[i] = min;

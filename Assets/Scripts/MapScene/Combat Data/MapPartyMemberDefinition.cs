@@ -3,12 +3,12 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
+using NUnit.Framework.Internal;
 
 [System.Serializable]
 public class MapPartyMemberDefinition
 {
     public GameObject characterPrefab;
-
     public string displayName = "Unnamed";
 
     [Header("Character Asset")]
@@ -68,6 +68,11 @@ public class MapPartyMemberDefinition
     public const int MaxLevel = 13;
     [Range(1, MaxLevel)] public int level = 1;
     [Min(0)] public int currentXp = 0;
+
+    [Header("Bonus stat")]
+    private int bonusStatsValue = 20;
+    private int bonusStatsMin = 2;
+    private int bonusStatsMax = 10;
 
     [NonSerialized] public int health = -1;
     [NonSerialized] public int sp     = -1; 
@@ -246,7 +251,7 @@ public class MapPartyMemberDefinition
     }
 
     // helper: adds (sign=+1) or subtracts (sign=-1) all fields of CombatStats
-    void ApplyStatsDelta(CombatStats d, int sign)
+    void ApplyStatsDelta(CombatStats d, int sign = 1)
     {
         if (d.Equals(null)) return;
 
@@ -317,19 +322,20 @@ public class MapPartyMemberDefinition
 
     }
 
-    public void tryToLevelUp()
+    public bool tryToLevelUp()
     {
-        if (level >= MaxLevel) return; // cannot level past max
+        if (level >= MaxLevel) return false; // cannot level past max
        
         int required = GetXpRequiredForNextLevel(level);
         if (currentXp < required)
-            return;
+            return false;
 
         currentXp -= required;
         level++;
 
         // apply level-up effects
         ApplyLevelUpEffects();
+        return true;
     }
 
     // Simple, centralized XP curve – tweak numbers as desired.
@@ -368,15 +374,7 @@ public class MapPartyMemberDefinition
             elementalResistance= Mathf.RoundToInt(baseStats.elementalResistance * (levelUpBaseMultiplier + level * levelUpLevelMultiplier))
         };
 
-        stats.maxHealth += delta.maxHealth;
-        stats.maxSp     += delta.maxSp;
-        stats.speed     += delta.speed;
-        stats.physicalAttack     += delta.physicalAttack;
-        stats.elementalPower     += delta.elementalPower;
-        stats.defense              += delta.defense;
-        stats.elementalResistance  += delta.elementalResistance;
-        stats.critChance           += delta.critChance;
-        stats.critDamage           += delta.critDamage;
+        ApplyStatsDelta(delta, +1);
 
         levelUpStats.maxHealth += delta.maxHealth;
         levelUpStats.maxSp     += delta.maxSp;
@@ -393,36 +391,9 @@ public class MapPartyMemberDefinition
         
     }
 
-    void applyLevelUpBonusStats(CombatStats delta)
+    public void ApplyLevelUpBonusStats(CombatStats delta)
     {
-        stats.maxHealth += delta.maxHealth;
-        stats.maxSp     += delta.maxSp;
-        stats.speed     += delta.speed;
-        stats.physicalAttack     += delta.physicalAttack;
-        stats.elementalPower     += delta.elementalPower;
-        stats.defense              += delta.defense;
-        stats.elementalResistance  += delta.elementalResistance;
-        stats.critChance           += delta.critChance;
-        stats.critDamage           += delta.critDamage;
-
-        stats.bludgeoningAttack    += delta.bludgeoningAttack;
-        stats.slashingAttack       += delta.slashingAttack;
-        stats.piercingAttack       += delta.piercingAttack;
-        stats.bludgeoningDefense   += delta.bludgeoningDefense;
-        stats.slashingDefense      += delta.slashingDefense;
-        stats.piercingDefense      += delta.piercingDefense;
-        stats.fireAttack           += delta.fireAttack;
-        stats.iceAttack            += delta.iceAttack;
-        stats.stormAttack          += delta.stormAttack;
-        stats.acidAttack           += delta.acidAttack;
-        stats.psychicAttack        += delta.psychicAttack;
-        stats.bloodAttack          += delta.bloodAttack;
-        stats.fireDefense          += delta.fireDefense;
-        stats.iceDefense           += delta.iceDefense;
-        stats.stormDefense         += delta.stormDefense;
-        stats.acidDefense          += delta.acidDefense;
-        stats.psychicDefense       += delta.psychicDefense;
-        stats.bloodDefense         += delta.bloodDefense;
+        ApplyStatsDelta(delta, +1);
 
 
         levelUpStats.maxHealth += delta.maxHealth;
@@ -596,6 +567,50 @@ public class MapPartyMemberDefinition
         statLevelUpMultipliers.Add(CombatSubStat.BloodDefense,          2f); //Blood Defense
     }
 
+    public void AddMainStatToCombatStats(CombatMainStat stat, ref CombatStats statObject, int value)
+    {
+        switch (stat)
+        {
+            case CombatMainStat.MaxHealth:            statObject.maxHealth += value; break;
+            case CombatMainStat.MaxSp:                statObject.maxSp += value; break;
+            case CombatMainStat.PhysicalAttack:       statObject.physicalAttack += value; break;
+            case CombatMainStat.ElementalPower:       statObject.elementalPower += value; break;
+            case CombatMainStat.Defense:              statObject.defense += value; break;
+            case CombatMainStat.ElementalResistance:  statObject.elementalResistance += value; break;
+            case CombatMainStat.Speed:                statObject.speed += value; break;
+            case CombatMainStat.CritChance:           statObject.critChance += value; break;
+            case CombatMainStat.CritDamage:           statObject.critDamage += value; break;
+        }
+    }
+
+    public void AddSubStatToCombatStats(CombatSubStat stat, ref CombatStats statObject, int value)
+    {
+        switch (stat)
+        {
+            case CombatSubStat.BludgeoningAttack:  statObject.bludgeoningAttack += value; break;
+            case CombatSubStat.SlashingAttack:     statObject.slashingAttack += value; break;
+            case CombatSubStat.PiercingAttack:     statObject.piercingAttack += value; break;
+
+            case CombatSubStat.BludgeoningDefense: statObject.bludgeoningDefense += value; break;
+            case CombatSubStat.SlashingDefense:    statObject.slashingDefense += value; break;
+            case CombatSubStat.PiercingDefense:    statObject.piercingDefense += value; break;
+
+            case CombatSubStat.FireAttack:         statObject.fireAttack += value; break;
+            case CombatSubStat.IceAttack:          statObject.iceAttack += value; break;
+            case CombatSubStat.StormAttack:        statObject.stormAttack += value; break;
+            case CombatSubStat.AcidAttack:         statObject.acidAttack += value; break;
+            case CombatSubStat.PsychicAttack:      statObject.psychicAttack += value; break;
+            case CombatSubStat.BloodAttack:        statObject.bloodAttack += value; break;
+
+            case CombatSubStat.FireDefense:        statObject.fireDefense += value; break;
+            case CombatSubStat.IceDefense:         statObject.iceDefense += value; break;
+            case CombatSubStat.StormDefense:       statObject.stormDefense += value; break;
+            case CombatSubStat.AcidDefense:        statObject.acidDefense += value; break;
+            case CombatSubStat.PsychicDefense:     statObject.psychicDefense += value; break;
+            case CombatSubStat.BloodDefense:       statObject.bloodDefense += value; break;
+        }
+    }
+
     public List<CombatStats> GetLevelUpBonusStats(int number = 3)
     {
         if(statLevelUpMultipliers == null || statLevelUpMultipliers.Count == 0)
@@ -619,12 +634,47 @@ public class MapPartyMemberDefinition
 
         ShuffleExtension.Shuffle(mainStatGroupA, mainStatGroupA.Count*2);
         ShuffleExtension.Shuffle(mainStatGroupB, mainStatGroupB.Count*2);
+        ShuffleExtension.Shuffle(mainSubStats, mainSubStats.Count*2);
+        ShuffleExtension.Shuffle(subSubStats, subSubStats.Count*2);
 
         List<CombatStats> bonusStats = new List<CombatStats>();
 
         for(int i = 0; i < number; i++)
         {
             
+            List<object> keys = new List<object>
+            {
+                mainStatGroupA[i % mainStatGroupA.Count],
+                mainStatGroupB[i % mainStatGroupB.Count],
+                mainSubStats[i % mainSubStats.Count],
+                subSubStats[i % subSubStats.Count]
+            };
+
+            List<int> keyRemovealIndices = new List<int>();
+            foreach(var key in keys)
+                if(!(key is CombatMainStat || key is CombatSubStat)) keyRemovealIndices.Add(keys.IndexOf(key));
+            foreach(var index in keyRemovealIndices)
+                keys.RemoveAt(index);
+            
+            int[] splitValues = GeneralUtility.splitInt(bonusStatsValue, keys.Count, bonusStatsMin, bonusStatsMax);
+            
+            CombatStats bonusStatSet = new CombatStats();
+            for(int j = 0; j < keys.Count; j++)
+            {
+                if(statLevelUpMultipliers[keys[j]] == null) continue;
+                int multiplier = Mathf.RoundToInt((float)statLevelUpMultipliers[keys[j]]);
+                Debug.Log($"Adding {splitValues[j]} * {multiplier} to {keys[j]}");
+
+                if (keys[j] is CombatMainStat)
+                {
+                    AddMainStatToCombatStats((CombatMainStat)keys[j], ref bonusStatSet, splitValues[j] * multiplier);
+                }
+                else if (keys[j] is CombatSubStat)
+                {
+                    AddSubStatToCombatStats((CombatSubStat)keys[j], ref bonusStatSet, splitValues[j] * multiplier);
+                }
+            }
+            bonusStats.Add(bonusStatSet);
         }
         
         return bonusStats;

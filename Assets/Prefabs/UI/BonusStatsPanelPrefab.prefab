@@ -161,6 +161,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d6a625917e9dc04783624e32258a447, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelUpStatsUIPrefab
+  statText: {fileID: 4440471082216531638}
+  button: {fileID: 2532302330479251645}
 --- !u!1 &6836254775457305165
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,7 +293,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -272.67706, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0

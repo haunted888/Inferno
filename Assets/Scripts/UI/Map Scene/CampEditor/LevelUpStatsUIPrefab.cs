@@ -1,15 +1,18 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LevelUpStatsUIPrefab : MonoBehaviour
 {
     private CombatStats statBonus;
     public TMP_Text statText;
+    public Button button;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public void setStatBonus(CombatStats statBonus)
     {
         this.statBonus = statBonus;
+        setStatText(statBonus);
     }
 
     public CombatStats getStatBonus()
@@ -17,14 +20,14 @@ public class LevelUpStatsUIPrefab : MonoBehaviour
         return statBonus;
     }
 
-    public void setStatText(CombatStats stats = new CombatStats())
+    private void setStatText(CombatStats stats = new CombatStats())
     {
         statText.text = "Receive:\n\n";
         if (stats.maxHealth > 0) statText.text += $"+{stats.maxHealth} Max Health\n";
         if (stats.maxSp > 0) statText.text += $"+{stats.maxSp} Max SP\n";
-        if (stats.physicalAttack > 0) statText.text += $"+{stats.physicalAttack} Attack\n";
+        if (stats.physicalAttack > 0) statText.text += $"+{stats.physicalAttack} Physical Attack\n";
         if (stats.defense > 0) statText.text += $"+{stats.defense} Defense\n";
-        if (stats.elementalPower > 0) statText.text += $"+{stats.elementalPower} Magic\n";
+        if (stats.elementalPower > 0) statText.text += $"+{stats.elementalPower} Elemental Power\n";
         if (stats.elementalResistance > 0) statText.text += $"+{stats.elementalResistance} Elemental Resistance\n";
         if (stats.speed > 0) statText.text += $"+{stats.speed} Speed\n";
         if (stats.critChance > 0) statText.text += $"+{stats.critChance} Crit Chance\n";
