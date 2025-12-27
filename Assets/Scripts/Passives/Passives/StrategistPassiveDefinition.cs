@@ -11,6 +11,6 @@ public class StrategistPassiveDefinition : PassivesDefinition
     }
     public override void OnSkillUsed(BattleCharacter self, Skill skill)
     {
-        self.AddPassive(zeroLuckPassive);
+        BattleTurnManager.Instance.passivesToAdd.Add(zeroLuckPassive);
     }
 }

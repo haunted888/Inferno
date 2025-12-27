@@ -3,8 +3,11 @@ using UnityEngine;
 public class MapCombatTrigger : MonoBehaviour
 {
     private MapNode mapNode;                     // assign in inspector
+    [Header("XP Reward")]
+    public int xpReward = 0;
     public MapEnemyDefinition[] enemies;        // assign in inspectorpublic MapEnemyDefinition[] enemies;
     public MapRewardGroup[] rewardGroups;
+    
 
 
     private bool triggered = false;
@@ -58,7 +61,7 @@ public class MapCombatTrigger : MonoBehaviour
         transfer.SetupEnemies(enemies);
 
         transfer.SetPendingRewardsFromGroups(rewardGroups);
-
+        transfer.lastBattleXpReward = xpReward;
 
 
         string safeNodeName = "";

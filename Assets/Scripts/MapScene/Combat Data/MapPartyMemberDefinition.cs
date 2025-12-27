@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
+using System.Collections;
 
 [System.Serializable]
 public class MapPartyMemberDefinition
@@ -23,6 +25,24 @@ public class MapPartyMemberDefinition
     public List<TraitDefinition> traits = new List<TraitDefinition>();
     [NonSerialized] public List<CharacterTrait> traitTypes = new List<CharacterTrait>();
 
+    [NonSerialized] public int[] levelXpRequired =
+    {
+        0, // level 0 not used
+        0, // level 1
+        100, // level 2
+        150, // level 3
+        200, // level 4
+        300, // level 5
+        400, // level 6
+        550, // level 7
+        700, // level 8
+        850, // level 9
+        1000, // level 10
+        1200, // level 11
+        1400, // level 12
+        1600, // level 13
+    };
+
     [Header("Stats (max values, editable)")]
     public CombatStats stats = new CombatStats
     {
@@ -37,8 +57,17 @@ public class MapPartyMemberDefinition
         critDamage         = 150
     };
 
+    private CombatStats baseStats = new CombatStats();
+    private CombatStats levelUpStats = new CombatStats();
+
     [Header("Skills (used if overrideSkills = true or no asset)")]
     public List<Skill> skills;
+
+    
+    [Header("Progression")]
+    public const int MaxLevel = 13;
+    [Range(1, MaxLevel)] public int level = 1;
+    [Min(0)] public int currentXp = 0;
 
     [NonSerialized] public int health = -1;
     [NonSerialized] public int sp     = -1; 
@@ -56,15 +85,27 @@ public class MapPartyMemberDefinition
     public TalentTreeUIController talentTreePrefab;   // assign a prefab that has TalentTreeUIController on root
 
     [Header("Talents")]
-    public int talentPoints = 5;                             // default pool per character
+    public int talentPoints = 1;                             // default pool per character
     public List<string> learnedTalentIds
         = new List<string>();
+
+    [Header("Substats (initialized once)")]
+    public List<CombatSubStat> mainSubStats = new List<CombatSubStat>(3);
+    public List<CombatSubStat> subSubStats  = new List<CombatSubStat>(3);
+
+    [NonSerialized] public bool initializedSubStats = false;
+
 
     public bool HasTalent(string talentId) =>
         !string.IsNullOrEmpty(talentId) && learnedTalentIds.Contains(talentId);
 
     public bool CanLearn(TalentDefinition t) =>
         t != null && !HasTalent(t.id) && talentPoints >= t.cost;
+
+    void Awake()
+    {
+        SetupLevelMultiplierHashtable();
+    }
 
     public void EnsureInitializedFromAsset()
     {
@@ -88,6 +129,7 @@ public class MapPartyMemberDefinition
 
             initializedFromAssetStats = true;
         }
+        baseStats = stats;
 
         if (!initializedFromAssetSkills && !overrideSkills &&
             characterAsset.skills != null && characterAsset.skills.Count > 0)
@@ -95,6 +137,14 @@ public class MapPartyMemberDefinition
             skills = new List<Skill>(characterAsset.skills);
             initializedFromAssetSkills = true;
         }
+        
+        if (!initializedSubStats)
+        {
+            InitializeSubStatsFromTemplate();
+            initializedSubStats = true;
+        }
+
+
     }
 
     public string GetDisplayName()
@@ -232,11 +282,352 @@ public class MapPartyMemberDefinition
         stats.psychicDefense       += sign * d.psychicDefense;
         stats.bloodDefense         += sign * d.bloodDefense;
     }
-    public void InitializeTalentPointsIfFresh(int defaultPoints = 5)
+    public void InitializeTalentPointsIfFresh(int defaultPoints = 1)
     {
         // only set if they're “fresh” (no prior spends) and points are non-positive
         if ((learnedTalentIds == null || learnedTalentIds.Count == 0) && talentPoints <= 0)
             talentPoints = defaultPoints;
     }
 
+    public void ResetProgression()
+    {
+        level = 1;
+        currentXp = 0;
+    }
+
+    public void SetLevelFromReward(int currentLevel)
+    {
+        ResetProgression();
+        currentXp += GetXpRequiredForXLevel(currentLevel);
+    }
+
+    public void SetXpFromReward(int totalXp)
+    {
+        ResetProgression();
+        if (totalXp > 0)
+            AddXp(totalXp);
+    }
+
+    public void AddXp(int amount)
+    {
+        if (amount <= 0) return;
+        if (level >= MaxLevel) return;
+
+        currentXp += amount;
+
+    }
+
+    public void tryToLevelUp()
+    {
+        if (level >= MaxLevel) return; // cannot level past max
+       
+        int required = GetXpRequiredForNextLevel(level);
+        if (currentXp < required)
+            return;
+
+        currentXp -= required;
+        level++;
+
+        // apply level-up effects
+        ApplyLevelUpEffects();
+    }
+
+    // Simple, centralized XP curve – tweak numbers as desired.
+    public int GetXpRequiredForNextLevel(int fromLevel)
+    {
+        if (fromLevel >= MaxLevel) return int.MaxValue;
+        // Example: linear curve, 20 * current level
+        return levelXpRequired[fromLevel + 1];
+    }
+
+    public int GetXpRequiredForXLevel(int toLevel, int fromLevel = 1)
+    {
+        if (fromLevel >= toLevel) return 0;
+
+        int totalXp = 0;
+        for (int i = fromLevel; i < toLevel; i++)
+            totalXp += GetXpRequiredForNextLevel(i);
+        return totalXp;
+    }
+
+    private float levelUpBaseMultiplier = .06f;
+    private float levelUpLevelMultiplier = 0.02f;
+    public void ApplyLevelUpEffects()
+    {
+        talentPoints += 1; // add 1 talent point per level-up
+
+        // apply level-up stats
+        CombatStats delta = new CombatStats
+        {
+            maxHealth          = Mathf.RoundToInt(baseStats.maxHealth * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            maxSp              = Mathf.RoundToInt(baseStats.maxSp * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            speed              = Mathf.RoundToInt(baseStats.speed * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            physicalAttack     = Mathf.RoundToInt(baseStats.physicalAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            elementalPower     = Mathf.RoundToInt(baseStats.elementalPower * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            defense            = Mathf.RoundToInt(baseStats.defense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            elementalResistance= Mathf.RoundToInt(baseStats.elementalResistance * (levelUpBaseMultiplier + level * levelUpLevelMultiplier))
+        };
+
+        stats.maxHealth += delta.maxHealth;
+        stats.maxSp     += delta.maxSp;
+        stats.speed     += delta.speed;
+        stats.physicalAttack     += delta.physicalAttack;
+        stats.elementalPower     += delta.elementalPower;
+        stats.defense              += delta.defense;
+        stats.elementalResistance  += delta.elementalResistance;
+        stats.critChance           += delta.critChance;
+        stats.critDamage           += delta.critDamage;
+
+        levelUpStats.maxHealth += delta.maxHealth;
+        levelUpStats.maxSp     += delta.maxSp;
+        levelUpStats.speed     += delta.speed;
+        levelUpStats.physicalAttack     += delta.physicalAttack;
+        levelUpStats.elementalPower     += delta.elementalPower;
+        levelUpStats.defense              += delta.defense;
+        levelUpStats.elementalResistance  += delta.elementalResistance;
+        levelUpStats.critChance           += delta.critChance;
+        levelUpStats.critDamage           += delta.critDamage;
+
+        health = stats.maxHealth;
+        sp = stats.maxSp;
+        
+    }
+
+    void applyLevelUpBonusStats(CombatStats delta)
+    {
+        stats.maxHealth += delta.maxHealth;
+        stats.maxSp     += delta.maxSp;
+        stats.speed     += delta.speed;
+        stats.physicalAttack     += delta.physicalAttack;
+        stats.elementalPower     += delta.elementalPower;
+        stats.defense              += delta.defense;
+        stats.elementalResistance  += delta.elementalResistance;
+        stats.critChance           += delta.critChance;
+        stats.critDamage           += delta.critDamage;
+
+        stats.bludgeoningAttack    += delta.bludgeoningAttack;
+        stats.slashingAttack       += delta.slashingAttack;
+        stats.piercingAttack       += delta.piercingAttack;
+        stats.bludgeoningDefense   += delta.bludgeoningDefense;
+        stats.slashingDefense      += delta.slashingDefense;
+        stats.piercingDefense      += delta.piercingDefense;
+        stats.fireAttack           += delta.fireAttack;
+        stats.iceAttack            += delta.iceAttack;
+        stats.stormAttack          += delta.stormAttack;
+        stats.acidAttack           += delta.acidAttack;
+        stats.psychicAttack        += delta.psychicAttack;
+        stats.bloodAttack          += delta.bloodAttack;
+        stats.fireDefense          += delta.fireDefense;
+        stats.iceDefense           += delta.iceDefense;
+        stats.stormDefense         += delta.stormDefense;
+        stats.acidDefense          += delta.acidDefense;
+        stats.psychicDefense       += delta.psychicDefense;
+        stats.bloodDefense         += delta.bloodDefense;
+
+
+        levelUpStats.maxHealth += delta.maxHealth;
+        levelUpStats.maxSp     += delta.maxSp;
+        levelUpStats.speed     += delta.speed;
+        levelUpStats.physicalAttack     += delta.physicalAttack;
+        levelUpStats.elementalPower     += delta.elementalPower;
+        levelUpStats.defense              += delta.defense;
+        levelUpStats.elementalResistance  += delta.elementalResistance;
+        levelUpStats.critChance           += delta.critChance;
+        levelUpStats.critDamage           += delta.critDamage;
+
+        levelUpStats.bludgeoningAttack    += delta.bludgeoningAttack;
+        levelUpStats.slashingAttack       += delta.slashingAttack;
+        levelUpStats.piercingAttack       += delta.piercingAttack;
+        levelUpStats.bludgeoningDefense   += delta.bludgeoningDefense;
+        levelUpStats.slashingDefense      += delta.slashingDefense;
+        levelUpStats.piercingDefense      += delta.piercingDefense;
+        levelUpStats.fireAttack           += delta.fireAttack;
+        levelUpStats.iceAttack            += delta.iceAttack;
+        levelUpStats.stormAttack          += delta.stormAttack;
+        levelUpStats.acidAttack           += delta.acidAttack;
+        levelUpStats.psychicAttack        += delta.psychicAttack;
+        levelUpStats.bloodAttack          += delta.bloodAttack;
+        levelUpStats.fireDefense          += delta.fireDefense;
+        levelUpStats.iceDefense           += delta.iceDefense;
+        levelUpStats.stormDefense         += delta.stormDefense;
+        levelUpStats.acidDefense          += delta.acidDefense;
+        levelUpStats.psychicDefense       += delta.psychicDefense;
+        levelUpStats.bloodDefense         += delta.bloodDefense;
+
+
+
+        health += delta.maxHealth;
+        sp += delta.maxSp;
+    }
+
+    private void InitializeSubStatsFromTemplate()
+    {
+        if (characterAsset == null) return;
+        var seed = characterAsset.predeterminedSubStats;
+        if (seed == null || seed.Count != 6)
+        {
+            
+            var substats = Enum.GetValues(typeof(CombatSubStat)).Cast<CombatSubStat>().ToList();
+            
+            while(seed.Count < 6){
+                var substatRandom = UnityEngine.Random.Range(0, substats.Count);
+                if(seed.Contains(substats[substatRandom])) {
+                    substats.RemoveAt(substatRandom);
+                    continue;
+                }
+                seed.Add(substats[substatRandom]);
+            }
+        }
+
+        // Shuffle copy
+        var list = new List<CombatSubStat>(seed);
+        ShuffleExtension.Shuffle(list, 20);
+
+        mainSubStats.Clear();
+        subSubStats.Clear();
+
+        // First 3 = main, last 3 = sub-sub
+        for (int i = 0; i < 6; i++)
+        {
+            if (i < 3) mainSubStats.Add(list[i]);
+            else       subSubStats.Add(list[i]);
+        }
+
+        // Main substats +10 each (this is separate from the 100 pool)
+        for (int i = 0; i < mainSubStats.Count; i++)
+            AddToSubStat(mainSubStats[i], 10);
+
+        // Pool allocation
+        int remaining = 100;
+        int index = 0;
+
+        // Track only pool points for the 40-cap
+        var poolAlloc = new Dictionary<CombatSubStat, int>(6);
+        for (int i = 0; i < 6; i++)
+            poolAlloc[list[i]] = 0;
+
+        while (remaining > 0)
+        {
+            var key = list[index];
+
+            // If this stat hit 40 from pool, move on (no point spent)
+            if (poolAlloc[key] >= 40)
+            {
+                index = (index + 1) % 6;
+                continue;
+            }
+
+            // Allocate 1 point
+            AddToSubStat(key, 1);
+            poolAlloc[key] += 1;
+            remaining -= 1;
+
+            if (remaining <= 0) break;
+
+            // Chance to move: 1 / remaining
+            float moveChance = 1f / remaining;
+            if (UnityEngine.Random.value < moveChance)
+                index = (index + 1) % 6;
+        }
+    }
+
+    private void AddToSubStat(CombatSubStat subStat, int delta)
+    {
+        switch (subStat)
+        {
+            case CombatSubStat.BludgeoningAttack:  stats.bludgeoningAttack += delta; break;
+            case CombatSubStat.SlashingAttack:     stats.slashingAttack += delta; break;
+            case CombatSubStat.PiercingAttack:     stats.piercingAttack += delta; break;
+
+            case CombatSubStat.BludgeoningDefense: stats.bludgeoningDefense += delta; break;
+            case CombatSubStat.SlashingDefense:    stats.slashingDefense += delta; break;
+            case CombatSubStat.PiercingDefense:    stats.piercingDefense += delta; break;
+
+            case CombatSubStat.FireAttack:         stats.fireAttack += delta; break;
+            case CombatSubStat.IceAttack:          stats.iceAttack += delta; break;
+            case CombatSubStat.StormAttack:        stats.stormAttack += delta; break;
+            case CombatSubStat.AcidAttack:         stats.acidAttack += delta; break;
+            case CombatSubStat.PsychicAttack:      stats.psychicAttack += delta; break;
+            case CombatSubStat.BloodAttack:        stats.bloodAttack += delta; break;
+
+            case CombatSubStat.FireDefense:        stats.fireDefense += delta; break;
+            case CombatSubStat.IceDefense:         stats.iceDefense += delta; break;
+            case CombatSubStat.StormDefense:       stats.stormDefense += delta; break;
+            case CombatSubStat.AcidDefense:        stats.acidDefense += delta; break;
+            case CombatSubStat.PsychicDefense:     stats.psychicDefense += delta; break;
+            case CombatSubStat.BloodDefense:       stats.bloodDefense += delta; break;
+        }
+    }
+
+    private Hashtable statLevelUpMultipliers = new Hashtable();
+
+    private void SetupLevelMultiplierHashtable()
+    {
+        statLevelUpMultipliers.Add(CombatMainStat.MaxHealth,            10f); //Max Health
+        statLevelUpMultipliers.Add(CombatMainStat.MaxSp,                5f); //Max SP
+        statLevelUpMultipliers.Add(CombatMainStat.PhysicalAttack,       1f); //Physical Attack
+        statLevelUpMultipliers.Add(CombatMainStat.ElementalPower,       1f); //Elemental Power
+        statLevelUpMultipliers.Add(CombatMainStat.Defense,              1f); //Defense
+        statLevelUpMultipliers.Add(CombatMainStat.ElementalResistance,  1f); //Elemental Resistance
+        statLevelUpMultipliers.Add(CombatMainStat.Speed,                1f);  //Speed
+        statLevelUpMultipliers.Add(CombatMainStat.CritChance,           .1f);  //Crit Chance
+        statLevelUpMultipliers.Add(CombatMainStat.CritDamage,           .2f);  //Crit Damage
+
+        statLevelUpMultipliers.Add(CombatSubStat.BludgeoningAttack,     2f); //Bludgeoning Attack
+        statLevelUpMultipliers.Add(CombatSubStat.SlashingAttack,        2f); //Slashing Attack
+        statLevelUpMultipliers.Add(CombatSubStat.PiercingAttack,        2f); //Piercing Attack
+
+        statLevelUpMultipliers.Add(CombatSubStat.BludgeoningDefense,    2f); //Bludgeoning Defense
+        statLevelUpMultipliers.Add(CombatSubStat.SlashingDefense,       2f); //Slashing Defense
+        statLevelUpMultipliers.Add(CombatSubStat.PiercingDefense,       2f); //Piercing Defense
+
+        statLevelUpMultipliers.Add(CombatSubStat.FireAttack,            2f); //Fire Attack
+        statLevelUpMultipliers.Add(CombatSubStat.IceAttack,             2f); //Ice Attack
+        statLevelUpMultipliers.Add(CombatSubStat.StormAttack,           2f); //Storm Attack
+        statLevelUpMultipliers.Add(CombatSubStat.AcidAttack,            2f); //Acid Attack
+        statLevelUpMultipliers.Add(CombatSubStat.PsychicAttack,         2f); //Psychic Attack
+        statLevelUpMultipliers.Add(CombatSubStat.BloodAttack,           2f); //Blood Attack
+
+        statLevelUpMultipliers.Add(CombatSubStat.FireDefense,           2f); //Fire Defense
+        statLevelUpMultipliers.Add(CombatSubStat.IceDefense,            2f); //Ice Defense
+        statLevelUpMultipliers.Add(CombatSubStat.StormDefense,          2f); //Storm Defense
+        statLevelUpMultipliers.Add(CombatSubStat.AcidDefense,           2f); //Acid Defense
+        statLevelUpMultipliers.Add(CombatSubStat.PsychicDefense,        2f); //Psychic Defense
+        statLevelUpMultipliers.Add(CombatSubStat.BloodDefense,          2f); //Blood Defense
+    }
+
+    public List<CombatStats> GetLevelUpBonusStats(int number = 3)
+    {
+        if(statLevelUpMultipliers == null || statLevelUpMultipliers.Count == 0)
+        {
+            SetupLevelMultiplierHashtable();
+        }
+        
+        List<CombatMainStat> mainStatGroupA = new List<CombatMainStat>{
+            CombatMainStat.PhysicalAttack,
+            CombatMainStat.ElementalPower,
+            CombatMainStat.MaxHealth
+        };
+        
+        List<CombatMainStat> mainStatGroupB = new List<CombatMainStat>
+        {
+            CombatMainStat.Defense,
+            CombatMainStat.ElementalResistance,
+            CombatMainStat.MaxSp,
+            CombatMainStat.Speed  
+        };
+
+        ShuffleExtension.Shuffle(mainStatGroupA, mainStatGroupA.Count*2);
+        ShuffleExtension.Shuffle(mainStatGroupB, mainStatGroupB.Count*2);
+
+        List<CombatStats> bonusStats = new List<CombatStats>();
+
+        for(int i = 0; i < number; i++)
+        {
+            
+        }
+        
+        return bonusStats;
+    }
+    
 }

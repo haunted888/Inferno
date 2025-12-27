@@ -1,6 +1,49 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum CombatMainStat
+{
+    MaxHealth,
+    MaxSp,
+    Speed,
+    PhysicalAttack,
+    ElementalPower,
+    Defense,
+    ElementalResistance,
+    CritChance,
+    CritDamage
+}
+
+public enum CombatSubStat
+{
+    // Physical sub-attack
+    BludgeoningAttack,
+    SlashingAttack,
+    PiercingAttack,
+
+    // Physical sub-defense
+    BludgeoningDefense,
+    SlashingDefense,
+    PiercingDefense,
+
+    // Elemental sub-attack
+    FireAttack,
+    IceAttack,
+    StormAttack,
+    AcidAttack,
+    PsychicAttack,
+    BloodAttack,
+
+    // Elemental sub-defense
+    FireDefense,
+    IceDefense,
+    StormDefense,
+    AcidDefense,
+    PsychicDefense,
+    BloodDefense
+}
+
+
 [CreateAssetMenu(menuName = "Characters/Character Template")]
 public class CharacterTemplate : ScriptableObject
 {
@@ -51,4 +94,9 @@ public class CharacterTemplate : ScriptableObject
 
     [Header("Skills")]
     public List<Skill> skills;
+
+    [Header("Substat Seed (exactly 6)")]
+    public List<CombatSubStat> predeterminedSubStats = new List<CombatSubStat>(6);
+
+
 }

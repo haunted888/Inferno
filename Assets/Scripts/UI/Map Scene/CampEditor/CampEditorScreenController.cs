@@ -33,8 +33,14 @@ public class CampEditorScreenController : MonoBehaviour
 
     [Header("Character Info")]
     public TMP_Text characterNameLabel;    
+    public TMP_Text characterLevelLabel;
     public Slider healthBar;
+    public Slider xpBar;
     public Image heldItemIcon;
+
+    [Header("LevelUp Stats Screen")]
+    public GameObject levelUpStatsScreenRoot;
+    
 
     //Option buttons
     [Header("Option Buttons")]
@@ -42,6 +48,7 @@ public class CampEditorScreenController : MonoBehaviour
     public Button skillScreenButton;
     public Button inventoryScreenButton;
     public Button talentScreenButton;
+    public Button levelUpButton;
 
     public CanvasManager canvasManager;
 
@@ -53,6 +60,7 @@ public class CampEditorScreenController : MonoBehaviour
         Skill,
         Inventory,
         Talent,
+        LevelUp
     };
 
     private CurrentScreen currentScreen = CurrentScreen.Stat;
@@ -91,6 +99,15 @@ public class CampEditorScreenController : MonoBehaviour
                 statScreenRoot.SetActive(false);
                 skillScreenRoot.SetActive(false);
                 inventoryScreenRoot.SetActive(false);
+            });
+        if(levelUpButton != null)
+            levelUpButton.onClick.AddListener(() => 
+            {
+                if(current != null)
+                {
+                    current.tryToLevelUp();
+                    Refresh();
+                }
             });
     }
 
@@ -259,6 +276,30 @@ public class CampEditorScreenController : MonoBehaviour
             healthBar.value = currentHealth;
         }
 
+        //Update xp bar and level up button
+        if (xpBar != null)
+        {
+            var currentXp = current.currentXp;
+            var nextLevelXp = current.GetXpRequiredForNextLevel(current.level);
+            xpBar.maxValue = nextLevelXp;
+            xpBar.value = Mathf.Min(currentXp, nextLevelXp);
+
+            
+            //Show level up button if character can level up
+            if(levelUpButton.gameObject != null)
+            {
+                levelUpButton.gameObject.SetActive(currentXp >= nextLevelXp);
+            }
+        }
+
+        
+
+        //Update character level
+        if(characterLevelLabel != null)
+        {
+            characterLevelLabel.text = $"Lv. {current.level}";
+        }
+
         //Update held item icon
         if (heldItemIcon != null)
         {
@@ -274,5 +315,7 @@ public class CampEditorScreenController : MonoBehaviour
                 heldItemIcon.enabled = false;
             }
         }
+
+        
     }
 }

@@ -21,7 +21,7 @@ public class FighterPassiveDefinition : PassivesDefinition
         if(skill.damageType != SkillDamageType.None && !self.passives.Contains(fighterDefenseBoost))
         {
             fighterDefenseBoost.setStatBoosts(defenseBoostAmount, resistanceBoostAmount);
-            self.AddPassive(fighterDefenseBoost);
+            BattleTurnManager.Instance.passivesToAdd.Add(fighterDefenseBoost);
         }
     }
 }

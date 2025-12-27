@@ -45,3 +45,4 @@ MonoBehaviour:
   skills:
   - {fileID: 11400000, guid: 08cae2a978420734c8aa7a056471542b, type: 2}
   - {fileID: 11400000, guid: 5df21aa61a790354d8c1e268ecb8d35b, type: 2}
+  predeterminedSubStats: 02000000080000000600000004000000050000000e000000

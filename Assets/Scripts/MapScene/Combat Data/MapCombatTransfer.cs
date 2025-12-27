@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 [System.Serializable]
 public class ItemStack
@@ -29,6 +30,8 @@ public class MapCombatTransfer : MonoBehaviour
     [HideInInspector] public string lastSafeNodeName;
     [HideInInspector] public string combatNodeObjectName;
     [HideInInspector] public bool  lastBattlePlayerWon;
+    [NonSerialized] public int   lastBattleXpReward = 0;
+
 
 
     public bool HasPartyData { get; private set; }
@@ -125,6 +128,14 @@ public class MapCombatTransfer : MonoBehaviour
             }
         }
 
+        // Award XP on victory
+        if (playerWon && lastBattleXpReward > 0)
+        {
+            AwardExperience(lastBattleXpReward, battlePlayers);
+        }
+
+        // Party becomes only living members (dead ones are no longer in party)
+
         // Party becomes only living members (dead ones are no longer in party)
         party = party
             .Where(d => d != null && d.health > 0)
@@ -150,6 +161,37 @@ public class MapCombatTransfer : MonoBehaviour
             ClearPendingRewards();
         }
     }
+    
+    private void AwardExperience(int battleXp, List<BattleCharacter> battlePlayers)
+    {
+        if (battleXp <= 0) return;
+
+        var participantDefs = new HashSet<MapPartyMemberDefinition>();
+        if (battlePlayers != null)
+        {
+            foreach (var bc in battlePlayers)
+            {
+                if (bc == null) continue;
+                var def = bc.sourceDefinition;
+                if (def == null) continue;
+                participantDefs.Add(def);
+            }
+        }
+
+        int fullXp = battleXp;
+        int halfXp = battleXp / 2;
+
+        foreach (var def in camp)
+        {
+            if (def == null) continue;
+
+            if (participantDefs.Contains(def))
+                def.AddXp(fullXp);
+            else
+                def.AddXp(halfXp);
+        }
+    }
+
 
 
     public void RegisterBattleContext(string safeNodeName, string combatNodeName)
@@ -308,7 +350,7 @@ public class MapCombatTransfer : MonoBehaviour
             if (candidates.Count == 0)
                 continue;
 
-            int index = Random.Range(0, candidates.Count);
+            int index = UnityEngine.Random.Range(0, candidates.Count);
             var chosen = candidates[index];
             pendingRewards.Add(chosen);
         }
@@ -321,7 +363,7 @@ public class MapCombatTransfer : MonoBehaviour
         Debug.Log($"Camp member {def.displayName} has health {def.health}");
         // Initialize from asset only the first time this definition enters the camp
         def.EnsureInitializedFromAsset();
-        def.InitializeTalentPointsIfFresh(5); // default 5 talent points
+        def.InitializeTalentPointsIfFresh(1); // default 1 talent points
 
         // If current HP has never been set, start at full
         if (def.health < 0)

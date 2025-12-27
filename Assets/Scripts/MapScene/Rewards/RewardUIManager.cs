@@ -163,8 +163,25 @@ public class RewardUIManager : MonoBehaviour
 
             if (r.type == RewardCategory.PartyMember && r.partyMember != null)
             {
-                transfer.AddPartyMember(r.partyMember, addToPartyIfSpace: true);
+                var def = r.partyMember;
+
+                // Only apply starting progression if this character is not already in camp
+                bool isNew = transfer.camp == null || !transfer.camp.Contains(def);
+                if (isNew)
+                {
+                    if (r.startWithXp)
+                    {
+                        def.SetXpFromReward(r.startXp);
+                    }
+                    else
+                    {
+                        def.SetLevelFromReward(r.startLevel);
+                    }
+                }
+
+                transfer.AddPartyMember(def, addToPartyIfSpace: true);
             }
+
             else if (r.type == RewardCategory.Item && r.item != null)
             {
                 int qty = Mathf.Max(1, r.itemQuantity);

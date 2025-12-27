@@ -18,6 +18,6 @@ public class EntertainerTraitDefinition : TraitDefinition
     public override void OnBattleStart(BattleCharacter user)
     {
         entertainerPassive.setSpHeal(spHeal);
-        user.AddPassive(entertainerPassive);
+        BattleTurnManager.Instance.passivesToAdd.Add(entertainerPassive);
     }
 }

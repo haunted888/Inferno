@@ -14,6 +14,9 @@ public class MapRewardDefinition
 
     [Header("Party Member (used when type = PartyMember)")]
     public MapPartyMemberDefinition partyMember;
+    public bool startWithXp = false;  // false = use levels, true = use xp
+    [Min(1)] public int startLevel = 1;
+    [Min(0)] public int startXp = 0;
 
     [Header("Money (not implemented yet)")]
     public int moneyAmount;

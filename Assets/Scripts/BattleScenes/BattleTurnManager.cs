@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +58,8 @@ public class BattleTurnManager : MonoBehaviour
     private Dictionary<BattleCharacter, BattleCharacter> chosenTargets      = new Dictionary<BattleCharacter, BattleCharacter>();
     private Dictionary<BattleCharacter, ItemDefinition>  chosenItems        = new Dictionary<BattleCharacter, ItemDefinition>();
 
+    [NonSerialized] public List<PassivesDefinition> passivesToRemove = new List<PassivesDefinition>();
+    [NonSerialized] public List<PassivesDefinition> passivesToAdd   = new List<PassivesDefinition>();   
     private void EnsureCommandOrder(BattleCharacter chr)
     {
         if (chr != null && !commandOrder.Contains(chr))
@@ -304,17 +307,19 @@ public class BattleTurnManager : MonoBehaviour
         Trigger_ResolvePhaseStart();
         var actions = EnumerateQueuedActions()
             .OrderByDescending(a => a.user.getSpeed())
-            .ThenBy(_ => Random.value)
+            .ThenBy(_ => UnityEngine.Random.value)
             .ToList();
 
         // Let passives modify order:
         var actionsArray = actions.ToArray();
         foreach(var a in actionsArray)
         {
-            foreach (var p in a.user.passives)
-            {
-                p.OnActionOrdered(a, actions);
-            }
+            InvokePassivesWithMutation(
+                a.user,
+                () => a.user.passives,
+                p => p.OnActionOrdered(a, actions)
+            );
+
         }
 
         // Execute
@@ -340,24 +345,25 @@ public class BattleTurnManager : MonoBehaviour
                         effectiveTarget == null)
                         break;
 
-                    // Apply passive effects
+                    // Apply passive effects (NOTE: Kinda janky, might fix later)
                     if (action.user.passives != null)
                     {
-                        foreach (var p in action.user.passives)
-                        {
-                            if (p == null) continue;
-                            p.OnSkillUsed(action.user, action.skill);
-                        }
+                        InvokePassivesWithMutation(
+                            action.user,
+                            () => action.user.passives,
+                            p => p.OnSkillUsed(action.user, action.skill)
+                        );
                     }
 
                     List<BattleCharacter> targets = GetTargetsForSkill(action.skill, action.user, action.target);
                     foreach (var t in targets)
                     {
-                        if (t.passives == null) continue;
-                        foreach (var p in t.passives)
-                        {
-                            p.OnSkillReceived(action.target, action.user, action.skill);
-                        }
+                        InvokePassivesWithMutation(
+                            t,
+                            () => t.passives,
+                            p => p.OnSkillReceived(t, action.user, action.skill)
+                        );
+
                     }
 
                     // Players spend SP via UseSkill; enemies ignore SP
@@ -369,21 +375,20 @@ public class BattleTurnManager : MonoBehaviour
                     // Apply passive effects
                     if (action.user.passives != null)
                     {
-                        foreach (var p in action.user.passives)
-                        {
-                            if (p == null) continue;
-                            p.OnSkillUsedEnd(action.user, action.skill);
-                        }
+                        InvokePassivesWithMutation(
+                            action.user,
+                            () => action.user.passives,
+                            p => p.OnSkillUsedEnd(action.user, action.skill)
+                        );
                     }
 
                     foreach (var t in targets)
                     {
-                        if (t.passives == null) continue;
-                        foreach (var p in t.passives)
-                        {
-                            if (p == null) continue;
-                            p.OnSkillReceivedEnd(action.target, action.user, action.skill);
-                        }
+                        InvokePassivesWithMutation(
+                            t,
+                            () => t.passives,
+                            p => p.OnSkillReceivedEnd(t, action.user, action.skill)
+                        );
                     }
                     
 
@@ -630,17 +635,24 @@ public class BattleTurnManager : MonoBehaviour
         if (action.target != null && !action.target.IsDead && candidates.Contains(action.target))
             return action.target;
 
-        int idx = Random.Range(0, candidates.Count);
+        int idx = UnityEngine.Random.Range(0, candidates.Count);
         return candidates[idx];
     }
 
     public void RegisterDamage(BattleCharacter source, BattleCharacter target, int amount)
     {
-        if (source != null)
-            foreach (var p in source.passives) p.OnAfterDealDamage(source, target, amount);
+        InvokePassivesWithMutation(
+            source,
+            () => source.passives,
+            p => p.OnAfterDealDamage(source, target, amount)
+        );
 
-        if (target != null)
-            foreach (var p in target.passives) p.OnAfterTakeDamage(target, source, amount);
+        InvokePassivesWithMutation(
+            target,
+            () => target.passives,
+            p => p.OnAfterTakeDamage(target, source, amount)
+        );
+
             
         if (source == null || amount <= 0) return;
         if (playerParty.Contains(source))
@@ -804,7 +816,7 @@ public class BattleTurnManager : MonoBehaviour
     {
         for (int i = list.Count - 1; i > 0; i--)
         {
-            int j = Random.Range(0, i + 1);
+            int j = UnityEngine.Random.Range(0, i + 1);
             (list[i], list[j]) = (list[j], list[i]);
         }
     }
@@ -818,23 +830,74 @@ public class BattleTurnManager : MonoBehaviour
     void Trigger_BattleStart()
     {
         ForEachCombatant(c => { foreach (var t in c.Traits) t.OnBattleStart(c); });
-        ForEachCombatant(c => { foreach (var p in c.passives) p.OnBattleStart(c); });
+        ForEachCombatant(c => { InvokePassivesWithMutation(
+                c,
+                () => c.passives,
+                p => p.OnBattleStart(c)
+            );
+        });
     }
 
     void Trigger_CommandPhaseStart()
     {
-        ForEachCombatant(c => { foreach (var p in c.passives) p.OnCommandPhaseStart(c); });
+        ForEachCombatant(c => { InvokePassivesWithMutation(
+                c,
+                () => c.passives,
+                p => p.OnCommandPhaseStart(c)
+            );
+        });
     }
 
     void Trigger_ResolvePhaseStart()
     {
-        ForEachCombatant(c => { foreach (var p in c.passives) p.OnResolvePhaseStart(c); });
+         ForEachCombatant(c => { InvokePassivesWithMutation(
+                c,
+                () => c.passives,
+                p => p.OnResolvePhaseStart(c)
+            );
+        });
 
     }
 
     void Trigger_ResolvePhaseEnd()
     {
         return;
+    }
+
+
+    // Run passives hooks with the ability to modify the list of passives
+    private void InvokePassivesWithMutation(
+        BattleCharacter owner,
+        Func<List<PassivesDefinition>> getCurrentPassives,
+        Action<PassivesDefinition> invokeHook)
+    {
+        if (owner == null || invokeHook == null) return;
+
+        var passivesList = getCurrentPassives?.Invoke();
+        if (passivesList == null) return;
+
+        do
+        {
+            passivesToAdd.Clear();
+
+            foreach (var p in passivesList)
+            {
+                if (p == null) continue;
+                if (passivesToRemove.Contains(p)) continue;
+
+                invokeHook(p);
+            }
+
+            passivesList = new List<PassivesDefinition>(passivesToAdd);
+            foreach (var p in passivesList)
+            {
+                if (p == null) continue;
+                owner.AddPassive(p);
+            }
+        } while (passivesList.Count > 0);
+
+        while (passivesToRemove.Count > 0)
+            owner.RemovePassive(passivesToRemove[0]);
     }
 
 }

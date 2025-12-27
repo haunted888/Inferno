@@ -49,3 +49,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1356d001a331fe944a4176fe2ef7d9e0, type: 2}
   - {fileID: 11400000, guid: 5f385232cd912f74598497c32e9dad7e, type: 2}
   - {fileID: 11400000, guid: 0952be139618b86419beddc160bfac33, type: 2}
+  predeterminedSubStats: 0200000005000000060000000c000000090000000f000000

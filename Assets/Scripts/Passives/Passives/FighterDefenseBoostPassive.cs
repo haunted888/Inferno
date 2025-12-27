@@ -22,7 +22,7 @@ public class FighterDefenseBoostPassive : PassivesDefinition
     {
         if(skill.damageType == SkillDamageType.None)
         {
-            self.RemovePassive(this);
+            OnDestroyed(self);
         }
     }
 }
