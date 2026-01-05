@@ -39,6 +39,8 @@ public class MapCombatTransfer : MonoBehaviour
 
     [HideInInspector] public bool starterChoiceCompleted = false;
 
+    [SerializeField] private int money = 0;
+
     void Awake()
     {
         if (Instance != null)
@@ -411,9 +413,10 @@ public class MapCombatTransfer : MonoBehaviour
         if (member == null || item == null) return;
         var held = item.heldEquippable;
         if (held == null) return;
+        var stack = inventory.Find(s => s.item == item);
 
         // If this item is already equipped on someone else, unequip from them (stat removal, no inventory change)
-        if (equippedToMember.TryGetValue(item, out var previousHolder) && previousHolder != null && previousHolder != member)
+        if (equippedToMember.TryGetValue(item, out var previousHolder) && previousHolder != null && previousHolder != member && stack.quantity == 0)
         {
             var prevItem = GetEquippedItem(previousHolder);
             if (prevItem == item)
@@ -428,7 +431,8 @@ public class MapCombatTransfer : MonoBehaviour
         if (equippedByMember.TryGetValue(member, out var oldItem) && oldItem != null && oldItem != item)
         {
             equippedByMember.Remove(member);
-            equippedToMember.Remove(oldItem);
+            if(equippedToMember.TryGetValue(oldItem, out var holder) && holder == member)
+                equippedToMember.Remove(oldItem);
 
             oldItem.heldEquippable?.OnUnequip(member);
             AddItem(oldItem, 1);   // return previous item to inventory
@@ -436,8 +440,7 @@ public class MapCombatTransfer : MonoBehaviour
 
         // If this item is not currently equipped on anyone (no previousHolder),
         // consume one from inventory for equipping
-        var currentHolder = GetItemHolder(item);
-        if (currentHolder == null)
+        if (stack != null && stack.quantity > 0)
         {
             RemoveItem(item, 1);   // you’ve already changed this to clamp at 0, not remove
         }
@@ -463,4 +466,22 @@ public class MapCombatTransfer : MonoBehaviour
         // Return one copy to inventory
         AddItem(item, 1);
     }
+
+
+    public int GetMoney() => money;
+
+    public void AddMoney(int amount)
+    {
+        if (amount <= 0) return;
+        money += amount;
+    }
+
+    public bool TrySpendMoney(int amount)
+    {
+        if (amount < 0) return false;
+        if (money < amount) return false;
+        money -= amount;
+        return true;
+    }
+
 }

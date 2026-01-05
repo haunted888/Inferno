@@ -18,7 +18,7 @@ public class MapRewardDefinition
     [Min(1)] public int startLevel = 1;
     [Min(0)] public int startXp = 0;
 
-    [Header("Money (not implemented yet)")]
+    [Header("Money")]
     public int moneyAmount;
 
     [Header("Item")]

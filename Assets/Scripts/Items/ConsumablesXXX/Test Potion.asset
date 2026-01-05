@@ -19,3 +19,4 @@ MonoBehaviour:
   mapConsumable: {fileID: 11400000, guid: 2caed1907b26cd744bf9f65de24c388a, type: 2}
   battleConsumable: {fileID: 11400000, guid: c47da8ea17531dd488cc683fa1559d04, type: 2}
   heldEquippable: {fileID: 0}
+  price: 50

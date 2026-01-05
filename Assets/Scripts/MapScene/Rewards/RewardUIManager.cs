@@ -187,7 +187,12 @@ public class RewardUIManager : MonoBehaviour
                 int qty = Mathf.Max(1, r.itemQuantity);
                 transfer.AddItem(r.item, qty);
             }
-            // Money: ignore for now
+            
+            else if (r.type == RewardCategory.Money)
+            {
+                transfer.AddMoney(Mathf.Max(0, r.moneyAmount));
+            }
+
         }
     }
 

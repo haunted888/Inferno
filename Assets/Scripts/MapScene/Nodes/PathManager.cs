@@ -24,6 +24,8 @@ public class PathfindingManager : MonoBehaviour
     private HashSet<PathNode> visitedNodes = new HashSet<PathNode>();
 
     public static System.Action<PathNode> OnArrivedAtNode;
+    public static System.Action<PathNode> OnExitedNode;
+
 
     void Awake()
     {
@@ -165,7 +167,8 @@ public class PathfindingManager : MonoBehaviour
                 Debug.LogWarning($"No SplinePathSegment found between {from.name} and {to.name}");
                 yield break;
             }
-
+            
+            OnExitedNode?.Invoke(startNode);
             yield return MoveAlongSplinePathSegment(edge, from, to);
         }
         foreach (var node in path)
@@ -175,8 +178,10 @@ public class PathfindingManager : MonoBehaviour
         }
         
         startNode = path[path.Count - 1];
+
         OnArrivedAtNode?.Invoke(startNode);
         PersistPathStateToTransfer();
+
     }
 
     SplinePathSegment FindEdge(PathNode from, PathNode to)

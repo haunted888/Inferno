@@ -20,4 +20,8 @@ public class ItemDefinition : ScriptableObject
     public ItemConsumableInMap    mapConsumable;     // already added earlier (was Map… renamed)
     public ItemConsumableInBattle battleConsumable;  // already added earlier
     public ItemHeldEquippable     heldEquippable;    // NEW: mark as equippable (held)
+
+    [Header("Shop")]
+    [Min(0)] public int price = 0;
+
 }
