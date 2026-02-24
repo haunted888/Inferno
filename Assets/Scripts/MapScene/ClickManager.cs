@@ -10,6 +10,7 @@ public class ClickManager : MonoBehaviour
 {
     public delegate void NodeClicked(PathNode node);
     public static UnityEvent<PathNode> OnNodeClicked = new UnityEvent<PathNode>();
+    public static UnityEvent<MapEnemyDefinition[]> OnNodeRightClicked = new UnityEvent<MapEnemyDefinition[]>();
     public static UnityEvent<GameObject> OnUIObjectRightClicked = new UnityEvent<GameObject>();
     private Camera mainCamera;
 
@@ -28,7 +29,7 @@ public class ClickManager : MonoBehaviour
             if (Physics.Raycast(ray, out RaycastHit hitInfo) && GetUIObjectUnderPointer() == null)
             {
                 //Broadcast pathnode click event
-                if (hitInfo.collider.TryGetComponent<MapNode>(out MapNode clickedNode))
+                if (hitInfo.collider.TryGetComponent(out MapNode clickedNode))
                 {
                     PathNode nodeLocation = clickedNode.location;
                     if(nodeLocation != null){
@@ -39,18 +40,35 @@ public class ClickManager : MonoBehaviour
                 }
             }
         }
+        //Handle right-clicks
         else if (Mouse.current.rightButton.wasPressedThisFrame)
         {
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            
+            GameObject uiObject = GetUIObjectUnderPointer();
+            if (uiObject != null)
             {
-                GameObject uiObject = GetUIObjectUnderPointer();
-                if (uiObject != null)
-                {
-                    OnUIObjectRightClicked?.Invoke(uiObject);
-                }
-
-                return;
+                OnUIObjectRightClicked?.Invoke(uiObject);
             }
+            else
+            {
+                Ray ray = mainCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+                if (Physics.Raycast(ray, out RaycastHit hitInfo) && GetUIObjectUnderPointer() == null)
+                {
+                    //Broadcast pathnode click event
+                    if (hitInfo.collider.TryGetComponent(out MapCombatTrigger clickedNode))
+                    {
+                        MapEnemyDefinition[] enemies = clickedNode.enemies;
+                        if(enemies != null){
+                            OnNodeRightClicked?.Invoke(enemies);
+                        } else {
+                            Debug.Log("Enemies array is null");
+                        }
+                    }
+                }
+            }
+
+            return;
+            
         }
     }
 
