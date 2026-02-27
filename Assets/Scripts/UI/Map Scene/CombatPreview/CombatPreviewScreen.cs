@@ -10,9 +10,10 @@ public class CombatPreviewScreen : MonoBehaviour
     public CalculatorScreen calculatorScreen;
     public Button closeButton;
     public Button calculatorButton;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    // Awake is called when the script instance is being loaded
+    void Awake()
     {
+        
 
         ClickManager.OnNodeRightClicked.AddListener(HandleNodeRightClicked);
         closeButton.onClick.AddListener(() => gameObject.SetActive(false));
@@ -46,6 +47,11 @@ public class CombatPreviewScreen : MonoBehaviour
 
     private void openCalculator()
     {
-        calculatorScreen.gameObject.SetActive(true);
+        var Transfer = MapCombatTransfer.Instance;
+        if (Transfer == null)
+        {
+            return;
+        }
+        calculatorScreen.Open(Transfer.party, storedEnemies);
     }
 }

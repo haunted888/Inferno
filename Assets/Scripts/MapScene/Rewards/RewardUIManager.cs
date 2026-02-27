@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -134,7 +135,13 @@ public class RewardUIManager : MonoBehaviour
 
     void OnDialogueClicked()
     {
+        if(Time.timeSinceLevelLoad < 0.5f)
+        {
+            // Prevent accidental clicks immediately after combat ends
+            return;
+        }
         // When the dialogue is closed, actually grant the party member rewards
+        Debug.Log("Dialogue clicked, applying rewards and showing summary");
         ApplyRewards();
         ShowSummary();
     }

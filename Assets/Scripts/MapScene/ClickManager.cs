@@ -59,6 +59,7 @@ public class ClickManager : MonoBehaviour
                     {
                         MapEnemyDefinition[] enemies = clickedNode.enemies;
                         if(enemies != null){
+                            Debug.Log("Right-clicked on non-UI element");
                             OnNodeRightClicked?.Invoke(enemies);
                         } else {
                             Debug.Log("Enemies array is null");

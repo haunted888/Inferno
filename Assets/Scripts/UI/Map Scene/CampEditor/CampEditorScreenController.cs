@@ -67,7 +67,7 @@ public class CampEditorScreenController : MonoBehaviour
     private CurrentScreen currentScreen = CurrentScreen.Stat;
 
     void Awake()
-    {
+    {   
         if (startHidden) gameObject.SetActive(false);
         if (statScreenButton != null)
             statScreenButton.onClick.AddListener(() => 
