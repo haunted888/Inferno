@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -7,6 +8,7 @@ public class CalculatorPartyEntryUI : MonoBehaviour
 {
     public TMP_Text nameText;
 
+    [Header("HP/SP")]
     public Slider hpBar;
     public Slider hpBarPreview; 
     public TMP_Text hpText;
@@ -17,11 +19,26 @@ public class CalculatorPartyEntryUI : MonoBehaviour
     public TMP_Text spText;
     public TMP_Text spPreviewText;
 
+    [Header("Icons")]
     public Image itemIcon;
+
+    [Header("Skills")]
+    public Button skillButton;
+
+    [Header("Turn Order")]
+    public TMP_Text turnOrderText;
+
+    [NonSerialized]
+    public CalculatorSkillList skillList;
+    [NonSerialized]
+    public GameObject skillListContainer;
+
+    private MapPartyMemberDefinition storedDef; 
 
     public void Setup(MapPartyMemberDefinition def)
     {
         if (def == null) return;
+        storedDef = def;
 
         // Name (display name)
         if (nameText != null)
@@ -60,7 +77,26 @@ public class CalculatorPartyEntryUI : MonoBehaviour
             itemIcon.enabled = icon != null;
         }
 
-        // Char icon intentionally not implemented yet
+        if(skillListContainer != null)
+        {
+            skillButton.onClick.AddListener(OpenSkillList);
+        }
+    }
+
+    public void SetSkillList(CalculatorSkillList skillList, GameObject skillListContainer)
+    {
+        this.skillList = skillList;
+        this.skillListContainer = skillListContainer;
+    }
+
+    void OpenSkillList()
+    {
+        if (skillList != null)
+        {
+            skillList.SetActiveCharacter(storedDef);
+            skillList.UpdateSkillList(storedDef.skills, true);
+            skillListContainer.gameObject.SetActive(true);
+        }
     }
 
     void setMaxHP(int max)
@@ -111,5 +147,11 @@ public class CalculatorPartyEntryUI : MonoBehaviour
         if (spText != null)
             spText.text = $"{current}/{spBar.maxValue}";
             spPreviewText.text = $"{current}/{spBarPreview.maxValue}";
+    }
+
+    public void SetTurnOrder(int order)
+    {
+        if (turnOrderText != null)
+            turnOrderText.text = $"{order}";
     }
 }

@@ -15,10 +15,12 @@ MonoBehaviour:
   skillName: Kill
   description: One percent chance to critically hit. Critical hits do 1000000% damage.
   targetType: 0
+  damageType: 0
   spCost: 10
   followUpSkills: []
+  traitTags: 
+  ammoCost: 0
   power: 1
-  damageType: 0
   subType: 0
-  skillCritChance: 0
+  skillCritChance: 1
   skillCritDamage: 1000000

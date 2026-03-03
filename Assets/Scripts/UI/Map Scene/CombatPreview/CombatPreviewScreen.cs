@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,7 +7,7 @@ public class CombatPreviewScreen : MonoBehaviour
 {
     public Transform enemyPreviewContainer;
     public EnemyPreviewPrefab enemyPreviewPrefab;
-    public MapEnemyDefinition[] storedEnemies; // For testing purposes, can be removed later
+    public List<MapEnemyDefinition> storedEnemies;
     public CalculatorScreen calculatorScreen;
     public Button closeButton;
     public Button calculatorButton;
@@ -29,7 +30,7 @@ public class CombatPreviewScreen : MonoBehaviour
 
     private void HandleNodeRightClicked(MapEnemyDefinition[] enemies)
     {
-        storedEnemies = enemies; // For testing, can be removed later
+        storedEnemies = new List<MapEnemyDefinition>(enemies);
         gameObject.SetActive(true);
         // Clear existing previews
         foreach (Transform child in enemyPreviewContainer)

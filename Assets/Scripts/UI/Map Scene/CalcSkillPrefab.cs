@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-public class SkillEntryPrefab : MonoBehaviour
+public class CalcSkillPrefab : MonoBehaviour
 {
     public TMP_Text skillNameText;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
