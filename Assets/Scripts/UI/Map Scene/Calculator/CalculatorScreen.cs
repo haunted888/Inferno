@@ -30,7 +30,7 @@ public class CalculatorScreen : MonoBehaviour
     private List<MapPartyMemberDefinition> currentParty;
     private List<MapEnemyDefinition> currentEnemies;
 
-    private DamageSkill pendingDamageSkill;
+    private Skill pendingSkill;
     private bool pendingCasterIsEnemy;
 
     public Dictionary<string, Dictionary<targetEffectType, int>> effectsByTarget = new Dictionary<string, Dictionary<targetEffectType, int>>();
@@ -82,7 +82,7 @@ public class CalculatorScreen : MonoBehaviour
         currentParty = party;
         currentEnemies = enemies;
 
-        pendingDamageSkill = null;
+        pendingSkill = null;
         DisableAllLineupButtons();
         UpdateTurnOrder();
     }
@@ -179,17 +179,19 @@ public class CalculatorScreen : MonoBehaviour
     private void HandleSkillSelected(Skill skill)
     {
         effectsByTarget.Clear();
+
         if (skillListContainer != null && skillListContainer.gameObject.activeSelf)
             skillListContainer.gameObject.SetActive(false);
 
-        // Only single-target damage skills for now
         if (skill == null) return;
-        if (skill.targetType != SkillTargetType.SingleEnemy) return;
 
-        var dmgSkill = skill as DamageSkill;
-        if (dmgSkill == null) return;
+        bool supported =
+            skill is DamageSkill ||
+            skill is DamageAllEnemiesSkill;
 
-        pendingDamageSkill = dmgSkill;
+        if (!supported) return;
+
+        pendingSkill = skill;
 
         pendingCasterIsEnemy = skillListUI != null && skillListUI.GetActiveEnemy() != null;
 
@@ -201,80 +203,167 @@ public class CalculatorScreen : MonoBehaviour
 
     private void OnPartyTargetClicked(int partyIndex)
     {
-        if (pendingDamageSkill == null) return;
+        if (pendingSkill == null) return;
         if (currentParty == null || partyIndex < 0 || partyIndex >= currentParty.Count) return;
 
-        var casterEnemy = skillListUI != null ? skillListUI.GetActiveEnemy() : null;
-        if (casterEnemy == null) return;
+        effectsByTarget = EstimateEffectsIncludingFollowUps(pendingSkill, true, partyIndex);
 
-        var target = currentParty[partyIndex];
-        if (target == null) return;
-
-        casterEnemy.EnsureInitializedFromAsset();
-        target.EnsureInitializedFromAsset();
-
-        int totalDamage = EstimateDamageIncludingFollowUps(pendingDamageSkill, casterEnemy.GetEffectiveStats(), target.GetEffectiveStats());
-
-        AddEffect($"P{partyIndex}", totalDamage);
-
-        pendingDamageSkill = null;
+        pendingSkill = null;
         DisableAllLineupButtons();
         UpdateLineupEffects();
     }
 
     private void OnEnemyTargetClicked(int enemyIndex)
     {
-        if (pendingDamageSkill == null) return;
+        if (pendingSkill == null) return;
         if (currentEnemies == null || enemyIndex < 0 || enemyIndex >= currentEnemies.Count) return;
 
-        var casterParty = skillListUI != null ? skillListUI.GetActivePartyMember() : null;
-        if (casterParty == null) return;
+        effectsByTarget = EstimateEffectsIncludingFollowUps(pendingSkill, false, enemyIndex);
 
-        var target = currentEnemies[enemyIndex];
-        if (target == null) return;
-
-        casterParty.EnsureInitializedFromAsset();
-        target.EnsureInitializedFromAsset();
-
-        int totalDamage = EstimateDamageIncludingFollowUps(pendingDamageSkill, casterParty.GetEffectiveStats(), target.GetEffectiveStats());
-
-        AddEffect($"E{enemyIndex}", totalDamage);
-
-        pendingDamageSkill = null;
+        pendingSkill = null;
         DisableAllLineupButtons();
         UpdateLineupEffects();
     }
-
-    private int EstimateDamageIncludingFollowUps(Skill root, CombatStats casterStats, CombatStats targetStats)
+    private Dictionary<string, Dictionary<targetEffectType, int>> EstimateEffectsIncludingFollowUps(
+        Skill rootSkill,
+        bool casterIsEnemy,
+        int primaryTargetIndex)
     {
-        int sum = 0;
+        var effects = new Dictionary<string, Dictionary<targetEffectType, int>>();
 
-        var dmg = root as DamageSkill;
-        if (dmg != null && root.targetType == SkillTargetType.SingleEnemy)
-            sum += dmg.EstimateDamage(casterStats, targetStats);
+        if (rootSkill == null)
+            return effects;
 
-        if (root.followUpSkills == null) return sum;
+        CombatStats casterStats;
 
-        for (int i = 0; i < root.followUpSkills.Length; i++)
+        if (casterIsEnemy)
         {
-            var s = root.followUpSkills[i];
-            if (s == null) continue;
+            var casterEnemy = skillListUI != null ? skillListUI.GetActiveEnemy() : null;
+            if (casterEnemy == null) return effects;
 
-            // Single-target damage follow-ups only for now (same target)
-            var ds = s as DamageSkill;
-            if (ds != null && s.targetType == SkillTargetType.SingleEnemy)
-                sum += ds.EstimateDamage(casterStats, targetStats);
+            casterEnemy.EnsureInitializedFromAsset();
+            casterStats = casterEnemy.GetEffectiveStats();
+        }
+        else
+        {
+            var casterParty = skillListUI != null ? skillListUI.GetActivePartyMember() : null;
+            if (casterParty == null) return effects;
+
+            casterParty.EnsureInitializedFromAsset();
+            casterStats = casterParty.GetEffectiveStats();
         }
 
-        return sum;
+        ApplySkillEffectsToDictionary(rootSkill, casterStats, casterIsEnemy, primaryTargetIndex, effects);
+
+        if (rootSkill.followUpSkills != null)
+        {
+            for (int i = 0; i < rootSkill.followUpSkills.Length; i++)
+            {
+                var followUp = rootSkill.followUpSkills[i];
+                if (followUp == null) continue;
+
+                ApplySkillEffectsToDictionary(followUp, casterStats, casterIsEnemy, primaryTargetIndex, effects);
+            }
+        }
+
+        return effects;
     }
 
-    private void AddEffect(string targetId, int delta)
+    private void ApplySkillEffectsToDictionary(
+        Skill skill,
+        CombatStats casterStats,
+        bool casterIsEnemy,
+        int primaryTargetIndex,
+        Dictionary<string, Dictionary<targetEffectType, int>> effects)
+    {
+        if (skill == null) return;
+
+        // Single-target damage
+        if (skill is DamageSkill singleDamageSkill)
+        {
+            if (skill.targetType != SkillTargetType.SingleEnemy)
+                return;
+
+            if (casterIsEnemy)
+            {
+                if (currentParty == null || primaryTargetIndex < 0 || primaryTargetIndex >= currentParty.Count)
+                    return;
+
+                var target = currentParty[primaryTargetIndex];
+                if (target == null) return;
+
+                target.EnsureInitializedFromAsset();
+                int damage = singleDamageSkill.EstimateDamage(casterStats, target.GetEffectiveStats());
+                AddEffect(effects, $"P{primaryTargetIndex}", targetEffectType.Damage, damage);
+            }
+            else
+            {
+                if (currentEnemies == null || primaryTargetIndex < 0 || primaryTargetIndex >= currentEnemies.Count)
+                    return;
+
+                var target = currentEnemies[primaryTargetIndex];
+                if (target == null) return;
+
+                target.EnsureInitializedFromAsset();
+                int damage = singleDamageSkill.EstimateDamage(casterStats, target.GetEffectiveStats());
+                AddEffect(effects, $"E{primaryTargetIndex}", targetEffectType.Damage, damage);
+            }
+
+            return;
+        }
+
+        // All-enemies damage
+        if (skill is DamageAllEnemiesSkill aoeDamageSkill)
+        {
+            if (skill.targetType != SkillTargetType.AllEnemies)
+                return;
+
+            if (casterIsEnemy)
+            {
+                if (currentParty == null) return;
+
+                for (int i = 0; i < currentParty.Count; i++)
+                {
+                    var target = currentParty[i];
+                    if (target == null) continue;
+
+                    target.EnsureInitializedFromAsset();
+                    int damage = aoeDamageSkill.EstimateDamage(casterStats, target.GetEffectiveStats());
+                    AddEffect(effects, $"P{i}", targetEffectType.Damage, damage);
+                }
+            }
+            else
+            {
+                if (currentEnemies == null) return;
+
+                for (int i = 0; i < currentEnemies.Count; i++)
+                {
+                    var target = currentEnemies[i];
+                    if (target == null) continue;
+
+                    target.EnsureInitializedFromAsset();
+                    int damage = aoeDamageSkill.EstimateDamage(casterStats, target.GetEffectiveStats());
+                    AddEffect(effects, $"E{i}", targetEffectType.Damage, damage);
+                }
+            }
+        }
+    }
+
+    private void AddEffect(
+        Dictionary<string, Dictionary<targetEffectType, int>> effects,
+        string targetId,
+        targetEffectType effectType,
+        int delta)
     {
         if (string.IsNullOrEmpty(targetId)) return;
-        if (!effectsByTarget.ContainsKey(targetId)) effectsByTarget[targetId] = new Dictionary<targetEffectType, int>();
-        if (!effectsByTarget[targetId].ContainsKey(targetEffectType.Damage)) effectsByTarget[targetId][targetEffectType.Damage] = 0;
-        effectsByTarget[targetId][targetEffectType.Damage] += delta;
+
+        if (!effects.ContainsKey(targetId))
+            effects[targetId] = new Dictionary<targetEffectType, int>();
+
+        if (!effects[targetId].ContainsKey(effectType))
+            effects[targetId][effectType] = 0;
+
+        effects[targetId][effectType] += delta;
     }
 
     private void DisableAllLineupButtons()

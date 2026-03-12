@@ -118,6 +118,7 @@ public class CampEditorScreenController : MonoBehaviour
 
     public void Open()
     {
+        canvasManager.RefreshUI();
         gameObject.SetActive(true);
         BuildCharacterButtons();
         // default to first member if none selected
