@@ -28,12 +28,15 @@ public class CalculatorPartyEntryUI : MonoBehaviour
     [Header("Turn Order")]
     public TMP_Text turnOrderText;
 
-    [NonSerialized]
-    public CalculatorSkillList skillList;
-    [NonSerialized]
-    public GameObject skillListContainer;
+    [Header("Stats")]
+    public Button statButton;
+
+    [NonSerialized] public CalculatorScreen calculatorScreen;
+
 
     private MapPartyMemberDefinition storedDef; 
+
+
 
     public void Setup(MapPartyMemberDefinition def)
     {
@@ -49,14 +52,14 @@ public class CalculatorPartyEntryUI : MonoBehaviour
         }
 
         // Max HP / Max SP (shown full)
-        int maxHp = !def.stats.IsUnityNull() ? def.stats.maxHealth : 0;
-        int maxSp = !def.stats.IsUnityNull() ? def.stats.maxSp : 0;
+        int maxHp = !storedDef.stats.IsUnityNull() ? storedDef.stats.maxHealth : 0;
+        int maxSp = !storedDef.stats.IsUnityNull() ? storedDef.stats.maxSp : 0;
 
         if (hpBar != null)
         {
             hpBar.minValue = 0;
             setMaxHP(maxHp);
-            setHP(def.health);
+            setHP(storedDef.health);
         }
 
         if (spBar != null)
@@ -70,33 +73,36 @@ public class CalculatorPartyEntryUI : MonoBehaviour
         if (itemIcon != null)
         {
             var transfer = MapCombatTransfer.Instance;
-            var equipped = transfer != null ? transfer.GetEquippedItem(def) : null;
+            var equipped = transfer != null ? transfer.GetEquippedItem(storedDef) : null;
             var icon = equipped != null ? equipped.icon : null;
             
             itemIcon.sprite = icon;
             itemIcon.enabled = icon != null;
         }
 
-        if(skillListContainer != null)
+        if (skillButton != null)
         {
+            skillButton.onClick.RemoveAllListeners();
             skillButton.onClick.AddListener(OpenSkillList);
         }
-    }
 
-    public void SetSkillList(CalculatorSkillList skillList, GameObject skillListContainer)
-    {
-        this.skillList = skillList;
-        this.skillListContainer = skillListContainer;
+        if (statButton != null)
+        {
+            statButton.onClick.RemoveAllListeners();
+            statButton.onClick.AddListener(OpenStatScreen);
+        }
     }
 
     void OpenSkillList()
     {
-        if (skillList != null)
-        {
-            skillList.SetActiveCharacter(storedDef);
-            skillList.UpdateSkillList(storedDef.skills, true);
-            skillListContainer.gameObject.SetActive(true);
-        }
+        if (calculatorScreen != null)
+            calculatorScreen.OpenPartySkillScreen(storedDef);
+    }
+
+    void OpenStatScreen()
+    {
+        if (calculatorScreen != null)
+            calculatorScreen.OpenPartyStatScreen(storedDef);
     }
 
     void setMaxHP(int max)
@@ -153,5 +159,10 @@ public class CalculatorPartyEntryUI : MonoBehaviour
     {
         if (turnOrderText != null)
             turnOrderText.text = $"{order}";
+    }
+
+    public void SetCalculatorScreen(CalculatorScreen screen)
+    {
+        calculatorScreen = screen;
     }
 }

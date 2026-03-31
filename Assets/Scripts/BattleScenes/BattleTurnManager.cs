@@ -58,8 +58,7 @@ public class BattleTurnManager : MonoBehaviour
     private Dictionary<BattleCharacter, BattleCharacter> chosenTargets      = new Dictionary<BattleCharacter, BattleCharacter>();
     private Dictionary<BattleCharacter, ItemDefinition>  chosenItems        = new Dictionary<BattleCharacter, ItemDefinition>();
 
-    [NonSerialized] public List<PassivesDefinition> passivesToRemove = new List<PassivesDefinition>();
-    [NonSerialized] public List<PassivesDefinition> passivesToAdd   = new List<PassivesDefinition>();   
+    [NonSerialized] public PassiveMutationUtility.PassiveMutationContext passiveMutationContext = new PassiveMutationUtility.PassiveMutationContext();
     private void EnsureCommandOrder(BattleCharacter chr)
     {
         if (chr != null && !commandOrder.Contains(chr))
@@ -132,6 +131,8 @@ public class BattleTurnManager : MonoBehaviour
     {
         playerParty = playerPartyParent.GetComponentsInChildren<BattleCharacter>(false).ToList();
         enemyParty  = enemyPartyParent.GetComponentsInChildren<BattleCharacter>(false).ToList();
+
+        AssignPassiveMutationContext();
 
         Trigger_BattleStart();
 
@@ -305,22 +306,7 @@ public class BattleTurnManager : MonoBehaviour
     private IEnumerator ActionResolutionPhase()
     {
         Trigger_ResolvePhaseStart();
-        var actions = EnumerateQueuedActions()
-            .OrderByDescending(a => a.user.getSpeed())
-            .ThenBy(_ => UnityEngine.Random.value)
-            .ToList();
-
-        // Let passives modify order:
-        var actionsArray = actions.ToArray();
-        foreach(var a in actionsArray)
-        {
-            InvokePassivesWithMutation(
-                a.user,
-                () => a.user.passives,
-                p => p.OnActionOrdered(a, actions)
-            );
-
-        }
+        var actions = ActionOrderUtility.GetOrderedActions(EnumerateQueuedActions().ToList());
 
         // Execute
         foreach (var action in actions)
@@ -348,20 +334,22 @@ public class BattleTurnManager : MonoBehaviour
                     // Apply passive effects (NOTE: Kinda janky, might fix later)
                     if (action.user.passives != null)
                     {
-                        InvokePassivesWithMutation(
+                        PassiveMutationUtility.InvokePassivesWithMutation(
                             action.user,
                             () => action.user.passives,
-                            p => p.OnSkillUsed(action.user, action.skill)
+                            p => p.OnSkillUsed(action.user, action.skill),
+                            passiveMutationContext
                         );
                     }
 
                     List<BattleCharacter> targets = GetTargetsForSkill(action.skill, action.user, action.target);
                     foreach (var t in targets)
                     {
-                        InvokePassivesWithMutation(
+                        PassiveMutationUtility.InvokePassivesWithMutation(
                             t,
                             () => t.passives,
-                            p => p.OnSkillReceived(t, action.user, action.skill)
+                            p => p.OnSkillReceived(t, action.user, action.skill),
+                            passiveMutationContext
                         );
 
                     }
@@ -375,19 +363,21 @@ public class BattleTurnManager : MonoBehaviour
                     // Apply passive effects
                     if (action.user.passives != null)
                     {
-                        InvokePassivesWithMutation(
+                        PassiveMutationUtility.InvokePassivesWithMutation(
                             action.user,
                             () => action.user.passives,
-                            p => p.OnSkillUsedEnd(action.user, action.skill)
+                            p => p.OnSkillUsedEnd(action.user, action.skill),
+                            passiveMutationContext
                         );
                     }
 
                     foreach (var t in targets)
                     {
-                        InvokePassivesWithMutation(
+                        PassiveMutationUtility.InvokePassivesWithMutation(
                             t,
                             () => t.passives,
-                            p => p.OnSkillReceivedEnd(t, action.user, action.skill)
+                            p => p.OnSkillReceivedEnd(t, action.user, action.skill),
+                            passiveMutationContext
                         );
                     }
                     
@@ -641,16 +631,18 @@ public class BattleTurnManager : MonoBehaviour
 
     public void RegisterDamage(BattleCharacter source, BattleCharacter target, int amount)
     {
-        InvokePassivesWithMutation(
+        PassiveMutationUtility.InvokePassivesWithMutation(
             source,
             () => source.passives,
-            p => p.OnAfterDealDamage(source, target, amount)
+            p => p.OnAfterDealDamage(source, target, amount),
+            passiveMutationContext
         );
 
-        InvokePassivesWithMutation(
+        PassiveMutationUtility.InvokePassivesWithMutation(
             target,
             () => target.passives,
-            p => p.OnAfterTakeDamage(target, source, amount)
+            p => p.OnAfterTakeDamage(target, source, amount),
+            passiveMutationContext
         );
 
             
@@ -821,7 +813,7 @@ public class BattleTurnManager : MonoBehaviour
         }
     }
 
-    void ForEachCombatant(System.Action<BattleCharacter> action)
+    void ForEachCombatant(Action<BattleCharacter> action)
     {
         if (playerParty != null) foreach (var c in playerParty) { if (c != null) action(c); }
         if (enemyParty  != null) foreach (var c in enemyParty)  { if (c != null) action(c); }
@@ -830,30 +822,34 @@ public class BattleTurnManager : MonoBehaviour
     void Trigger_BattleStart()
     {
         ForEachCombatant(c => { foreach (var t in c.Traits) t.OnBattleStart(c); });
-        ForEachCombatant(c => { InvokePassivesWithMutation(
+        ForEachCombatant(c => { PassiveMutationUtility.InvokePassivesWithMutation(
                 c,
                 () => c.passives,
-                p => p.OnBattleStart(c)
+                p => p.OnBattleStart(c),
+                passiveMutationContext
             );
         });
     }
 
     void Trigger_CommandPhaseStart()
     {
-        ForEachCombatant(c => { InvokePassivesWithMutation(
+        ForEachCombatant(c => { PassiveMutationUtility.InvokePassivesWithMutation(
                 c,
                 () => c.passives,
-                p => p.OnCommandPhaseStart(c)
+                p => p.OnCommandPhaseStart(c),
+                passiveMutationContext
             );
         });
     }
 
     void Trigger_ResolvePhaseStart()
     {
-         ForEachCombatant(c => { InvokePassivesWithMutation(
+        
+         ForEachCombatant(c => { PassiveMutationUtility.InvokePassivesWithMutation(
                 c,
                 () => c.passives,
-                p => p.OnResolvePhaseStart(c)
+                p => p.OnResolvePhaseStart(c),
+                passiveMutationContext
             );
         });
 
@@ -861,43 +857,29 @@ public class BattleTurnManager : MonoBehaviour
 
     void Trigger_ResolvePhaseEnd()
     {
-        return;
+        ForEachCombatant(c => { PassiveMutationUtility.InvokePassivesWithMutation(
+                c,
+                () => c.passives,
+                p => p.OnResolvePhaseEnd(c),
+                passiveMutationContext
+            );
+        });
     }
 
-
-    // Run passives hooks with the ability to modify the list of passives
-    private void InvokePassivesWithMutation(
-        BattleCharacter owner,
-        Func<List<PassivesDefinition>> getCurrentPassives,
-        Action<PassivesDefinition> invokeHook)
+    private void AssignPassiveMutationContext()
     {
-        if (owner == null || invokeHook == null) return;
-
-        var passivesList = getCurrentPassives?.Invoke();
-        if (passivesList == null) return;
-
-        do
+        foreach (var chr in playerParty)
         {
-            passivesToAdd.Clear();
+            if (chr != null)
+                chr.passiveMutationContext = passiveMutationContext;
+        }
 
-            foreach (var p in passivesList)
-            {
-                if (p == null) continue;
-                if (passivesToRemove.Contains(p)) continue;
-
-                invokeHook(p);
-            }
-
-            passivesList = new List<PassivesDefinition>(passivesToAdd);
-            foreach (var p in passivesList)
-            {
-                if (p == null) continue;
-                owner.AddPassive(p);
-            }
-        } while (passivesList.Count > 0);
-
-        while (passivesToRemove.Count > 0)
-            owner.RemovePassive(passivesToRemove[0]);
+        foreach (var chr in enemyParty)
+        {
+            if (chr != null)
+                chr.passiveMutationContext = passiveMutationContext;
+        }
     }
+    
 
 }

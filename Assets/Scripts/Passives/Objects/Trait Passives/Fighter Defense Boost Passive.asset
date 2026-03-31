@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ea7edce51d795e47b76fc40f5bcb27f, type: 3}
   m_Name: Fighter Defense Boost Passive
   m_EditorClassIdentifier: Assembly-CSharp::FighterDefenseBoostPassive
+  displayName: Guard Up

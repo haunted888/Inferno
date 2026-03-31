@@ -1,6 +1,7 @@
 using UnityEngine;
+using System.Collections.Generic;
 
-[CreateAssetMenu(menuName = "Battle/Skills/Damage Skill")]
+[CreateAssetMenu(menuName = "Skills/Damage Skill")]
 public class DamageSkill : Skill
 {
     [Header("Damage Skill")]
@@ -11,15 +12,27 @@ public class DamageSkill : Skill
 
     public override int EstimateDamage(BattleCharacter user, BattleCharacter target)
     {
-        if (user == null || target == null) return 0;
-        return EstimateDamage(user.GetEffectiveStats(), target.GetEffectiveStats());
-    }
+        SkillDamageType damageType = this.damageType;
 
-    public int EstimateDamage(CombatStats userStats, CombatStats targetStats)
-    {
+        if (damageType == SkillDamageType.Adaptive)
+        {
+            Dictionary<DamageSubType, int> subTypeCounts = user.GetSubAttackStats();
+            subType = DamageSubType.None;
+            int highestCount = 0;
+            foreach (var kvp in subTypeCounts)
+            {
+                if (kvp.Value > highestCount)
+                {
+                    highestCount = kvp.Value;
+                    subType = kvp.Key;
+                    damageType = subTypeToDamageType[subType];
+                }
+            }
+        }
+
         return EstimateExpectedDamageInternal(
-            userStats,
-            targetStats,
+            user.GetEffectiveStats(),
+            target.GetEffectiveStats(),
             power,
             damageType,
             skillCritChance,
@@ -27,9 +40,29 @@ public class DamageSkill : Skill
             subType);
     }
 
+    //NOTE: When you add animations, add them directly to the skill and have them execute in this function.
     public override void Execute(BattleCharacter user, BattleCharacter target)
     {
         if (user == null || target == null || target.IsDead) return;
+
+        SkillDamageType damageType = this.damageType;
+
+        if (damageType == SkillDamageType.Adaptive)
+        {
+            Dictionary<DamageSubType, int> subTypeCounts = user.GetSubAttackStats();
+            subType = DamageSubType.None;
+            int highestCount = 0;
+            foreach (var kvp in subTypeCounts)
+            {
+                if (kvp.Value > highestCount)
+                {
+                    highestCount = kvp.Value;
+                    subType = kvp.Key;
+                    damageType = subTypeToDamageType[subType];
+                }
+            }
+            Debug.Log($"{this.damageType} damage type determined: {damageType} based on sub-type {subType}");
+        }
 
         int damage = ComputeActualDamage(
             user.GetEffectiveStats(), target.GetEffectiveStats(),
@@ -40,7 +73,13 @@ public class DamageSkill : Skill
             subType);
 
         damage = user.ApplyTraitDamageModifiers(this, target, damage);
+        damage = target.ApplyIncomingDamageModifiers(damage);
+        damage = user.ApplyOutgoingDamageModifiers(damage);
+
         int dealt = target.TakeDamage(damage);
+        target.ClearIncomingDamageModifiers();
+        user.ClearOutgoingDamageModifiers();
+
         BattleTurnManager.Instance?.RegisterDamage(user, target, dealt);
 
         ExecuteFollowUps(user, target);

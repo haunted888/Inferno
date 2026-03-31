@@ -7,7 +7,7 @@ public class EntertainerTraitDefinition : TraitDefinition
     public EntertainerPassiveDefinition entertainerPassive;
 
     [Header("SP heal percent")]
-    public float spHeal = 0f;
+    public float spHeal = 0.5f;
 
     void Awake()
     {
@@ -15,9 +15,9 @@ public class EntertainerTraitDefinition : TraitDefinition
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public override void OnBattleStart(BattleCharacter user)
+    public override void OnBattleStart(BattleCharacter self)
     {
         entertainerPassive.setSpHeal(spHeal);
-        BattleTurnManager.Instance.passivesToAdd.Add(entertainerPassive);
+        self.QueuePassiveToAdd(entertainerPassive);
     }
 }

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b46758e7021b2843aa9a5f13dd2ac4b, type: 3}
+  m_Name: Caesar Passive
+  m_EditorClassIdentifier: Assembly-CSharp::CaesarPassive
+  displayName: Caesar
+  attackBoostPercent: 0.1
+  defenseBoostPercent: 0.1
+  elementalResistanceBoostPercent: 0.1
+  elementalPowerBoostPercent: 0.1
+  passiveBoost: {fileID: 11400000, guid: 1147a376fb091e24987ea590bd718d23, type: 2}

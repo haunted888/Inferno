@@ -1,27 +1,44 @@
 // DamageAllEnemiesSkill.cs
+using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Battle/Skills/Damage All Enemies")]
+[CreateAssetMenu(menuName = "Skills/Damage All Enemies")]
 public class DamageAllEnemiesSkill : Skill
 {
     [Header("Damage AOE SKill")]
+    public affectsCharacters characters;
     public int power = 10;
     public DamageSubType subType = DamageSubType.None;
 
     public int skillCritChance = 0;
     public int skillCritDamage = 0;
 
+
     public override int EstimateDamage(BattleCharacter user, BattleCharacter target)
     {
         if (user == null || target == null) return 0;
-        return EstimateDamage(user.GetEffectiveStats(), target.GetEffectiveStats());
-    }
 
-    public int EstimateDamage(CombatStats userStats, CombatStats targetStats)
-    {
+        SkillDamageType damageType = this.damageType;
+
+        if (damageType == SkillDamageType.Adaptive)
+        {
+            Dictionary<DamageSubType, int> subTypeCounts = user.GetSubAttackStats();
+            subType = DamageSubType.None;
+            int highestCount = 0;
+            foreach (var kvp in subTypeCounts)
+            {
+                if (kvp.Value > highestCount)
+                {
+                    highestCount = kvp.Value;
+                    subType = kvp.Key;
+                    damageType = subTypeToDamageType[subType];
+                }
+            }
+        }
+
         return EstimateExpectedDamageInternal(
-            userStats,
-            targetStats,
+            user.GetEffectiveStats(),
+            target.GetEffectiveStats(),
             power,
             damageType,
             skillCritChance,
@@ -29,18 +46,65 @@ public class DamageAllEnemiesSkill : Skill
             subType);
     }
 
+
     public override void Execute(BattleCharacter user, BattleCharacter target)
     {
-        if (BattleTurnManager.Instance == null || user == null) return;
+        if (user == null) return;
 
-        // Use the target's team (fallback to user if target is null)
-        var center = target != null ? target : user;
-        var group = BattleTurnManager.Instance.GetAlliesOf(center);
+        List<BattleCharacter> group;
+
+        switch (characters)
+        {
+            case affectsCharacters.Target:
+                group = new List<BattleCharacter> { target };
+                break;
+            case affectsCharacters.TargetTeam:
+                group = new List<BattleCharacter>(target.GetAllies());
+                break;
+            case affectsCharacters.Self:
+                group = new List<BattleCharacter> { user };
+                break;
+            case affectsCharacters.Allies:
+                group = new List<BattleCharacter>(user.GetAllies());
+                break;
+            case affectsCharacters.Enemies:
+                group = new List<BattleCharacter>(user.GetEnemies());
+                break;
+            case affectsCharacters.AllOtherAllies:
+                group = new List<BattleCharacter>(user.GetAllies());
+                group.Remove(user);
+                break;
+            default:
+                group = new List<BattleCharacter>(target.GetAllies());
+                break;
+        }
+
+        SkillDamageType damageType = this.damageType;
+
+        if (damageType == SkillDamageType.Adaptive)
+        {
+            Dictionary<DamageSubType, int> subTypeCounts = user.GetSubAttackStats();
+            subType = DamageSubType.None;
+            int highestCount = 0;
+            foreach (var kvp in subTypeCounts)
+            {
+                if (kvp.Value > highestCount)
+                {
+                    highestCount = kvp.Value;
+                    subType = kvp.Key;
+                    damageType = subTypeToDamageType[subType];
+                }
+            }
+        }
+        
         foreach (var member in group)
         {
             if (member == null || member.IsDead) continue;
+            
+            
 
-           int damage = ComputeActualDamage(
+
+            int damage = ComputeActualDamage(
                 user.GetEffectiveStats(),
                 member.GetEffectiveStats(),
                 power,
@@ -49,10 +113,15 @@ public class DamageAllEnemiesSkill : Skill
                 skillCritDamage,
                 subType);
 
-            damage = user.ApplyTraitDamageModifiers(this, target, damage);
-            
-            int dealt  = member.TakeDamage(damage);
-            BattleTurnManager.Instance.RegisterDamage(user, member, dealt);
+            damage = user.ApplyTraitDamageModifiers(this, member, damage);
+            damage = member.ApplyIncomingDamageModifiers(damage);
+            damage = user.ApplyOutgoingDamageModifiers(damage);
+
+            int dealt = member.TakeDamage(damage);
+            member.ClearIncomingDamageModifiers();
+            user.ClearOutgoingDamageModifiers();
+
+            BattleTurnManager.Instance?.RegisterDamage(user, member, dealt);
         }
 
         ExecuteFollowUps(user, target);
@@ -61,13 +130,13 @@ public class DamageAllEnemiesSkill : Skill
 
     // Slight refactor: better to compute once per target:
     protected int ComputeActualDamage(
-    CombatStats userStats,
-    CombatStats targetStats,
-    int skillPower,
-    SkillDamageType type,
-    int skillCritChance,
-    int skillCritDamage,
-    DamageSubType subType)
+        CombatStats userStats,
+        CombatStats targetStats,
+        int skillPower,
+        SkillDamageType type,
+        int skillCritChance,
+        int skillCritDamage,
+        DamageSubType subType)
     {
         // Base offense/defense (physical or elemental)
         int baseOff = (type == SkillDamageType.Physical)
@@ -113,13 +182,13 @@ public class DamageAllEnemiesSkill : Skill
     }
 
     protected int EstimateExpectedDamageInternal(
-    CombatStats userStats,
-    CombatStats targetStats,
-    int skillPower,
-    SkillDamageType type,
-    int skillCritChance,
-    int skillCritDamage,
-    DamageSubType subType)
+        CombatStats userStats,
+        CombatStats targetStats,
+        int skillPower,
+        SkillDamageType type,
+        int skillCritChance,
+        int skillCritDamage,
+        DamageSubType subType)
     {
         // Base offense/defense (physical or elemental)
         int baseOff = (type == SkillDamageType.Physical)

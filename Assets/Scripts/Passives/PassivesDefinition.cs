@@ -4,13 +4,17 @@ using UnityEngine;
 
 public abstract class PassivesDefinition : ScriptableObject
 {
+    // Display Name
+    public string displayName = "Passive";
+
     // Passive stats
-    public virtual void getStatBoosts(BattleCharacter self) {  }
+    public virtual void GetStatBoosts(BattleCharacter self) {  }
 
     // Phase hooks
     public virtual void OnBattleStart(BattleCharacter self) { }
     public virtual void OnCommandPhaseStart(BattleCharacter self) { }
     public virtual void OnResolvePhaseStart(BattleCharacter self) { }
+    public virtual void OnResolvePhaseEnd(BattleCharacter self) { }
 
     // Combat event hooks
     public virtual void OnAfterDealDamage(BattleCharacter self, BattleCharacter target, int amount) { }

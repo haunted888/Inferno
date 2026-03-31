@@ -16,11 +16,11 @@ public class CalculatorEnemyEntryUI : MonoBehaviour
 
     [Header("Skills")]
     public Button skillButton;
-    
-    [NonSerialized]
-    public CalculatorSkillList skillList;
-    [NonSerialized]
-    public GameObject skillListContainer;
+
+    [Header("Stats")]
+    public Button statButton;
+
+    [NonSerialized] public CalculatorScreen calculatorScreen;
 
     [Header("Turn Order")]
     public TMP_Text turnOrderText;
@@ -41,10 +41,10 @@ public class CalculatorEnemyEntryUI : MonoBehaviour
         }
 
 
-        def.EnsureInitializedFromAsset();
+        storedDef.EnsureInitializedFromAsset();
 
         // Max HP only (enemies do not have SP)
-        int maxHp = !def.stats.IsUnityNull() ? def.stats.maxHealth : 0;
+        int maxHp = !storedDef.stats.IsUnityNull() ? storedDef.stats.maxHealth : 0;
 
         if (hpBar != null)
         {
@@ -53,26 +53,29 @@ public class CalculatorEnemyEntryUI : MonoBehaviour
             setHP(maxHp);
         }
 
-        if(skillListContainer != null)
+        if (skillButton != null)
         {
+            skillButton.onClick.RemoveAllListeners();
             skillButton.onClick.AddListener(OpenSkillList);
+        }
+
+        if (statButton != null)
+        {
+            statButton.onClick.RemoveAllListeners();
+            statButton.onClick.AddListener(OpenStatScreen);
         }
     }
     
-    public void SetSkillList(CalculatorSkillList skillList, GameObject skillListContainer)
+
+    public void SetCalculatorScreen(CalculatorScreen screen)
     {
-        this.skillList = skillList;
-        this.skillListContainer = skillListContainer;
+        calculatorScreen = screen;
     }
 
     void OpenSkillList()
     {
-        if (skillList != null)
-        {
-            skillList.SetActiveCharacter(storedDef);
-            skillList.UpdateSkillList(storedDef.skills, false);
-            skillListContainer.SetActive(true);
-        }
+        if (calculatorScreen != null)
+            calculatorScreen.OpenEnemySkillScreen(storedDef);
     }
 
     void setMaxHP(int max)
@@ -103,5 +106,11 @@ public class CalculatorEnemyEntryUI : MonoBehaviour
     {
         if (turnOrderText != null)
             turnOrderText.text = $"{order}";
+    }
+
+    void OpenStatScreen()
+    {
+        if (calculatorScreen != null)
+            calculatorScreen.OpenEnemyStatScreen(storedDef);
     }
 }

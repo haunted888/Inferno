@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Battle/Skills/Restore Resources Percent")]
+[CreateAssetMenu(menuName = "Skills/Restore Resources Percent")]
 public class RestoreResourcesPercent : Skill
 {
     [Header("Restore Percent Skill")]

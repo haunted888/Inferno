@@ -17,6 +17,8 @@ public class PartySlotController : MonoBehaviour
             var chr  = inst.GetComponent<BattleCharacter>();
             if (chr == null) continue;
 
+            
+
             chr.sourceDefinition = def;
 
             CombatStats stats = def.GetEffectiveStats();
@@ -63,6 +65,7 @@ public class PartySlotController : MonoBehaviour
                 if (t != null)
                     t.SetupForBattle(def, chr);
             }
+
 
         }
     }

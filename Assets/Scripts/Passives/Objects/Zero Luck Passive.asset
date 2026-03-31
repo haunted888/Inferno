@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 791f3b68eb8652849a2f254dca22d18e, type: 3}
   m_Name: Zero Luck Passive
   m_EditorClassIdentifier: Assembly-CSharp::ZeroLuckPassive
+  displayName: Zero Luck

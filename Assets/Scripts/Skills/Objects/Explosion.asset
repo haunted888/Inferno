@@ -17,9 +17,11 @@ MonoBehaviour:
   targetType: 1
   damageType: 0
   spCost: 5
+  hpCost: 0
   followUpSkills: []
   traitTags: 
   ammoCost: 0
+  characters: 1
   power: 30
   subType: 0
   skillCritChance: 0

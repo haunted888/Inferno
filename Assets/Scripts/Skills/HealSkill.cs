@@ -1,7 +1,7 @@
 // HealAllySkill.cs
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Battle/Skills/Heal Ally")]
+[CreateAssetMenu(menuName = "Skills/Heal Ally")]
 public class HealAllySkill : Skill
 {
     [Header("Heal Skill")]

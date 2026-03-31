@@ -1,0 +1,230 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14eec20560603704cbdf8f662bf64313, type: 3}
+  m_Name: ExpeditionistCaesarTrait
+  m_EditorClassIdentifier: Assembly-CSharp::ExpeditionistTraitDefinition
+  traitName: Expeditionist
+  description: 
+  traitType: 8
+  expeditionRewards:
+  - type: 1
+    partyMember:
+      characterPrefab: {fileID: 0}
+      displayName: 
+      characterAsset: {fileID: 0}
+      overrideTraits: 0
+      overrideStats: 0
+      overrideSkills: 0
+      traits: []
+      stats:
+        maxHealth: 0
+        maxSp: 0
+        speed: 0
+        physicalAttack: 0
+        elementalPower: 0
+        defense: 0
+        elementalResistance: 0
+        critChance: 0
+        critDamage: 0
+        bludgeoningAttack: 0
+        slashingAttack: 0
+        piercingAttack: 0
+        bludgeoningDefense: 0
+        slashingDefense: 0
+        piercingDefense: 0
+        fireAttack: 0
+        iceAttack: 0
+        stormAttack: 0
+        acidAttack: 0
+        psychicAttack: 0
+        bloodAttack: 0
+        fireDefense: 0
+        iceDefense: 0
+        stormDefense: 0
+        acidDefense: 0
+        psychicDefense: 0
+        bloodDefense: 0
+      skills: []
+      level: 0
+      currentXp: 0
+      passives: []
+      talentTreePrefab: {fileID: 0}
+      talentPoints: 0
+      learnedTalentIds: []
+      mainSubStats: 
+      subSubStats: 
+    startWithXp: 0
+    startLevel: 0
+    startXp: 0
+    moneyAmount: 25
+    item: {fileID: 0}
+    itemQuantity: 0
+    expeditionistQuantity: 50
+  - type: 1
+    partyMember:
+      characterPrefab: {fileID: 0}
+      displayName: 
+      characterAsset: {fileID: 0}
+      overrideTraits: 0
+      overrideStats: 0
+      overrideSkills: 0
+      traits: []
+      stats:
+        maxHealth: 0
+        maxSp: 0
+        speed: 0
+        physicalAttack: 0
+        elementalPower: 0
+        defense: 0
+        elementalResistance: 0
+        critChance: 0
+        critDamage: 0
+        bludgeoningAttack: 0
+        slashingAttack: 0
+        piercingAttack: 0
+        bludgeoningDefense: 0
+        slashingDefense: 0
+        piercingDefense: 0
+        fireAttack: 0
+        iceAttack: 0
+        stormAttack: 0
+        acidAttack: 0
+        psychicAttack: 0
+        bloodAttack: 0
+        fireDefense: 0
+        iceDefense: 0
+        stormDefense: 0
+        acidDefense: 0
+        psychicDefense: 0
+        bloodDefense: 0
+      skills: []
+      level: 0
+      currentXp: 0
+      passives: []
+      talentTreePrefab: {fileID: 0}
+      talentPoints: 0
+      learnedTalentIds: []
+      mainSubStats: 
+      subSubStats: 
+    startWithXp: 0
+    startLevel: 0
+    startXp: 0
+    moneyAmount: 50
+    item: {fileID: 0}
+    itemQuantity: 0
+    expeditionistQuantity: 30
+  - type: 2
+    partyMember:
+      characterPrefab: {fileID: 0}
+      displayName: 
+      characterAsset: {fileID: 0}
+      overrideTraits: 0
+      overrideStats: 0
+      overrideSkills: 0
+      traits: []
+      stats:
+        maxHealth: 0
+        maxSp: 0
+        speed: 0
+        physicalAttack: 0
+        elementalPower: 0
+        defense: 0
+        elementalResistance: 0
+        critChance: 0
+        critDamage: 0
+        bludgeoningAttack: 0
+        slashingAttack: 0
+        piercingAttack: 0
+        bludgeoningDefense: 0
+        slashingDefense: 0
+        piercingDefense: 0
+        fireAttack: 0
+        iceAttack: 0
+        stormAttack: 0
+        acidAttack: 0
+        psychicAttack: 0
+        bloodAttack: 0
+        fireDefense: 0
+        iceDefense: 0
+        stormDefense: 0
+        acidDefense: 0
+        psychicDefense: 0
+        bloodDefense: 0
+      skills: []
+      level: 0
+      currentXp: 0
+      passives: []
+      talentTreePrefab: {fileID: 0}
+      talentPoints: 0
+      learnedTalentIds: []
+      mainSubStats: 
+      subSubStats: 
+    startWithXp: 0
+    startLevel: 0
+    startXp: 0
+    moneyAmount: 0
+    item: {fileID: 11400000, guid: 90e3409091222444eb62437a4c59fd34, type: 2}
+    itemQuantity: 1
+    expeditionistQuantity: 15
+  - type: 2
+    partyMember:
+      characterPrefab: {fileID: 0}
+      displayName: 
+      characterAsset: {fileID: 0}
+      overrideTraits: 0
+      overrideStats: 0
+      overrideSkills: 0
+      traits: []
+      stats:
+        maxHealth: 0
+        maxSp: 0
+        speed: 0
+        physicalAttack: 0
+        elementalPower: 0
+        defense: 0
+        elementalResistance: 0
+        critChance: 0
+        critDamage: 0
+        bludgeoningAttack: 0
+        slashingAttack: 0
+        piercingAttack: 0
+        bludgeoningDefense: 0
+        slashingDefense: 0
+        piercingDefense: 0
+        fireAttack: 0
+        iceAttack: 0
+        stormAttack: 0
+        acidAttack: 0
+        psychicAttack: 0
+        bloodAttack: 0
+        fireDefense: 0
+        iceDefense: 0
+        stormDefense: 0
+        acidDefense: 0
+        psychicDefense: 0
+        bloodDefense: 0
+      skills: []
+      level: 0
+      currentXp: 0
+      passives: []
+      talentTreePrefab: {fileID: 0}
+      talentPoints: 0
+      learnedTalentIds: []
+      mainSubStats: 
+      subSubStats: 
+    startWithXp: 0
+    startLevel: 0
+    startXp: 0
+    moneyAmount: 0
+    item: {fileID: 11400000, guid: f9cda8308c0f47143993f56babb23d38, type: 2}
+    itemQuantity: 1
+    expeditionistQuantity: 5

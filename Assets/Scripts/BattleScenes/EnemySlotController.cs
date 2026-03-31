@@ -24,6 +24,7 @@ public class EnemySlotController : MonoBehaviour
             Debug.Log("Instantiated enemy prefab: " + def.enemyPrefab.name);
             var chr = inst.GetComponent<BattleCharacter>();
             if (chr == null) continue;
+            
 
             CombatStats stats = def.GetEffectiveStats();
             int maxHp = stats.maxHealth;
@@ -54,6 +55,7 @@ public class EnemySlotController : MonoBehaviour
                 // Optional: parent to enemy so it moves with them
                 barObj.transform.SetParent(chr.transform);
             }
+
         }
     }
 

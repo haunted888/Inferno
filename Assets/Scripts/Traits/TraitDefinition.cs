@@ -9,7 +9,8 @@ public enum CharacterTrait
     Fighter,
     Marksman,
     Rogue,
-    Strategist
+    Strategist,
+    Expeditionist
 }
 
 public abstract class TraitDefinition : ScriptableObject

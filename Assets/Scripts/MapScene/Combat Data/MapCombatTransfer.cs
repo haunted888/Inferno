@@ -357,6 +357,13 @@ public class MapCombatTransfer : MonoBehaviour
             pendingRewards.Add(chosen);
         }
     }
+
+    public void AddToPendingRewards(MapRewardDefinition reward)
+    {
+        if (reward == null) return;
+        pendingRewards.Add(reward);
+    }
+
     private void AddCampMember(MapPartyMemberDefinition def)
     {
         if (def == null) return;

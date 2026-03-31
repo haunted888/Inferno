@@ -15,10 +15,12 @@ MonoBehaviour:
   skillName: Shoot
   description: Shoots at an enemy
   targetType: 0
+  damageType: 0
   spCost: 0
   followUpSkills: []
+  traitTags: 
+  ammoCost: 0
   power: 50
-  damageType: 0
   subType: 3
   skillCritChance: 0
   skillCritDamage: 0

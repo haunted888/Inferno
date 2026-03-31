@@ -1,7 +1,7 @@
 // HealAllAlliesSkill.cs
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Battle/Skills/Heal All Allies")]
+[CreateAssetMenu(menuName = "Skills/Heal All Allies")]
 public class HealAllAlliesSkill : Skill
 {
     [Header("Heal ALL Skill")]
@@ -9,10 +9,9 @@ public class HealAllAlliesSkill : Skill
 
     public override void Execute(BattleCharacter user, BattleCharacter target)
     {
-        if (BattleTurnManager.Instance == null || user == null) return;
+        if (user == null) return;
 
-        var center = target != null ? target : user;
-        var group = BattleTurnManager.Instance.GetAlliesOf(center);
+        var group = user.GetAllies();
 
         foreach (var ally in group)
         {

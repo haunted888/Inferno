@@ -1637,6 +1637,7 @@ MonoBehaviour:
   hpText: {fileID: 6007272101055953618}
   hpPreviewText: {fileID: 2885032798090460798}
   skillButton: {fileID: 7805445347180172711}
+  statButton: {fileID: 1986480813340668276}
   turnOrderText: {fileID: 3223787317389430715}
 --- !u!1 &8167305244494350356
 GameObject:

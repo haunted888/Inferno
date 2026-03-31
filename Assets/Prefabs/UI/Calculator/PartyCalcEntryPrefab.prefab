@@ -485,6 +485,7 @@ MonoBehaviour:
   itemIcon: {fileID: 2954062725615211102}
   skillButton: {fileID: 2000536976940768760}
   turnOrderText: {fileID: 156868815565412242}
+  statButton: {fileID: 6216443206551891648}
 --- !u!1 &1996511282986793402
 GameObject:
   m_ObjectHideFlags: 0

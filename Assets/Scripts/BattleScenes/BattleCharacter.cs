@@ -39,6 +39,11 @@ public class BattleCharacter : MonoBehaviour
     public List<TraitDefinition> Traits { get; } = new List<TraitDefinition>();
     public List<CharacterTrait> traitTypes = new List<CharacterTrait>();
 
+    [NonSerialized] public PassiveMutationUtility.PassiveMutationContext passiveMutationContext;
+
+    public List<QueuedAction> currentActionOrder;
+    
+
     void Awake()
     {
         
@@ -130,6 +135,13 @@ public class BattleCharacter : MonoBehaviour
             return;
         }
 
+        float hpCost = skill.hpCost; // new field on Skill
+        if (!TrySpendHp(hpCost))
+        {
+            Debug.Log($"{name} does not have enough HP ({currentHealth}/{cost}) to use {skill.skillName}.");
+            return;
+        }
+
         // Trait tests
         if(!HasEnoughAmmoFor(skill)) return;
 
@@ -180,7 +192,7 @@ public class BattleCharacter : MonoBehaviour
         foreach (var p in passives)
         {
             if (p == null) continue;
-            p.getStatBoosts(this);
+            p.GetStatBoosts(this);
         }
         CombatStats result = new CombatStats();
         result.maxHealth      = baseStats.maxHealth      + bonusStats.maxHealth;
@@ -228,42 +240,50 @@ public class BattleCharacter : MonoBehaviour
         return baseStats.speed + bonusStats.speed;
     }
 
-    public int GetSubAttack(DamageSubType subType)
+    public Dictionary<DamageSubType, int> GetSubAttackStats()
     {
-        switch (subType)
+        bonusStats = new CombatStats();
+        foreach (var p in passives)
         {
-            case DamageSubType.Bludgeoning: return baseStats.bludgeoningAttack + bonusStats.bludgeoningAttack;
-            case DamageSubType.Slashing:    return baseStats.slashingAttack + bonusStats.slashingAttack;
-            case DamageSubType.Piercing:    return baseStats.piercingAttack + bonusStats.piercingAttack;
-
-            case DamageSubType.Fire:        return baseStats.fireAttack + bonusStats.fireAttack;
-            case DamageSubType.Ice:         return baseStats.iceAttack + bonusStats.iceAttack;
-            case DamageSubType.Storm:       return baseStats.stormAttack + bonusStats.stormAttack;
-            case DamageSubType.Acid:        return baseStats.acidAttack + bonusStats.acidAttack;
-            case DamageSubType.Psychic:     return baseStats.psychicAttack + bonusStats.psychicAttack;
-            case DamageSubType.Blood:       return baseStats.bloodAttack + bonusStats.bloodAttack;
-
-            default: return 0;
+            if (p == null) continue;
+            p.GetStatBoosts(this);
         }
+        Dictionary<DamageSubType, int> subAttackStats = new Dictionary<DamageSubType, int>
+        {
+            { DamageSubType.Bludgeoning, baseStats.bludgeoningAttack + bonusStats.bludgeoningAttack + baseStats.physicalAttack + bonusStats.physicalAttack },
+            { DamageSubType.Slashing, baseStats.slashingAttack + bonusStats.slashingAttack + baseStats.physicalAttack + bonusStats.physicalAttack },
+            { DamageSubType.Piercing, baseStats.piercingAttack + bonusStats.piercingAttack + baseStats.physicalAttack + bonusStats.physicalAttack },
+            { DamageSubType.Fire, baseStats.fireAttack + bonusStats.fireAttack + baseStats.elementalPower + bonusStats.elementalPower },
+            { DamageSubType.Ice, baseStats.iceAttack + bonusStats.iceAttack + baseStats.elementalPower + bonusStats.elementalPower },
+            { DamageSubType.Storm, baseStats.stormAttack + bonusStats.stormAttack + baseStats.elementalPower + bonusStats.elementalPower },
+            { DamageSubType.Acid, baseStats.acidAttack + bonusStats.acidAttack + baseStats.elementalPower + bonusStats.elementalPower },
+            { DamageSubType.Psychic, baseStats.psychicAttack + bonusStats.psychicAttack + baseStats.elementalPower + bonusStats.elementalPower },
+            { DamageSubType.Blood, baseStats.bloodAttack + bonusStats.bloodAttack + baseStats.elementalPower + bonusStats.elementalPower }
+        };
+        return subAttackStats;
     }
 
-    public int GetSubDefense(DamageSubType subType)
+    public Dictionary<DamageSubType, int> GetSubDefenseStats()
     {
-        switch (subType)
+        bonusStats = new CombatStats();
+        foreach (var p in passives)
         {
-            case DamageSubType.Bludgeoning: return baseStats.bludgeoningDefense + bonusStats.bludgeoningDefense;
-            case DamageSubType.Slashing:    return baseStats.slashingDefense + bonusStats.slashingDefense;
-            case DamageSubType.Piercing:    return baseStats.piercingDefense + bonusStats.piercingDefense;
-
-            case DamageSubType.Fire:        return baseStats.fireDefense + bonusStats.fireDefense;
-            case DamageSubType.Ice:         return baseStats.iceDefense + bonusStats.iceDefense;
-            case DamageSubType.Storm:       return baseStats.stormDefense + bonusStats.stormDefense;
-            case DamageSubType.Acid:        return baseStats.acidDefense + bonusStats.acidDefense;
-            case DamageSubType.Psychic:     return baseStats.psychicDefense + bonusStats.psychicDefense;
-            case DamageSubType.Blood:       return baseStats.bloodDefense + bonusStats.bloodDefense;
-
-            default: return 0;
+            if (p == null) continue;
+            p.GetStatBoosts(this);
         }
+        Dictionary<DamageSubType, int> subDefenseStats = new Dictionary<DamageSubType, int>
+        {
+            { DamageSubType.Bludgeoning, baseStats.bludgeoningDefense + bonusStats.bludgeoningDefense + baseStats.defense + bonusStats.defense },
+            { DamageSubType.Slashing, baseStats.slashingDefense + bonusStats.slashingDefense + baseStats.defense + bonusStats.defense },
+            { DamageSubType.Piercing, baseStats.piercingDefense + bonusStats.piercingDefense + baseStats.defense + bonusStats.defense },
+            { DamageSubType.Fire, baseStats.fireDefense + bonusStats.fireDefense + baseStats.elementalResistance + bonusStats.elementalResistance },
+            { DamageSubType.Ice, baseStats.iceDefense + bonusStats.iceDefense + baseStats.elementalResistance + bonusStats.elementalResistance },
+            { DamageSubType.Storm, baseStats.stormDefense + bonusStats.stormDefense + baseStats.elementalResistance + bonusStats.elementalResistance },
+            { DamageSubType.Acid, baseStats.acidDefense + bonusStats.acidDefense + baseStats.elementalResistance + bonusStats.elementalResistance },
+            { DamageSubType.Psychic, baseStats.psychicDefense + bonusStats.psychicDefense + baseStats.elementalResistance + bonusStats.elementalResistance },
+            { DamageSubType.Blood, baseStats.bloodDefense + bonusStats.bloodDefense + baseStats.elementalResistance + bonusStats.elementalResistance }
+        };
+        return subDefenseStats;
     }
 
     public void SetMaxSp(int newMax, bool fillToMax = true)
@@ -287,6 +307,19 @@ public class BattleCharacter : MonoBehaviour
 
         currentSp -= amount;
         Debug.Log($"{name} spent {amount} SP. SP: {currentSp}/{maxSp}");
+        return true;
+    }
+
+    public bool TrySpendHp(float amount)
+    {
+        int hpLost = Mathf.CeilToInt(amount * maxHealth);
+        Debug.Log($"{name} attempting to spend {hpLost} HP. Current HP: {currentHealth}/{maxHealth}");
+        if (amount <= 0) return true;
+        Debug.Log($"{name} has enough HP to spend.");
+        if (currentHealth <= hpLost) return false;
+
+        currentHealth -= hpLost;
+        Debug.Log($"{name} spent {hpLost} HP. HP: {currentHealth}/{maxHealth}");
         return true;
     }
 
@@ -360,4 +393,100 @@ public class BattleCharacter : MonoBehaviour
         return CurrentAmmo >= needed;
     }
 
+
+    // Fighting side info
+    private IReadOnlyList<BattleCharacter> previewAllies;
+    private IReadOnlyList<BattleCharacter> previewEnemies;
+
+    public void SetPreviewTeams(
+        IReadOnlyList<BattleCharacter> allies,
+        IReadOnlyList<BattleCharacter> enemies)
+    {
+        previewAllies = allies;
+        previewEnemies = enemies;
+    }
+
+    public IEnumerable<BattleCharacter> GetAllies()
+    {
+        if (BattleTurnManager.Instance != null)
+            return BattleTurnManager.Instance.GetAlliesOf(this);
+
+        return previewAllies ?? Array.Empty<BattleCharacter>();
+    }
+
+    public IEnumerable<BattleCharacter> GetEnemies()
+    {
+        if (BattleTurnManager.Instance != null)
+            return BattleTurnManager.Instance.GetEnemiesOf(this);
+
+        return previewEnemies ?? Array.Empty<BattleCharacter>();
+    }
+
+    public void QueuePassiveToAdd(PassivesDefinition passive)
+    {
+        if (passive == null) return;
+
+        if (passiveMutationContext != null)
+        {
+            passiveMutationContext.passivesToAdd.Add(passive);
+        }
+        else
+        {
+            AddPassive(passive);
+        }
+    }
+
+    public void QueuePassiveToRemove(PassivesDefinition passive)
+    {
+        if (passive == null) return;
+
+        if (passiveMutationContext != null)
+        {
+            passiveMutationContext.passivesToRemove.Add(passive);
+        }
+        else
+        {
+            RemovePassive(passive);
+        }
+    }
+
+    public IReadOnlyList<QueuedAction> GetCurrentActionOrder()
+    {
+        return currentActionOrder;
+    }
+
+    // Direct damage modifiers
+    private float incomingDamageMultiplier = 1f;
+
+    public void AddIncomingDamageMultiplier(float percentBonus)
+    {
+        incomingDamageMultiplier += percentBonus;
+    }
+
+    public int ApplyIncomingDamageModifiers(int damage)
+    {
+        return Mathf.Max(0, Mathf.RoundToInt(damage * incomingDamageMultiplier));
+    }
+
+    private float outgoingDamageMultiplier = 1f;
+
+    public void AddOutgoingDamageMultiplier(float percentBonus)
+    {
+        outgoingDamageMultiplier += percentBonus;
+    }
+
+    public int ApplyOutgoingDamageModifiers(int damage)
+    {
+        return Mathf.Max(0, Mathf.RoundToInt(damage * outgoingDamageMultiplier));
+    }
+
+    public void ClearIncomingDamageModifiers()
+    {
+        incomingDamageMultiplier = 1f;
+    }
+    
+    public void ClearOutgoingDamageModifiers()
+    {
+        outgoingDamageMultiplier = 1f;
+    }
 }

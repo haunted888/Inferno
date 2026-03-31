@@ -1,5 +1,8 @@
 using UnityEngine;
 
+
+
+[CreateAssetMenu(menuName = "Traits/Strategist")]
 public class StrategistTraitDefinition : TraitDefinition
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -12,8 +15,8 @@ public class StrategistTraitDefinition : TraitDefinition
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public override void OnBattleStart(BattleCharacter user)
+    public override void OnBattleStart(BattleCharacter self)
     {
-        user.AddPassive(strategistPassiveDefinition);
+        self.QueuePassiveToAdd(strategistPassiveDefinition);
     }
 }

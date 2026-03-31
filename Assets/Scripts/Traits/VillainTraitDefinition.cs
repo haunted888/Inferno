@@ -17,25 +17,26 @@ public class VillainTraitDefinition : TraitDefinition
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public override void OnBattleStart(BattleCharacter user)
+    public override void OnBattleStart(BattleCharacter self)
     {
-        var allies = BattleTurnManager.Instance.GetAlliesOf(user);
+        var allies = self.GetAllies();
         allyPassiveBoost.setStatBoosts(physicalAttackBoost, elementalAttackBoost, physicalDefenseBoost, elementalResistanceBoost);
         foreach (var ally in allies)
         {
-            if(ally == user) continue;
+            if(ally == self) continue;
             ally.AddPassive(allyPassiveBoost);
         }
+        base.OnBattleStart(self);
     }
 
-    public override void OnDeath(BattleCharacter user)
+    public override void OnDeath(BattleCharacter self)
     {
-        var allies = BattleTurnManager.Instance.GetAlliesOf(user);
+        var allies = self.GetAllies();
         foreach (var ally in allies)
         {
-            if(ally == user) continue;
+            if(ally == self) continue;
             ally.RemovePassive(allyPassiveBoost);
         }
-        base.OnBattleStart(user);
+        base.OnDeath(self);
     }
 }
