@@ -16,7 +16,6 @@ MonoBehaviour:
   traits:
   - {fileID: 11400000, guid: a6f405de52bdc584e8db27c71c0df4f7, type: 2}
   - {fileID: 11400000, guid: ab27e88e5e933a54480836c76abb27c0, type: 2}
-  - {fileID: 11400000, guid: 4d33ebc5f623c4d4292323c7fd29a604, type: 2}
   baseStats:
     maxHealth: 15
     maxSp: 10

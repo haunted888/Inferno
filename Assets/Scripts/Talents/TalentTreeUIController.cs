@@ -26,10 +26,24 @@ public class TalentTreeUIController : MonoBehaviour
 
     void OnNodeToggle(TalentDefinition t)
     {
+        
+
         if (member == null || t == null) return;
 
-        // Only learn; do NOT unlearn here (realloc will be added later)
         if (!member.HasTalent(t.id) && member.CanLearn(t))
+
+            if(t.cost == 0)
+            {
+                //Only one free talent per character
+                foreach (var node in nodes)
+                {
+                    if(node.talent.cost == 0 && member.HasTalent(node.talent.id))
+                    {
+                        member.UnlearnTalent(node.talent);
+                    }
+                }
+            }
+
             member.LearnTalent(t);
 
         RefreshAll();
@@ -56,6 +70,7 @@ public class TalentTreeUIController : MonoBehaviour
             if (n != null && n.talent != null && member.HasTalent(n.talent.id))
                 member.UnlearnTalent(n.talent);
         }
+        member.InitializeTalents();
         RefreshAll();
     }
 }

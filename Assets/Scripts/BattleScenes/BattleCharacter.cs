@@ -457,6 +457,9 @@ public class BattleCharacter : MonoBehaviour
 
     // Direct damage modifiers
     private float incomingDamageMultiplier = 1f;
+    private float incomingDamageMultiplierMax = float.PositiveInfinity;
+
+    private float incomingDamageMultiplierMin = 0f;
 
     public void AddIncomingDamageMultiplier(float percentBonus)
     {
@@ -465,10 +468,28 @@ public class BattleCharacter : MonoBehaviour
 
     public int ApplyIncomingDamageModifiers(int damage)
     {
+        if (incomingDamageMultiplierMin > incomingDamageMultiplierMax)
+            incomingDamageMultiplierMin = incomingDamageMultiplierMax;
+        if (incomingDamageMultiplier > incomingDamageMultiplierMax)
+            incomingDamageMultiplier = incomingDamageMultiplierMax;
+        if (incomingDamageMultiplier < incomingDamageMultiplierMin)
+            incomingDamageMultiplier = incomingDamageMultiplierMin;
         return Mathf.Max(0, Mathf.RoundToInt(damage * incomingDamageMultiplier));
     }
 
+    public void SetIncomingDamageMultiplierLimits(float min = 0f, float max = float.PositiveInfinity)
+    {
+        if(incomingDamageMultiplierMin < min)
+            incomingDamageMultiplierMin = min;
+        if(incomingDamageMultiplierMax > max)
+            incomingDamageMultiplierMax = max;
+    }
+
     private float outgoingDamageMultiplier = 1f;
+
+    private float outgoingDamageMultiplierMax = float.PositiveInfinity;
+
+    private float outgoingDamageMultiplierMin = 0f;
 
     public void AddOutgoingDamageMultiplier(float percentBonus)
     {
@@ -477,16 +498,36 @@ public class BattleCharacter : MonoBehaviour
 
     public int ApplyOutgoingDamageModifiers(int damage)
     {
+        if (outgoingDamageMultiplierMin > outgoingDamageMultiplierMax)
+            outgoingDamageMultiplierMin = outgoingDamageMultiplierMax;
+        if (outgoingDamageMultiplier > outgoingDamageMultiplierMax)
+            outgoingDamageMultiplier = outgoingDamageMultiplierMax;
+        if (outgoingDamageMultiplier < outgoingDamageMultiplierMin)
+            outgoingDamageMultiplier = outgoingDamageMultiplierMin;
         return Mathf.Max(0, Mathf.RoundToInt(damage * outgoingDamageMultiplier));
+    }
+
+    public void SetOutgoingDamageMultiplierLimits(float min = 0f, float max = float.PositiveInfinity)
+    {
+        if(outgoingDamageMultiplierMin < min)
+            outgoingDamageMultiplierMin = min;
+        if(outgoingDamageMultiplierMax > max)
+            outgoingDamageMultiplierMax = max;
     }
 
     public void ClearIncomingDamageModifiers()
     {
         incomingDamageMultiplier = 1f;
+        incomingDamageMultiplierMin = 0f;
+        incomingDamageMultiplierMax = float.PositiveInfinity;
+
     }
     
     public void ClearOutgoingDamageModifiers()
     {
         outgoingDamageMultiplier = 1f;
+        outgoingDamageMultiplierMin = 0f;
+        outgoingDamageMultiplierMax = float.PositiveInfinity;
+
     }
 }

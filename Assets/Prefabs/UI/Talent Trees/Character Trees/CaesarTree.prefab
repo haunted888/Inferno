@@ -228,10 +228,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TalentTreeUIController
   pointsLabel: {fileID: 7418936078250744531}
   nodes:
+  - {fileID: 245315597775273901}
   - {fileID: 893023166815343058}
   - {fileID: 5012356197654164149}
   - {fileID: 7719542110070418414}
+  - {fileID: 4879487545325227298}
+  - {fileID: 7041280099424521662}
   - {fileID: 4592402126530370483}
+  - {fileID: 1156426639456487246}
   - {fileID: 4115309314729260466}
   - {fileID: 2101002223410349984}
 --- !u!1 &6460316350072588256
@@ -558,6 +562,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b67bb31184ef56c4a9ef6b85b7eaf933, type: 3}
+--- !u!114 &245315597775273901 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 703237558976062331, guid: b67bb31184ef56c4a9ef6b85b7eaf933, type: 3}
+  m_PrefabInstance: {fileID: 767283099707563222}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e72bdd6e23dac44da1374e70d3e7136, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TalentNodeUI
 --- !u!224 &2344091575652031832 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3036003631620112782, guid: b67bb31184ef56c4a9ef6b85b7eaf933, type: 3}
@@ -781,6 +796,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b67bb31184ef56c4a9ef6b85b7eaf933, type: 3}
+--- !u!114 &1156426639456487246 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 703237558976062331, guid: b67bb31184ef56c4a9ef6b85b7eaf933, type: 3}
+  m_PrefabInstance: {fileID: 1859447007939224629}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e72bdd6e23dac44da1374e70d3e7136, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TalentNodeUI
 --- !u!224 &3741391796389946811 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3036003631620112782, guid: b67bb31184ef56c4a9ef6b85b7eaf933, type: 3}
@@ -1343,6 +1369,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b67bb31184ef56c4a9ef6b85b7eaf933, type: 3}
+--- !u!114 &4879487545325227298 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 703237558976062331, guid: b67bb31184ef56c4a9ef6b85b7eaf933, type: 3}
+  m_PrefabInstance: {fileID: 5365206370670259801}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e72bdd6e23dac44da1374e70d3e7136, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TalentNodeUI
 --- !u!224 &6942026091711557591 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3036003631620112782, guid: b67bb31184ef56c4a9ef6b85b7eaf933, type: 3}
@@ -1793,6 +1830,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3036003631620112782, guid: b67bb31184ef56c4a9ef6b85b7eaf933, type: 3}
   m_PrefabInstance: {fileID: 7527133616514723525}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7041280099424521662 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 703237558976062331, guid: b67bb31184ef56c4a9ef6b85b7eaf933, type: 3}
+  m_PrefabInstance: {fileID: 7527133616514723525}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e72bdd6e23dac44da1374e70d3e7136, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TalentNodeUI
 --- !u!1001 &8333216270529356339
 PrefabInstance:
   m_ObjectHideFlags: 0

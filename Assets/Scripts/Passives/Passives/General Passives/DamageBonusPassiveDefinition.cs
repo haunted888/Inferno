@@ -7,7 +7,7 @@ public class DamageBonusPassiveDefinition : PassivesDefinition
 
     public int turnsToLast = 1;
 
-    public override void OnSkillUsed(BattleCharacter self, Skill skill)
+    public override void BeforeDamageSkillExecute(BattleCharacter self, BattleCharacter target, Skill skill)
     {
         if (self == null || skill == null) return;
         if (skill.damageType == SkillDamageType.None) return;

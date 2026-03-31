@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class FullStatScreenUI : MonoBehaviour
 {
     public TMP_Text hpStatText;
+    public TMP_Text spStatText;
     public TMP_Text attackStatText;
     public TMP_Text subAttackStatText;
     public TMP_Text elementalStatText;
@@ -22,6 +23,8 @@ public class FullStatScreenUI : MonoBehaviour
     {
         if (hpStatText != null)
             hpStatText.text = $"HP: {stats.maxHealth}";
+        if (spStatText != null)
+            spStatText.text = $"SP: {stats.maxSp}";
         if (attackStatText != null)
             attackStatText.text = $"Attack: {stats.physicalAttack}";
         if (subAttackStatText != null)

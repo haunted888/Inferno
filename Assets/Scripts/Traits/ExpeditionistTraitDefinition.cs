@@ -7,7 +7,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Traits/Expeditionist")]
 public class ExpeditionistTraitDefinition : TraitDefinition
 {
-
+    //NOTE: Expedition rewards applied at the beginning of combat, may want to change to end later for game design purposes. If done, also change Vici passive.
     [Header("Expedition Rewards")]
     public List<MapRewardDefinition> expeditionRewards;
 
@@ -17,6 +17,11 @@ public class ExpeditionistTraitDefinition : TraitDefinition
     }
 
     public override void OnBattleStart(BattleCharacter user)
+    {
+        addReward();
+    }
+
+    public void addReward()
     {
         MapRewardDefinition chosen = null;
         int total = 0;

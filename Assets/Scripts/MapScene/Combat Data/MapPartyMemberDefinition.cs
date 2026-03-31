@@ -81,6 +81,7 @@ public class MapPartyMemberDefinition
     [NonSerialized] public bool initializedFromAssetTraits  = false;
     [NonSerialized] public bool initializedFromAssetStats  = false;
     [NonSerialized] public bool initializedFromAssetSkills = false;
+    [NonSerialized] public bool initializedTalents = false;
 
     public PassivesDefinition[] passives; // optional; can be empty
 
@@ -147,6 +148,12 @@ public class MapPartyMemberDefinition
         {
             InitializeSubStatsFromTemplate();
             initializedSubStats = true;
+        }
+
+        if (!initializedTalents)
+        {
+            InitializeTalents();
+            initializedTalents = true;
         }
 
 
@@ -680,4 +687,20 @@ public class MapPartyMemberDefinition
         return bonusStats;
     }
     
+    public void InitializeTalents()
+    {
+        if (talentTreePrefab == null) return;
+
+        // Automatically learn the first talent(s) in the tree that cost 0 points, if any
+        foreach (var t in talentTreePrefab.nodes)
+        {
+            if (t.talent.cost == 0)
+            {
+                LearnTalent(t.talent);
+                break;
+            }
+        }
+
+        
+    }
 }

@@ -18,6 +18,8 @@ public class DamageAllEnemiesSkill : Skill
     {
         if (user == null || target == null) return 0;
 
+        BeforeDamageSkillExecute(user, target);
+
         SkillDamageType damageType = this.damageType;
 
         if (damageType == SkillDamageType.Adaptive)

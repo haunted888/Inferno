@@ -45,6 +45,8 @@ public class DamageSkill : Skill
     {
         if (user == null || target == null || target.IsDead) return;
 
+        BeforeDamageSkillExecute(user, target);
+
         SkillDamageType damageType = this.damageType;
 
         if (damageType == SkillDamageType.Adaptive)

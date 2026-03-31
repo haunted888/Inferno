@@ -157,6 +157,7 @@ public class BattleTurnManager : MonoBehaviour
 
             itemSelectionUI.Hide();
             skillSelectionUI.Hide();
+            ClearAllTargetOutlines();
 
             yield return StartCoroutine(CommandSelectionPhase());
 
@@ -187,6 +188,8 @@ public class BattleTurnManager : MonoBehaviour
             // 1) Main command menu
             bool waitingForCommand = true;
             BattleCommandType chosenCommand = BattleCommandType.Skills;
+
+            ClearAllTargetOutlines();
 
             commandUI.ShowForCharacter(chr, hasPrevious, (cmd) =>
             {
@@ -262,6 +265,15 @@ public class BattleTurnManager : MonoBehaviour
                     };
 
                     ClickManagerBattle.OnCharacterClicked.AddListener(handler);
+
+                    IEnumerable<BattleCharacter> targetPool =
+                        chosenSkill.targetType == SkillTargetType.SingleEnemy || chosenSkill.targetType == SkillTargetType.AllEnemies
+                            ? GetEnemiesOf(chr)
+                            : chosenSkill.targetType == SkillTargetType.SingleAlly || chosenSkill.targetType == SkillTargetType.AllAllies
+                                ? GetAlliesOf(chr)
+                                : new List<BattleCharacter> { chr };
+
+                    SetOutlineEnabled(targetPool, true);
 
                     while (waitingForTarget && !cancelToCommand)
                         yield return null;
@@ -517,6 +529,26 @@ public class BattleTurnManager : MonoBehaviour
                         waitingForTarget = false;
                     };
                     ClickManagerBattle.OnCharacterClicked.AddListener(handler);
+
+                    List<BattleCharacter> itemTargetPool = new List<BattleCharacter>();
+                    foreach(var p in playerParty)
+                    {
+                        if (bc.CanTarget(chr, p))
+                        {
+                            itemTargetPool.Add(p);
+                        }
+                    }
+
+                    foreach(var e in enemyParty)
+                    {
+                        if (bc.CanTarget(chr, e))
+                        {
+                            itemTargetPool.Add(e);
+                        }
+
+                    }
+
+                    SetOutlineEnabled(itemTargetPool, true);
 
                     while (waitingForTarget && !cancelToCommand) yield return null;
 
@@ -879,6 +911,26 @@ public class BattleTurnManager : MonoBehaviour
             if (chr != null)
                 chr.passiveMutationContext = passiveMutationContext;
         }
+    }
+
+    private void SetOutlineEnabled(IEnumerable<BattleCharacter> characters, bool enabled)
+    {
+        if (characters == null) return;
+
+        foreach (var chr in characters)
+        {
+            if (chr == null || chr.IsDead) continue;
+
+            var outline = chr.GetComponent<Outline>();
+            if (outline != null)
+                outline.enabled = enabled;
+        }
+    }
+
+    private void ClearAllTargetOutlines()
+    {
+        SetOutlineEnabled(playerParty, false);
+        SetOutlineEnabled(enemyParty, false);
     }
     
 

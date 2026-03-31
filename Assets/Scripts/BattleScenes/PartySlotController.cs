@@ -66,6 +66,8 @@ public class PartySlotController : MonoBehaviour
                     t.SetupForBattle(def, chr);
             }
 
+            if(inst.GetComponent<Outline>() != null)
+                inst.GetComponent<Outline>().enabled = false; // Disable outline by default; can be enabled later when selecting targets, etc.
 
         }
     }

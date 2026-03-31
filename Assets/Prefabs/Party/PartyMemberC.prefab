@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: m_Name
-      value: HumanDummy_F Purple
+      value: PartyMemberC
       objectReference: {fileID: 0}
     - target: {fileID: 2775862123970177323, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -69,6 +69,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1924406365309993158}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8314253632327106515}
   m_SourcePrefab: {fileID: 100100000, guid: f1e8e1bfafe7fa241ba6b4181f3eba85, type: 3}
 --- !u!1 &4494123611944530687 stripped
 GameObject:
@@ -113,13 +116,55 @@ MonoBehaviour:
   slotSize: 1
   maxHealth: 100
   currentHealth: 0
-  speed: 10
+  maxSp: 10
+  currentSp: 0
+  passives: []
   sourceDefinition:
     characterPrefab: {fileID: 0}
     displayName: Unnamed
-    health: 100
-    speed: 10
+    characterAsset: {fileID: 0}
+    overrideTraits: 0
+    overrideStats: 0
+    overrideSkills: 0
+    traits: []
+    stats:
+      maxHealth: 100
+      maxSp: 10
+      speed: 10
+      physicalAttack: 100
+      elementalPower: 100
+      defense: 0
+      elementalResistance: 0
+      critChance: 5
+      critDamage: 150
+      bludgeoningAttack: 0
+      slashingAttack: 0
+      piercingAttack: 0
+      bludgeoningDefense: 0
+      slashingDefense: 0
+      piercingDefense: 0
+      fireAttack: 0
+      iceAttack: 0
+      stormAttack: 0
+      acidAttack: 0
+      psychicAttack: 0
+      bloodAttack: 0
+      fireDefense: 0
+      iceDefense: 0
+      stormDefense: 0
+      acidDefense: 0
+      psychicDefense: 0
+      bloodDefense: 0
     skills: []
+    level: 1
+    currentXp: 0
+    passives: []
+    talentTreePrefab: {fileID: 0}
+    talentPoints: 1
+    learnedTalentIds: []
+    mainSubStats: 
+    subSubStats: 
+  traitTypes: 
   threat: 0
   skills: []
 --- !u!114 &1924406365309993158
@@ -134,3 +179,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca7604d235cf92b4fa8dedbf2328a6f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Party
+--- !u!114 &-8314253632327106515
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4494123611944530687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 0, g: 0.85081005, b: 1, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 1
+  bakeKeys: []
+  bakeValues: []

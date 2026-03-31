@@ -93,6 +93,16 @@ public abstract class Skill : ScriptableObject
         return 0;
     }
 
+    public void BeforeDamageSkillExecute(BattleCharacter user, BattleCharacter target)
+    {
+
+        for (int i = 0; i < user.passives.Count; i++)
+        {
+            var p = user.passives[i];
+            if (p == null) continue;
+            p.BeforeDamageSkillExecute(user, target, this);
+        }
+    }
     
     //NOTE: When you add animations, add them directly to the skill and have them execute in this function.
     public abstract void Execute(BattleCharacter user, BattleCharacter target);

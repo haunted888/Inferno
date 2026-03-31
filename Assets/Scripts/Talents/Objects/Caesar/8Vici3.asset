@@ -45,4 +45,4 @@ MonoBehaviour:
     bloodDefense: 0
   grantSkills: []
   grantPassives:
-  - {fileID: 0}
+  - {fileID: 11400000, guid: e80c20e0a4a114640b6af1bc76a168a4, type: 2}

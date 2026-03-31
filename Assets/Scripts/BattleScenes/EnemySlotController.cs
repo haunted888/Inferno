@@ -55,6 +55,9 @@ public class EnemySlotController : MonoBehaviour
                 // Optional: parent to enemy so it moves with them
                 barObj.transform.SetParent(chr.transform);
             }
+            
+            if(inst.GetComponent<Outline>() != null)
+                inst.GetComponent<Outline>().enabled = false; // Disable outline by default; can be enabled later when selecting targets, etc.
 
         }
     }

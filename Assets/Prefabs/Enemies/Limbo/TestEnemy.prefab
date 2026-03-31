@@ -69,6 +69,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7282065641878646563}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -9129846903522044240}
   m_SourcePrefab: {fileID: 100100000, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
 --- !u!1 &1542760893854486959 stripped
 GameObject:
@@ -90,7 +93,56 @@ MonoBehaviour:
   slotSize: 1
   maxHealth: 100
   currentHealth: 0
-  speed: 10
+  maxSp: 10
+  currentSp: 0
+  passives: []
+  sourceDefinition:
+    characterPrefab: {fileID: 0}
+    displayName: Unnamed
+    characterAsset: {fileID: 0}
+    overrideTraits: 0
+    overrideStats: 0
+    overrideSkills: 0
+    traits: []
+    stats:
+      maxHealth: 100
+      maxSp: 10
+      speed: 10
+      physicalAttack: 100
+      elementalPower: 100
+      defense: 0
+      elementalResistance: 0
+      critChance: 5
+      critDamage: 150
+      bludgeoningAttack: 0
+      slashingAttack: 0
+      piercingAttack: 0
+      bludgeoningDefense: 0
+      slashingDefense: 0
+      piercingDefense: 0
+      fireAttack: 0
+      iceAttack: 0
+      stormAttack: 0
+      acidAttack: 0
+      psychicAttack: 0
+      bloodAttack: 0
+      fireDefense: 0
+      iceDefense: 0
+      stormDefense: 0
+      acidDefense: 0
+      psychicDefense: 0
+      bloodDefense: 0
+    skills: []
+    level: 1
+    currentXp: 0
+    passives: []
+    talentTreePrefab: {fileID: 0}
+    talentPoints: 1
+    learnedTalentIds: []
+    mainSubStats: 
+    subSubStats: 
+  traitTypes: 
+  threat: 0
   skills: []
 --- !u!114 &2148232811105938060
 MonoBehaviour:
@@ -127,3 +179,21 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &-9129846903522044240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1542760893854486959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Outline
+  outlineMode: 0
+  outlineColor: {r: 0, g: 0.85081005, b: 1, a: 1}
+  outlineWidth: 2
+  precomputeOutline: 1
+  bakeKeys: []
+  bakeValues: []

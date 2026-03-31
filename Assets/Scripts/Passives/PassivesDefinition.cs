@@ -20,6 +20,7 @@ public abstract class PassivesDefinition : ScriptableObject
     public virtual void OnAfterDealDamage(BattleCharacter self, BattleCharacter target, int amount) { }
     public virtual void OnAfterTakeDamage(BattleCharacter self, BattleCharacter attacker, int amount) { }
     public virtual void OnSkillUsed(BattleCharacter self, Skill skill) { }
+    public virtual void BeforeDamageSkillExecute(BattleCharacter self, BattleCharacter target, Skill skill) { }
     public virtual void OnSkillUsedEnd(BattleCharacter self, Skill skill) { }
     public virtual void OnSkillReceived(BattleCharacter self, BattleCharacter attacker, Skill skill) { }
     public virtual void OnSkillReceivedEnd(BattleCharacter self, BattleCharacter attacker, Skill skill) { }
