@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Final Effort Passive
   m_EditorClassIdentifier: Assembly-CSharp::DamageBonusPassiveDefinition
   displayName: Final Effort
+  type: 3
   damageBonusPercent: 1
   turnsToLast: 1

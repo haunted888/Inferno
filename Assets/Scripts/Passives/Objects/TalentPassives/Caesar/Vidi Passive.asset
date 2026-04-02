@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: Vidi Passive
   m_EditorClassIdentifier: Assembly-CSharp::VidiPassive
   displayName: '"Vidi"'
+  type: 5

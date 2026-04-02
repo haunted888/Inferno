@@ -668,7 +668,7 @@ public class CalculatorScreen : MonoBehaviour
         PassiveMutationUtility.InvokePassivesWithMutation(
             caster,
             () => caster.passives,
-            p => p.OnSkillUsed(caster, skill),
+            p => p.OnSkillUsed(caster, target, skill),
             caster.passiveMutationContext
         );
 
@@ -686,7 +686,7 @@ public class CalculatorScreen : MonoBehaviour
         PassiveMutationUtility.InvokePassivesWithMutation(
             caster,
             () => caster.passives,
-            p => p.OnSkillUsedEnd(caster, skill),
+            p => p.OnSkillUsedEnd(caster, target, skill),
             caster.passiveMutationContext
         );
 

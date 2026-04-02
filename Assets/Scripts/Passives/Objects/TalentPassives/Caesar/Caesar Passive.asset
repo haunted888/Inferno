@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Caesar Passive
   m_EditorClassIdentifier: Assembly-CSharp::CaesarPassive
   displayName: Caesar
+  type: 5
   attackBoostPercent: 0.1
   defenseBoostPercent: 0.1
   elementalResistanceBoostPercent: 0.1

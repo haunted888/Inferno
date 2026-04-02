@@ -2,13 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [CreateAssetMenu(menuName = "Skills/Damage Skill")]
-public class DamageSkill : Skill
+public class DamageSkill : DamageSkillParent
 {
-    [Header("Damage Skill")]
-    public int power = 10;
-    public DamageSubType subType = DamageSubType.None;
-    public int skillCritChance = 0;
-    public int skillCritDamage = 0;
 
     public override int EstimateDamage(BattleCharacter user, BattleCharacter target)
     {
@@ -66,6 +61,8 @@ public class DamageSkill : Skill
             Debug.Log($"{this.damageType} damage type determined: {damageType} based on sub-type {subType}");
         }
 
+        int powerRange = Random.Range(power - damageVariance, power + damageVariance);
+
         int damage = ComputeActualDamage(
             user.GetEffectiveStats(), target.GetEffectiveStats(),
             power,
@@ -84,6 +81,9 @@ public class DamageSkill : Skill
 
         BattleTurnManager.Instance?.RegisterDamage(user, target, dealt);
 
+
+        
+        AfterExecute(user, target);
         ExecuteFollowUps(user, target);
     }
 

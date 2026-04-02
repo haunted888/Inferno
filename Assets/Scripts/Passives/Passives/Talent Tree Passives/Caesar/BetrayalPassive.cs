@@ -6,7 +6,7 @@ public class BetrayalPassive : PassivesDefinition
     public BattleCharacter betrayed;
     public float damagePercent = 0.1f;
 
-    public override void OnSkillUsed(BattleCharacter self, Skill skill)
+    public override void OnSkillUsed(BattleCharacter self, BattleCharacter target, Skill skill)
     {
         if (self == null || skill == null) return;
         if (betrayed == null || betrayed.IsDead) return;

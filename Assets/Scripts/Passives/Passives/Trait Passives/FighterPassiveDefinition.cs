@@ -16,7 +16,7 @@ public class FighterPassiveDefinition : PassivesDefinition
     {
         resistanceBoostAmount = amount;
     }
-    public override void OnSkillUsed(BattleCharacter self, Skill skill)
+    public override void OnSkillUsed(BattleCharacter self, BattleCharacter target, Skill skill)
     {
         if (skill == null || fighterDefenseBoost == null) return;
 

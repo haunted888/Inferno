@@ -11,7 +11,15 @@ public class HealAllySkill : Skill
     {
         if (target == null || target.IsDead) return;
 
-        target.Heal(healAmount);
+        BeforeHealingSkillExecute(user, target);
+
+        
+
+        int healing = target.ApplyIncomingHealingModifiers(healAmount);
+
+        target.Heal(healing);
+
+        target.ClearIncomingHealingModifiers();
 
         ExecuteFollowUps(user, target);
     }

@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: Zero Luck Passive
   m_EditorClassIdentifier: Assembly-CSharp::ZeroLuckPassive
   displayName: Zero Luck
+  type: 4

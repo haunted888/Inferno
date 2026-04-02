@@ -3,15 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Skills/Damage All Enemies")]
-public class DamageAllEnemiesSkill : Skill
+public class DamageAllEnemiesSkill : DamageSkillParent
 {
-    [Header("Damage AOE SKill")]
+    [Header("AOE Skill")]
     public affectsCharacters characters;
-    public int power = 10;
-    public DamageSubType subType = DamageSubType.None;
-
-    public int skillCritChance = 0;
-    public int skillCritDamage = 0;
 
 
     public override int EstimateDamage(BattleCharacter user, BattleCharacter target)
@@ -104,12 +99,12 @@ public class DamageAllEnemiesSkill : Skill
             if (member == null || member.IsDead) continue;
             
             
-
+            int powerRange = Random.Range(power - damageVariance, power + damageVariance);
 
             int damage = ComputeActualDamage(
                 user.GetEffectiveStats(),
                 member.GetEffectiveStats(),
-                power,
+                powerRange,
                 damageType,
                 skillCritChance,
                 skillCritDamage,
@@ -126,6 +121,7 @@ public class DamageAllEnemiesSkill : Skill
             BattleTurnManager.Instance?.RegisterDamage(user, member, dealt);
         }
 
+        AfterExecute(user, target);
         ExecuteFollowUps(user, target);
     }
 

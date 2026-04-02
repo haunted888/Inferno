@@ -12,3 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be1673f11b0464748841dcdef45a9179, type: 3}
   m_Name: Villain Passive Definition
   m_EditorClassIdentifier: Assembly-CSharp::VillainPassiveDefinition
+  displayName: On Guard
+  type: 5

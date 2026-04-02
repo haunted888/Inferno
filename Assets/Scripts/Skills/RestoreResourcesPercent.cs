@@ -28,5 +28,10 @@ public class RestoreResourcesPercent : Skill
             if(user.traitTypes.Contains(CharacterTrait.Marksman))
                 user.AddAmmo(Mathf.RoundToInt(Mathf.RoundToInt(ammoRestore * (user.MaxAmmo - user.CurrentAmmo))));
         }
+
+        
+        ExecuteFollowUps(user, target);
     }
+
+    
 }

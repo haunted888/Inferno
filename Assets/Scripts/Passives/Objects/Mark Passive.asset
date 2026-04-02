@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: Mark Passive
   m_EditorClassIdentifier: Assembly-CSharp::MarkPassiveDefinition
   displayName: Mark
+  type: 4
   damageIncreasePercent: 0.1

@@ -39,6 +39,16 @@ public enum SkillTargetType
     Self
 }
 
+public enum SkillEffectType
+{
+    Damage,
+    Heal,
+    Buff,
+    Debuff,
+    Utility,
+    Misc
+}
+
 public abstract class Skill : ScriptableObject
 {
     // Used internally for skill logic
@@ -74,9 +84,10 @@ public abstract class Skill : ScriptableObject
     [Header("Cost")]
     public int spCost = 0;
     [Range(0f, 1f)] public float hpCost = 0f;
+    public int delay = 0; // Turns until skill executes after being chosen
 
     [Header("Additional Effects")]
-    public Skill[] followUpSkills;   // skills to trigger after this one
+    public List<Skill> followUpSkills;   // skills to trigger after this one
 
     [Header("Trait Requirements")]
     public List<CharacterTrait> traitTags = new List<CharacterTrait>();
@@ -103,6 +114,17 @@ public abstract class Skill : ScriptableObject
             p.BeforeDamageSkillExecute(user, target, this);
         }
     }
+
+    public void BeforeHealingSkillExecute(BattleCharacter user, BattleCharacter target)
+    {
+
+        for (int i = 0; i < user.passives.Count; i++)
+        {
+            var p = user.passives[i];
+            if (p == null) continue;
+            p.BeforeHealingSkillExecute(user, target, this);
+        }
+    }
     
     //NOTE: When you add animations, add them directly to the skill and have them execute in this function.
     public abstract void Execute(BattleCharacter user, BattleCharacter target);
@@ -111,7 +133,7 @@ public abstract class Skill : ScriptableObject
     {
         if (followUpSkills == null) return;
 
-        for (int i = 0; i < followUpSkills.Length; i++)
+        for (int i = 0; i < followUpSkills.Count; i++)
         {
             var s = followUpSkills[i];
             if (s == null) continue;
@@ -137,5 +159,70 @@ public abstract class Skill : ScriptableObject
                 return true;
         }
         return false;
+    }
+
+    public void UseNewSkill(BattleCharacter user, BattleCharacter target, Skill skillToUse)
+    {
+
+        if (user.IsAsleep || user.IsDead || target.IsDead) return;
+        if (user.passives != null)
+        {
+            PassiveMutationUtility.InvokePassivesWithMutation(
+                user,
+                () => user.passives,
+                p => p.OnSkillUsed(user, target, skillToUse),
+                user.passiveMutationContext
+            );
+        }
+
+        List<BattleCharacter> targets = BattleUtility.GetTargetsForSkill(skillToUse, user, target);
+        foreach (var t in targets)
+        {
+            PassiveMutationUtility.InvokePassivesWithMutation(
+                t,
+                () => t.passives,
+                p => p.OnSkillReceived(t, user, skillToUse),
+                t.passiveMutationContext
+            );
+
+        }
+
+        skillToUse.Execute(user, target);
+
+        // Apply passive effects
+        if (user.passives != null)
+        {
+            PassiveMutationUtility.InvokePassivesWithMutation(
+                user,
+                () => user.passives,
+                p => p.OnSkillUsedEnd(user, target, skillToUse),
+                user.passiveMutationContext
+            );
+        }
+
+        foreach (var t in targets)
+        {
+            PassiveMutationUtility.InvokePassivesWithMutation(
+                t,
+                () => t.passives,
+                p => p.OnSkillReceivedEnd(t, user, skillToUse),
+                t.passiveMutationContext
+            );
+        }
+    }
+
+    public List<SkillEffectType> GetAllEffectTypes()
+    {
+        List<SkillEffectType> effectTypes = new List<SkillEffectType>();
+        List<Skill> allSkills = new List<Skill> { this };
+        while (allSkills.Count > 0) // Arbitrary limit to prevent infinite loops
+        {
+            allSkills[1].followUpSkills?.ForEach(s => allSkills.Add(s));
+            var current = allSkills[0];
+            if(current is DamageSkillParent) effectTypes.Add(SkillEffectType.Damage);
+            else effectTypes.Add(SkillEffectType.Misc); // Placeholder for non-damage skills until we have more types
+            allSkills.RemoveAt(0);
+        }
+        return effectTypes;
     }
 }

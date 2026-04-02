@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e76d7a58bfbfcd24e967765bfc943312, type: 3}
   m_Name: Fighter Passive Definition
   m_EditorClassIdentifier: Assembly-CSharp::FighterPassiveDefinition
+  displayName: Fighter
+  type: 5
   fighterDefenseBoost: {fileID: 11400000, guid: 60d0a50c814fb4142bda52e8d725d323, type: 2}
   defenseBoostAmount: 0.3
   resistanceBoostAmount: 0.3

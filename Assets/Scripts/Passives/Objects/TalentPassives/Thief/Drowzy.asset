@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e236874ee2398b409ead7d183b222bf, type: 3}
+  m_Name: Drowzy
+  m_EditorClassIdentifier: Assembly-CSharp::ApplyPassiveFuture
+  displayName: Drowzy
+  type: 2
+  passiveToApply: {fileID: 11400000, guid: fb5942bdcd2717740acc85b441bc8632, type: 2}
+  turnsUntilApply: 1

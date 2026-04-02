@@ -9,7 +9,7 @@ public class StrategistPassiveDefinition : PassivesDefinition
     {
         attacker.AddPassive(zeroLuckPassive);
     }
-    public override void OnSkillUsed(BattleCharacter self, Skill skill)
+    public override void OnSkillUsed(BattleCharacter self, BattleCharacter target, Skill skill)
     {
         self.AddPassive(zeroLuckPassive);
     }

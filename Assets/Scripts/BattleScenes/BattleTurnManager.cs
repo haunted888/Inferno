@@ -95,6 +95,11 @@ public class BattleTurnManager : MonoBehaviour
             return false;
 
         var lastChar = commandOrder[commandOrder.Count - 1];
+        if(lastChar.DelayedCastSkill != null)
+        {
+            if(!TryStepBack(1))
+                return false;
+        }
         commandOrder.RemoveAt(commandOrder.Count - 1);
         chosenSkillIndices.Remove(lastChar);
         chosenTargets.Remove(lastChar);
@@ -102,6 +107,29 @@ public class BattleTurnManager : MonoBehaviour
 
         int idx = playerParty.IndexOf(lastChar);
         currentPlayerIndex = Mathf.Max(0, idx);
+
+        return true;
+    }
+
+    private bool TryStepBack(int steps)
+    {
+        if (commandOrder.Count - steps == 0)
+            return false;
+
+        var lastChar = commandOrder[commandOrder.Count - steps - 1];
+        if(lastChar.DelayedCastSkill != null)
+        {
+            if(!TryStepBack(1 + steps))
+                return false;
+        }
+        commandOrder.RemoveAt(commandOrder.Count - steps - 1);
+        chosenSkillIndices.Remove(lastChar);
+        chosenTargets.Remove(lastChar);
+        chosenItems.Remove(lastChar);
+
+        int idx = playerParty.IndexOf(lastChar);
+        currentPlayerIndex = Mathf.Max(0, idx);
+
         return true;
     }
 
@@ -180,6 +208,13 @@ public class BattleTurnManager : MonoBehaviour
             if (chr == null || chr.IsDead)
             {
                 currentPlayerIndex++;
+                continue;
+            }
+
+            if(chr.DelayedCastSkill != null)
+            {
+                Debug.Log($"{chr.name} is still casting {chr.DelayedCastSkill.skill.skillName}, {chr.DelayedCastTurns} turns remaining. Automatically skipping turn.");
+                QueueSkill(chr, chr.DelayedCastSkill.skillIndex, chr.DelayedCastSkill.target);
                 continue;
             }
 
@@ -321,18 +356,53 @@ public class BattleTurnManager : MonoBehaviour
         var actions = ActionOrderUtility.GetOrderedActions(EnumerateQueuedActions().ToList());
 
         // Execute
-        foreach (var action in actions)
+        foreach (var a in actions)
         {
+            var action = a;
             if (IsSideDefeated(playerParty)) { OnBattleEnd(false); yield break; }
             if (IsSideDefeated(enemyParty))  { OnBattleEnd(true);  yield break; }
 
             if (action.user == null || action.user.IsDead) continue;
+            if (action.user.IsAsleep)
+            {
+                Debug.Log($"{action.user.name} is asleep and skips their turn!");
+                action.user.HandleSkippedAction();
+                
+                continue;
+            }
+
+            //Handle delayed skills
+            bool delayFinished = false;
+            if(action.user.DelayedCastSkill != null)
+            {
+                action.user.DelayedCastTurns--;
+                if (action.user.DelayedCastTurns <= 0)
+                {
+                    delayFinished = true;
+                    Debug.Log($"{action.user.name} finishes casting {action.skill.skillName}!");
+                    action = action.user.DelayedCastSkill;
+                    action.user.DelayedCastSkill = null;
+                    action.user.DelayedCastTurns = 0;
+                }
+                else
+                {
+                    Debug.Log($"{action.user.name} is still casting {action.skill.skillName}, {action.user.DelayedCastTurns} turns remaining.");
+                    continue;
+                }
+            }
 
             switch (action.kind)
             {
                 case ActionKind.Skill:
                 {
                     if (action.skill == null) break;
+                    if (action.skill.delay > 0 && !delayFinished) // Handle delayed cast: store skill and remaining turns on character, skip execution for now
+                    {
+                        action.user.DelayedCastSkill = action;
+                        action.user.DelayedCastTurns = action.skill.delay;
+                        Debug.Log($"{action.user.name} begins casting {action.skill.skillName}, which will execute in {action.skill.delay} turns!");
+                        break;
+                    }
 
                     // Resolve target (may retarget)
                     BattleCharacter effectiveTarget = ResolveEffectiveTarget(action);
@@ -349,12 +419,12 @@ public class BattleTurnManager : MonoBehaviour
                         PassiveMutationUtility.InvokePassivesWithMutation(
                             action.user,
                             () => action.user.passives,
-                            p => p.OnSkillUsed(action.user, action.skill),
+                            p => p.OnSkillUsed(action.user, action.target, action.skill),
                             passiveMutationContext
                         );
                     }
 
-                    List<BattleCharacter> targets = GetTargetsForSkill(action.skill, action.user, action.target);
+                    List<BattleCharacter> targets = BattleUtility.GetTargetsForSkill(action.skill, action.user, action.target);
                     foreach (var t in targets)
                     {
                         PassiveMutationUtility.InvokePassivesWithMutation(
@@ -378,7 +448,7 @@ public class BattleTurnManager : MonoBehaviour
                         PassiveMutationUtility.InvokePassivesWithMutation(
                             action.user,
                             () => action.user.passives,
-                            p => p.OnSkillUsedEnd(action.user, action.skill),
+                            p => p.OnSkillUsedEnd(action.user, action.target, action.skill),
                             passiveMutationContext
                         );
                     }
@@ -424,26 +494,6 @@ public class BattleTurnManager : MonoBehaviour
 
     private IEnumerable<QueuedAction> EnumerateQueuedActions()
     {
-        foreach (var kvp in chosenSkillIndices)
-        {
-            var user = kvp.Key;
-            int skillIndex = kvp.Value;
-
-            if (user == null || user.IsDead) continue;
-            if (skillIndex < 0 || skillIndex >= user.Skills.Count) continue;
-
-            Skill skill = user.Skills[skillIndex];
-            chosenTargets.TryGetValue(user, out BattleCharacter target);
-
-            yield return new QueuedAction
-            {
-                kind       = ActionKind.Skill,
-                user       = user,
-                skillIndex = skillIndex,
-                skill      = skill,
-                target     = target
-            };
-        }
 
         foreach (var kvp in chosenItems)
         {
@@ -462,6 +512,31 @@ public class BattleTurnManager : MonoBehaviour
                 target = target // may be null; self-use items will ignore and use self
             };
         }
+        
+        foreach (var kvp in chosenSkillIndices)
+        {
+            var user = kvp.Key;
+            int skillIndex = kvp.Value;
+
+            if (user == null || user.IsDead) continue;
+
+            
+            Skill skill = null;
+            if (skillIndex >= 0 && skillIndex < user.Skills.Count) skill = user.Skills[skillIndex];
+
+            chosenTargets.TryGetValue(user, out BattleCharacter target);
+
+            yield return new QueuedAction
+            {
+                kind       = ActionKind.Skill,
+                user       = user,
+                skillIndex = skillIndex,
+                skill      = skill,
+                target     = target
+            };
+        }
+
+        
     }
 
     private IEnumerator ItemsFlow(BattleCharacter chr, bool hasPrevious)
@@ -691,10 +766,10 @@ public class BattleTurnManager : MonoBehaviour
                 continue;
 
             EvaluateEnemyAction(enemy, out int skillIndex, out BattleCharacter target);
-            if (skillIndex < 0) continue;
+            
+            Skill skill = null;
+            if (skillIndex > 0) skill = enemy.Skills[skillIndex];;
 
-            Skill skill = enemy.Skills[skillIndex];
-            if (skill == null) continue;
 
             if ((skill.targetType == SkillTargetType.SingleEnemy ||
                  skill.targetType == SkillTargetType.SingleAlly) &&
@@ -706,46 +781,16 @@ public class BattleTurnManager : MonoBehaviour
         }
     }
 
-    private List<BattleCharacter> GetTargetsForSkill(Skill skill, BattleCharacter user, BattleCharacter target)
-    {
-        if (skill == null || user == null) return new List<BattleCharacter>();
-
-        IEnumerable<BattleCharacter> targetsEnum;
-        switch (skill.targetType)
-        {
-            case SkillTargetType.SingleEnemy:
-            case SkillTargetType.AllEnemies:
-                targetsEnum = GetEnemiesOf(user);
-                break;
-            case SkillTargetType.SingleAlly:
-            case SkillTargetType.AllAllies:
-                targetsEnum = GetAlliesOf(user);
-                break;
-            case SkillTargetType.Self:
-                targetsEnum = new List<BattleCharacter> { user };
-                break;
-            default:
-                targetsEnum = new List<BattleCharacter> { target };
-                break;
-        }
-
-        foreach (var followUpSkill in skill.followUpSkills)
-        {
-            if (followUpSkill == null) continue;
-            var followUpTargets = GetTargetsForSkill(followUpSkill, user, target);
-            targetsEnum = targetsEnum.Union(followUpTargets).ToList();
-        }
-
-        var candidates = new List<BattleCharacter>();
-        foreach (var c in targetsEnum)
-            if (c != null && !c.IsDead) candidates.Add(c);
-        return candidates;
-    }
 
     private void EvaluateEnemyAction(BattleCharacter enemy, out int bestSkillIndex, out BattleCharacter bestTarget)
     {
         bestSkillIndex = -1;
         bestTarget     = null;
+
+        if(enemy.DelayedCastSkill != null)
+        {
+            return;
+        }
 
         var skills = enemy.Skills;
         if (skills == null || skills.Count == 0) return;

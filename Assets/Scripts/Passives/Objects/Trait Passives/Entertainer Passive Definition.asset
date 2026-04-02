@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 555a299e8523b4a40bd21f658e73ded0, type: 3}
   m_Name: Entertainer Passive Definition
   m_EditorClassIdentifier: Assembly-CSharp::EntertainerPassiveDefinition
+  displayName: Entertaining
+  type: 5
   spHealPercentage: 0

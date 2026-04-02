@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Lead by Caesar Passive
   m_EditorClassIdentifier: Assembly-CSharp::TempStatBoostPercent
   displayName: Lead by Caesar
+  type: 1
   attackBoostPercent: 0.1
   elementalPowerBoostPercent: 0.1
   defenseBoostPercent: 0.1

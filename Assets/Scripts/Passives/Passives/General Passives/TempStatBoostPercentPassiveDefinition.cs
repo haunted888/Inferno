@@ -24,12 +24,13 @@ public class TempStatBoostPercent : PassivesDefinition
     public override void OnCreated(BattleCharacter self)
     {
         
-        if(displayName == "Boosted Stats") return; // Allow multiple instances of this passive
+        if(displayName == "Stat Modification") return; // Allow multiple instances of this passive
         foreach (var existingPassive in self.passives)
         {
             if (existingPassive != this && existingPassive.displayName == displayName)
             {
                 self.RemovePassive(this);
+                break;
             }
         }
     }
@@ -37,17 +38,12 @@ public class TempStatBoostPercent : PassivesDefinition
     public override void GetStatBoosts(BattleCharacter self)
     {
         if (self == null) return;
+        
+        self.bonusStats.physicalAttack += Mathf.CeilToInt(self.baseStats.physicalAttack * Mathf.Abs(attackBoostPercent)) * (int)Mathf.Sign(attackBoostPercent);
+        self.bonusStats.elementalPower += Mathf.CeilToInt(self.baseStats.elementalPower * Mathf.Abs(elementalPowerBoostPercent)) * (int)Mathf.Sign(elementalPowerBoostPercent);
+        self.bonusStats.defense += Mathf.CeilToInt(self.baseStats.defense * Mathf.Abs(defenseBoostPercent)) * (int)Mathf.Sign(defenseBoostPercent);
+        self.bonusStats.elementalResistance += Mathf.CeilToInt(self.baseStats.elementalResistance * Mathf.Abs(elementalResistanceBoostPercent)) * (int)Mathf.Sign(elementalResistanceBoostPercent);
 
-        self.bonusStats.physicalAttack += Mathf.CeilToInt(self.baseStats.physicalAttack * attackBoostPercent);
-        self.bonusStats.elementalPower += Mathf.CeilToInt(self.baseStats.elementalPower * elementalPowerBoostPercent);
-        self.bonusStats.defense += Mathf.CeilToInt(self.baseStats.defense * defenseBoostPercent);
-        self.bonusStats.elementalResistance += Mathf.CeilToInt(self.baseStats.elementalResistance * elementalResistanceBoostPercent);
-
-        Debug.Log($"TempStatBoostPercent applied to {self.name}: " +
-                  $"ATK +{Mathf.CeilToInt(self.baseStats.physicalAttack * attackBoostPercent)}, " +
-                  $"ELM POW +{Mathf.CeilToInt(self.baseStats.elementalPower * elementalPowerBoostPercent)}, " +
-                  $"DEF +{Mathf.CeilToInt(self.baseStats.defense * defenseBoostPercent)}, " +
-                  $"ELM RES +{Mathf.CeilToInt(self.baseStats.elementalResistance * elementalResistanceBoostPercent)}");
     }
 
     public override void OnResolvePhaseEnd(BattleCharacter self)

@@ -20,7 +20,7 @@ public class HeroTraitDefinition : TraitDefinition
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void OnBattleStart(BattleCharacter user)
     {
-        heroPassiveBoost.setStatBoosts(physicalAttackBoost, elementalAttackBoost, physicalDefenseBoost, elementalResistanceBoost);
+        heroPassiveBoost.SetStatBoosts(physicalAttackBoost, elementalAttackBoost, physicalDefenseBoost, elementalResistanceBoost);
         user.AddPassive(heroPassiveBoost);
     }
 

@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Betrayal Passive
   m_EditorClassIdentifier: Assembly-CSharp::BetrayalPassive
   displayName: Betrayal
+  type: 0
   betrayed: {fileID: 0}
   damagePercent: 0.1

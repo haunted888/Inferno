@@ -18,7 +18,7 @@ public class FighterDefenseBoostPassive : PassivesDefinition
         self.bonusStats.elementalResistance += Mathf.CeilToInt(self.baseStats.elementalResistance * resistanceBoost);
     }
 
-    public override void OnSkillUsed(BattleCharacter self, Skill skill)
+    public override void OnSkillUsed(BattleCharacter self, BattleCharacter target, Skill skill)
     {
         if(skill.damageType == SkillDamageType.None)
         {

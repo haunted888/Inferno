@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c0a6363a6105a042bc331cfd92a2f2a, type: 3}
   m_Name: Strategist Passive Definition
   m_EditorClassIdentifier: Assembly-CSharp::StrategistPassiveDefinition
+  displayName: Strategist
+  type: 5
   zeroLuckPassive: {fileID: 11400000, guid: ca1d45ae063587a478e06c9000409195, type: 2}

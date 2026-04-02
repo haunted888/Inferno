@@ -9,7 +9,7 @@ public class HeroPassiveDefinition : PassivesDefinition
     int defenseBoost = 0;
     int resistanceBoost = 0;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public void setStatBoosts(int physicalAttackBoost, int elementalAttackBoost, int defenseBoost, int resistanceBoost)
+    public void SetStatBoosts(int physicalAttackBoost, int elementalAttackBoost, int defenseBoost, int resistanceBoost)
     {
         this.physicalAttackBoost = physicalAttackBoost;
         this.elementalAttackBoost = elementalAttackBoost;

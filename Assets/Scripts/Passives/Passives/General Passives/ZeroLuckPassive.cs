@@ -14,7 +14,7 @@ public class ZeroLuckPassive : PassivesDefinition
         self.QueuePassiveToRemove(this);
     }
     
-    public override void OnSkillUsedEnd(BattleCharacter self, Skill skill)
+    public override void OnSkillUsedEnd(BattleCharacter self, BattleCharacter target, Skill skill)
     {
         self.QueuePassiveToRemove(this);
     }

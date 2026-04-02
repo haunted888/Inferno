@@ -12,3 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f2d06e21b686e246b62fb5b39c7be1e, type: 3}
   m_Name: Hero Passive Definition
   m_EditorClassIdentifier: Assembly-CSharp::HeroPassiveDefinition
+  displayName: Heroic Strength
+  type: 5

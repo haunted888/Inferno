@@ -1,11 +1,13 @@
+using System;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Burn")]
+[CreateAssetMenu(menuName = "Passives/Statuses/Burn")]
 public class BurnPassiveDefinition : PassivesDefinition
 {
 
     private const float burnDamagePercent = .0625f;
     public int counter = 1;
+
     public override void OnCreated(BattleCharacter self)
     {
         bool removeThisBurn = false;

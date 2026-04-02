@@ -12,3 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82e4066d5453d9b4ab8b3fc06132987e, type: 3}
   m_Name: Rogue Passive Definition
   m_EditorClassIdentifier: Assembly-CSharp::RoguePassiveDefinition
+  displayName: Rogue
+  type: 5

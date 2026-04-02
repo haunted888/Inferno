@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: Vici Passive
   m_EditorClassIdentifier: Assembly-CSharp::ViciPassive
   displayName: '"Vici!"'
+  type: 5

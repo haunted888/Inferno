@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Et Tu Brute Passive
   m_EditorClassIdentifier: Assembly-CSharp::EtTuBrutePassive
   displayName: "\"Et tu, Brut\xE9?\""
+  type: 5
   attackBoostPercent: 0.4
   defenseBoostPercent: 0.4
   elementalResistanceBoostPercent: 0.4

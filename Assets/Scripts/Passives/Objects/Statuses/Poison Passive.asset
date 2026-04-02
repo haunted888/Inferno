@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ebe133ae227aa642bc2b3aef0b3387d, type: 3}
-  m_Name: Burn Passive
-  m_EditorClassIdentifier: Assembly-CSharp::BurnPassiveDefinition
-  displayName: Burn
+  m_Script: {fileID: 11500000, guid: 5d1a84d2ad1d31946a28c6c7aaecc4da, type: 3}
+  m_Name: Poison Passive
+  m_EditorClassIdentifier: Assembly-CSharp::PoisonPassiveDefinition
+  displayName: Poison
+  type: 2
   counter: 1

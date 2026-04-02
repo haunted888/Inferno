@@ -17,6 +17,11 @@ public class BattleCharacter : MonoBehaviour
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
     public bool IsDead => currentHealth <= 0;
+    [NonSerialized] public bool IsAsleep = false;
+    [NonSerialized] public bool IsStunned = false;
+    [NonSerialized] public int DelayedCastTurns = 0;
+    [NonSerialized] public QueuedAction DelayedCastSkill = null;
+
 
     [Header("SP")]
     [SerializeField] private int maxSp = 10;
@@ -52,6 +57,8 @@ public class BattleCharacter : MonoBehaviour
 
         // Initialize SP at full by default
         currentSp = Mathf.Max(0, maxSp);
+
+        IsAsleep = false;
     }
 
     public int TakeDamage(int amount)
@@ -94,9 +101,57 @@ public class BattleCharacter : MonoBehaviour
         threat = 0;
     }
 
+    private float healingMultiplier = 1f;
+    private float healingMultiplierMax = float.PositiveInfinity;
+
+    private float healingMultiplierMin = 0f;
+
+    public void ModifyIncomingHealingMultiplier(float percentBonus)
+    {
+        healingMultiplier *= percentBonus;
+    }
+
+    public int ApplyIncomingHealingModifiers(int healing)
+    {
+        if (passives != null)
+        {
+            PassiveMutationUtility.InvokePassivesWithMutation(
+                this,
+                () => passives,
+                p => p.BeforeReceivingHealing(this, healing),
+                passiveMutationContext
+            );
+        }
+
+        if (healingMultiplierMin > healingMultiplierMax)
+            healingMultiplierMin = healingMultiplierMax;
+        if (healingMultiplier > healingMultiplierMax)
+            healingMultiplier = healingMultiplierMax;
+        if (healingMultiplier < healingMultiplierMin)
+            healingMultiplier = healingMultiplierMin;
+        return Mathf.Max(0, Mathf.CeilToInt(healing * healingMultiplier));
+    }
+
+    public void SetIncomingHealingMultiplierLimits(float min = 0f, float max = float.PositiveInfinity)
+    {
+        if(healingMultiplierMin < min)
+            healingMultiplierMin = min;
+        if(healingMultiplierMax > max)
+            healingMultiplierMax = max;
+    }
+
+    public void ClearIncomingHealingModifiers()
+    {
+        healingMultiplier = 1f;
+        healingMultiplierMin = 0f;
+        healingMultiplierMax = float.PositiveInfinity;
+    }
+
     public void Heal(int amount)
     {
         if (amount <= 0 || IsDead) return;
+
+        amount = ApplyIncomingHealingModifiers(amount);
 
         currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
         Debug.Log($"{name} healed {amount}. HP: {currentHealth}/{maxHealth}");
@@ -474,7 +529,7 @@ public class BattleCharacter : MonoBehaviour
             incomingDamageMultiplier = incomingDamageMultiplierMax;
         if (incomingDamageMultiplier < incomingDamageMultiplierMin)
             incomingDamageMultiplier = incomingDamageMultiplierMin;
-        return Mathf.Max(0, Mathf.RoundToInt(damage * incomingDamageMultiplier));
+        return Mathf.Max(0, Mathf.CeilToInt(damage * incomingDamageMultiplier));
     }
 
     public void SetIncomingDamageMultiplierLimits(float min = 0f, float max = float.PositiveInfinity)
@@ -529,5 +584,11 @@ public class BattleCharacter : MonoBehaviour
         outgoingDamageMultiplierMin = 0f;
         outgoingDamageMultiplierMax = float.PositiveInfinity;
 
+    }
+
+    public void HandleSkippedAction()
+    {
+        DelayedCastSkill = null;
+        DelayedCastTurns = 0;
     }
 }

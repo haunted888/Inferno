@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 [CreateAssetMenu(menuName = "Skills/Charge")]
 public class ChargeSkill : Skill
@@ -28,8 +29,10 @@ public class ChargeSkill : Skill
         foreach (var character in group)
         {
             if (character == null) continue;
-            skillToUse.Execute(character, target);
+            UseNewSkill(character, target, skillToUse);
 
         }
+        
+        ExecuteFollowUps(user, target);
     }
 }

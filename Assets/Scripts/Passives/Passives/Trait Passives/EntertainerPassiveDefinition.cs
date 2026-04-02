@@ -10,7 +10,7 @@ public class EntertainerPassiveDefinition : PassivesDefinition
         spHealPercentage = percentage;
     }
 
-    public override void OnSkillUsed(BattleCharacter self, Skill skill)
+    public override void OnSkillUsed(BattleCharacter self, BattleCharacter target, Skill skill)
     {
         var allies = self.GetAllies();;
         foreach (var a in allies)

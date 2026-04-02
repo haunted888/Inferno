@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: Fighter Defense Boost Passive
   m_EditorClassIdentifier: Assembly-CSharp::FighterDefenseBoostPassive
   displayName: Guard Up
+  type: 5
