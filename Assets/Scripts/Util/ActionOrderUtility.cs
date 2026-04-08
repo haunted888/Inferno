@@ -26,6 +26,7 @@ public static class ActionOrderUtility
                 action.user,
                 () => action.user.passives,
                 p => p.OnActionOrdered(action, orderedActions),
+                PassivesDefinition.PassiveHook.OnActionOrdered,
                 action.user.passiveMutationContext
             );
         }

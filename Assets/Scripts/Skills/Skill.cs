@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using System;
 
 public enum SkillDamageType
@@ -88,6 +87,7 @@ public abstract class Skill : ScriptableObject
 
     [Header("Additional Effects")]
     public List<Skill> followUpSkills;   // skills to trigger after this one
+    public float bonusEffectChance = 1f;
 
     [Header("Trait Requirements")]
     public List<CharacterTrait> traitTags = new List<CharacterTrait>();
@@ -97,6 +97,35 @@ public abstract class Skill : ScriptableObject
     [Header("Marksman")]
     [Range(0f, 1f)]
     public float ammoCost = 0f;
+
+    [NonSerialized] public Skill skillDetailShell;
+
+
+
+    public virtual void OnCreated(BattleCharacter self)
+    {
+        if(skillDetailShell != null) Destroy(skillDetailShell);
+        skillDetailShell = Instantiate(this);
+
+        foreach (var s in followUpSkills)
+        {
+            if (s == null) continue;
+            s.OnCreated(self);
+        }
+    }
+
+    public void OnCommandPhaseStart()
+    {
+        if(skillDetailShell != null) Destroy(skillDetailShell);
+
+        skillDetailShell = Instantiate(this);
+
+        foreach (var s in followUpSkills)
+        {
+            if (s == null) continue;
+            s.OnCommandPhaseStart();
+        }
+    }
 
     public virtual int EstimateDamage(BattleCharacter user, BattleCharacter target)
     {
@@ -131,14 +160,20 @@ public abstract class Skill : ScriptableObject
 
     protected void ExecuteFollowUps(BattleCharacter user, BattleCharacter target)
     {
-        if (followUpSkills == null) return;
+        if (skillDetailShell.followUpSkills == null) return;
 
-        for (int i = 0; i < followUpSkills.Count; i++)
+        for (int i = 0; i < skillDetailShell.followUpSkills.Count; i++)
         {
-            var s = followUpSkills[i];
+            var s = skillDetailShell.followUpSkills[i];
             if (s == null) continue;
             s.Execute(user, target);
         }
+    }
+
+    public void EndExecution()
+    {
+        if (skillDetailShell != null) Destroy(skillDetailShell);
+        skillDetailShell = Instantiate(this);
     }
 
     public bool CanBeLearnedBy(MapPartyMemberDefinition member)
@@ -164,13 +199,14 @@ public abstract class Skill : ScriptableObject
     public void UseNewSkill(BattleCharacter user, BattleCharacter target, Skill skillToUse)
     {
 
-        if (user.IsAsleep || user.IsDead || target.IsDead) return;
+        if (user.IsAsleep || user.IsDead || user.IsDazed || target.IsDead) return;
         if (user.passives != null)
         {
             PassiveMutationUtility.InvokePassivesWithMutation(
                 user,
                 () => user.passives,
                 p => p.OnSkillUsed(user, target, skillToUse),
+                PassivesDefinition.PassiveHook.OnSkillUsed,
                 user.passiveMutationContext
             );
         }
@@ -182,6 +218,7 @@ public abstract class Skill : ScriptableObject
                 t,
                 () => t.passives,
                 p => p.OnSkillReceived(t, user, skillToUse),
+                PassivesDefinition.PassiveHook.OnSkillReceived,
                 t.passiveMutationContext
             );
 
@@ -196,6 +233,7 @@ public abstract class Skill : ScriptableObject
                 user,
                 () => user.passives,
                 p => p.OnSkillUsedEnd(user, target, skillToUse),
+                PassivesDefinition.PassiveHook.OnSkillUsedEnd,
                 user.passiveMutationContext
             );
         }
@@ -206,6 +244,29 @@ public abstract class Skill : ScriptableObject
                 t,
                 () => t.passives,
                 p => p.OnSkillReceivedEnd(t, user, skillToUse),
+                PassivesDefinition.PassiveHook.OnSkillReceivedEnd,
+                t.passiveMutationContext
+            );
+        }
+    }
+
+    public void BeforeSkillExecute(BattleCharacter user, BattleCharacter target)
+    {
+        PassiveMutationUtility.InvokePassivesWithMutation(
+            user,
+            () => user.passives,
+            p => p.BeforeSkillExecute(user, target, this),
+            PassivesDefinition.PassiveHook.BeforeSkillExecute,
+            user.passiveMutationContext
+        );
+
+        foreach (var t in BattleUtility.GetTargetsForSkill(this, user, target))
+        {
+            PassiveMutationUtility.InvokePassivesWithMutation(
+                t,
+                () => t.passives,
+                p => p.BeforeSkillExecuteReceived(t, user, this),
+                PassivesDefinition.PassiveHook.BeforeSkillExecuteReceived,
                 t.passiveMutationContext
             );
         }
@@ -217,8 +278,8 @@ public abstract class Skill : ScriptableObject
         List<Skill> allSkills = new List<Skill> { this };
         while (allSkills.Count > 0) // Arbitrary limit to prevent infinite loops
         {
-            allSkills[1].followUpSkills?.ForEach(s => allSkills.Add(s));
             var current = allSkills[0];
+            current.followUpSkills?.ForEach(s => allSkills.Add(s));
             if(current is DamageSkillParent) effectTypes.Add(SkillEffectType.Damage);
             else effectTypes.Add(SkillEffectType.Misc); // Placeholder for non-damage skills until we have more types
             allSkills.RemoveAt(0);

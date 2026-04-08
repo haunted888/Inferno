@@ -13,9 +13,8 @@ public class DamageAllEnemiesSkill : DamageSkillParent
     {
         if (user == null || target == null) return 0;
 
-        BeforeDamageSkillExecute(user, target);
 
-        SkillDamageType damageType = this.damageType;
+        SkillDamageType damageType = this.skillDetailShell.damageType;
 
         if (damageType == SkillDamageType.Adaptive)
         {
@@ -48,6 +47,11 @@ public class DamageAllEnemiesSkill : DamageSkillParent
     {
         if (user == null) return;
 
+        
+        BeforeSkillExecute(user, target);
+        
+        BeforeDamageSkillExecute(user, target);
+
         List<BattleCharacter> group;
 
         switch (characters)
@@ -76,7 +80,7 @@ public class DamageAllEnemiesSkill : DamageSkillParent
                 break;
         }
 
-        SkillDamageType damageType = this.damageType;
+        SkillDamageType damageType = this.skillDetailShell.damageType;
 
         if (damageType == SkillDamageType.Adaptive)
         {
@@ -122,7 +126,11 @@ public class DamageAllEnemiesSkill : DamageSkillParent
         }
 
         AfterExecute(user, target);
+        
+        
         ExecuteFollowUps(user, target);
+        
+        EndExecution();
     }
 
 

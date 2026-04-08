@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Xml.XPath;
+using UnityEngine.Events;
 
 public class BattleCharacter : MonoBehaviour
 {
@@ -18,7 +19,7 @@ public class BattleCharacter : MonoBehaviour
     public int CurrentHealth => currentHealth;
     public bool IsDead => currentHealth <= 0;
     [NonSerialized] public bool IsAsleep = false;
-    [NonSerialized] public bool IsStunned = false;
+    [NonSerialized] public bool IsDazed = false;
     [NonSerialized] public int DelayedCastTurns = 0;
     [NonSerialized] public QueuedAction DelayedCastSkill = null;
 
@@ -46,6 +47,8 @@ public class BattleCharacter : MonoBehaviour
 
     [NonSerialized] public PassiveMutationUtility.PassiveMutationContext passiveMutationContext;
 
+    public UnityEvent<PassivesDefinition[]> OnPassivesChanged;
+
     public List<QueuedAction> currentActionOrder;
     
 
@@ -69,6 +72,15 @@ public class BattleCharacter : MonoBehaviour
         currentHealth = Mathf.Max(0, currentHealth - amount);
         int dealt = oldHealth - currentHealth;
 
+        
+        PassiveMutationUtility.InvokePassivesWithMutation(
+            this,
+            () => passives,
+            p => p.OnAfterTakeDamage(this, amount),
+            PassivesDefinition.PassiveHook.OnAfterTakeDamage,
+            passiveMutationContext
+        );
+
         if (IsDead)
         {
             Debug.Log($"{name} died.");
@@ -79,6 +91,7 @@ public class BattleCharacter : MonoBehaviour
         else
         {
             Debug.Log($"{name} took {dealt} damage. HP: {currentHealth}/{maxHealth}");
+            
         }
 
         return dealt;
@@ -119,6 +132,7 @@ public class BattleCharacter : MonoBehaviour
                 this,
                 () => passives,
                 p => p.BeforeReceivingHealing(this, healing),
+                PassivesDefinition.PassiveHook.BeforeReceivingHealing,
                 passiveMutationContext
             );
         }
@@ -157,6 +171,11 @@ public class BattleCharacter : MonoBehaviour
         Debug.Log($"{name} healed {amount}. HP: {currentHealth}/{maxHealth}");
     }
 
+    public void SetCurrentHealth(int newHealth)
+    {
+        currentHealth = Mathf.Clamp(newHealth, 0, maxHealth);
+    }
+
     public void SetMaxHealth(int newMax, bool fillToMax = true)
     {
         maxHealth = Mathf.Max(1, newMax);
@@ -183,14 +202,14 @@ public class BattleCharacter : MonoBehaviour
             return;
         }
 
-        int cost = skill.spCost; // new field on Skill
+        int cost = skill.skillDetailShell.spCost; // new field on Skill
         if (!TrySpendSp(cost))
         {
             Debug.Log($"{name} does not have enough SP ({currentSp}/{cost}) to use {skill.skillName}.");
             return;
         }
 
-        float hpCost = skill.hpCost; // new field on Skill
+        float hpCost = skill.skillDetailShell.hpCost; // new field on Skill
         if (!TrySpendHp(hpCost))
         {
             Debug.Log($"{name} does not have enough HP ({currentHealth}/{cost}) to use {skill.skillName}.");
@@ -206,17 +225,37 @@ public class BattleCharacter : MonoBehaviour
     public void ClearPassives() => passives.Clear();
     public void AddPassive(PassivesDefinition p)
     {
+        var passive = p;
+        if (p != null) {
+            if(p.isInstance)
+                passive = Instantiate(p);
+            passives.Add(passive);
+            passive.OnCreated(this);
+            OnPassivesChanged?.Invoke(passives.ToArray());
+        }
+        
+    }
+
+    public void AddPassiveNoInstance(PassivesDefinition p)
+    {
         if (p != null) {
             passives.Add(p);
             p.OnCreated(this);
+            OnPassivesChanged?.Invoke(passives.ToArray());
         }
+        
     }
+
     public void RemovePassive(PassivesDefinition p)
     {
         if (p != null)
         {
+            Debug.Log($"Removing passive {p.name} from {name}");
             p.OnDestroyed(this);
             passives.Remove(p);
+            if(p.isInstance)
+                Destroy(p);
+            OnPassivesChanged?.Invoke(passives.ToArray());
         } 
     }
 
@@ -224,6 +263,7 @@ public class BattleCharacter : MonoBehaviour
     public void AddSkill(Skill s)
     {
         if (s != null) skills.Add(s);
+        s.OnCreated(this);
     }
 
     public void ClearTraits() { 
@@ -249,38 +289,39 @@ public class BattleCharacter : MonoBehaviour
             if (p == null) continue;
             p.GetStatBoosts(this);
         }
-        CombatStats result = new CombatStats();
-        result.maxHealth      = baseStats.maxHealth      + bonusStats.maxHealth;
-        result.maxSp          = baseStats.maxSp          + bonusStats.maxSp;
-        result.physicalAttack = baseStats.physicalAttack + bonusStats.physicalAttack;
-        result.elementalPower = baseStats.elementalPower + bonusStats.elementalPower;
-        result.defense        = baseStats.defense        + bonusStats.defense;
-        result.elementalResistance = baseStats.elementalResistance + bonusStats.elementalResistance;
-        result.speed          = baseStats.speed          + bonusStats.speed;
-        result.critChance     = baseStats.critChance     + bonusStats.critChance;
-        result.critDamage = baseStats.critDamage + bonusStats.critDamage;
+        CombatStats result = new CombatStats(){
+            maxHealth      = baseStats.maxHealth      + bonusStats.maxHealth,
+            maxSp          = baseStats.maxSp          + bonusStats.maxSp,
+            physicalAttack = baseStats.physicalAttack + bonusStats.physicalAttack,
+            elementalPower = baseStats.elementalPower + bonusStats.elementalPower,
+            defense        = baseStats.defense        + bonusStats.defense,
+            elementalResistance = baseStats.elementalResistance + bonusStats.elementalResistance,
+            speed          = baseStats.speed          + bonusStats.speed,
+            critChance     = baseStats.critChance     + bonusStats.critChance,
+            critDamage = baseStats.critDamage + bonusStats.critDamage,
 
-        result.piercingAttack = baseStats.piercingAttack + bonusStats.piercingAttack;
-        result.bludgeoningAttack = baseStats.bludgeoningAttack + bonusStats.bludgeoningAttack;
-        result.slashingAttack = baseStats.slashingAttack + bonusStats.slashingAttack;
+            piercingAttack = baseStats.piercingAttack + bonusStats.piercingAttack,
+            bludgeoningAttack = baseStats.bludgeoningAttack + bonusStats.bludgeoningAttack,
+            slashingAttack = baseStats.slashingAttack + bonusStats.slashingAttack,
 
-        result.fireAttack = baseStats.fireAttack + bonusStats.fireAttack;
-        result.iceAttack  = baseStats.iceAttack  + bonusStats.iceAttack;
-        result.stormAttack  = baseStats.stormAttack  + bonusStats.stormAttack;
-        result.acidAttack   = baseStats.acidAttack   + bonusStats.acidAttack;
-        result.psychicAttack = baseStats.psychicAttack + bonusStats.psychicAttack;
-        result.bloodAttack    = baseStats.bloodAttack    + bonusStats.bloodAttack;
+            fireAttack = baseStats.fireAttack + bonusStats.fireAttack,
+            iceAttack  = baseStats.iceAttack  + bonusStats.iceAttack,
+            stormAttack  = baseStats.stormAttack  + bonusStats.stormAttack,
+            acidAttack   = baseStats.acidAttack   + bonusStats.acidAttack,
+            psychicAttack = baseStats.psychicAttack + bonusStats.psychicAttack,
+            bloodAttack    = baseStats.bloodAttack    + bonusStats.bloodAttack,
 
-        result.piercingDefense = baseStats.piercingDefense + bonusStats.piercingDefense;
-        result.bludgeoningDefense = baseStats.bludgeoningDefense + bonusStats.bludgeoningDefense;
-        result.slashingDefense  = baseStats.slashingDefense  + bonusStats.slashingDefense;
+            piercingDefense = baseStats.piercingDefense + bonusStats.piercingDefense,
+            bludgeoningDefense = baseStats.bludgeoningDefense + bonusStats.bludgeoningDefense,
+            slashingDefense  = baseStats.slashingDefense  + bonusStats.slashingDefense,
 
-        result.fireDefense  = baseStats.fireDefense  + bonusStats.fireDefense;
-        result.iceDefense   = baseStats.iceDefense   + bonusStats.iceDefense;
-        result.stormDefense = baseStats.stormDefense + bonusStats.stormDefense;
-        result.acidDefense    = baseStats.acidDefense    + bonusStats.acidDefense;
-        result.psychicDefense = baseStats.psychicDefense + bonusStats.psychicDefense;
-        result.bloodDefense     = baseStats.bloodDefense     + bonusStats.bloodDefense;
+            fireDefense  = baseStats.fireDefense  + bonusStats.fireDefense,
+            iceDefense   = baseStats.iceDefense   + bonusStats.iceDefense,
+            stormDefense = baseStats.stormDefense + bonusStats.stormDefense,
+            acidDefense    = baseStats.acidDefense    + bonusStats.acidDefense,
+            psychicDefense = baseStats.psychicDefense + bonusStats.psychicDefense,
+            bloodDefense     = baseStats.bloodDefense     + bonusStats.bloodDefense
+        };
 
         return result;
     }
@@ -378,6 +419,19 @@ public class BattleCharacter : MonoBehaviour
         return true;
     }
 
+    public bool HasEnoughResourcesFor(Skill skill)
+    {
+        if (skill == null) return true;
+
+        if (currentSp < skill.skillDetailShell.spCost) return false;
+
+        if (currentHealth < skill.skillDetailShell.hpCost) return false;
+
+        if (!HasEnoughAmmoFor(skill)) return false;
+
+        return true;
+    }
+
     public void RecoverSp(int amount)
     {
         currentSp = Mathf.Min(maxSp, currentSp + amount);
@@ -435,14 +489,14 @@ public class BattleCharacter : MonoBehaviour
             return true;
 
         // If the skill has no ammo requirement, it's always usable.
-        if (skill.ammoCost <= 0f)
+        if (skill.skillDetailShell.ammoCost <= 0f)
             return true;
 
         if (ConstantMaxAmmo <= 0)
             return false;
 
         // Required ammo = ceil(percent * constantMaxAmmo)
-        float percent = Mathf.Clamp01(skill.ammoCost);
+        float percent = Mathf.Clamp01(skill.skillDetailShell.ammoCost);
         int needed = Mathf.CeilToInt(percent * ConstantMaxAmmo);
 
         return CurrentAmmo >= needed;
@@ -477,13 +531,15 @@ public class BattleCharacter : MonoBehaviour
         return previewEnemies ?? Array.Empty<BattleCharacter>();
     }
 
-    public void QueuePassiveToAdd(PassivesDefinition passive)
+    public void QueuePassiveToAdd(PassivesDefinition passive, PassivesDefinition.PassiveHook hook)
     {
         if (passive == null) return;
 
         if (passiveMutationContext != null)
         {
-            passiveMutationContext.passivesToAdd.Add(passive);
+            if(passive.isInstance)
+                passive = Instantiate(passive);
+            passiveMutationContext.passivesToAdd.Add(passive, hook);
         }
         else
         {
@@ -491,13 +547,13 @@ public class BattleCharacter : MonoBehaviour
         }
     }
 
-    public void QueuePassiveToRemove(PassivesDefinition passive)
+    public void QueuePassiveToRemove(PassivesDefinition passive, PassivesDefinition.PassiveHook hook)
     {
         if (passive == null) return;
 
         if (passiveMutationContext != null)
         {
-            passiveMutationContext.passivesToRemove.Add(passive);
+            passiveMutationContext.passivesToRemove.Add(passive, hook);
         }
         else
         {

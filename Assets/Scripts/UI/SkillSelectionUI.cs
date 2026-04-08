@@ -29,7 +29,7 @@ public class SkillSelectionUI : MonoBehaviour
             Button btn = buttonObj.GetComponent<Button>();
             TMP_Text  text = buttonObj.GetComponentInChildren<TMP_Text>();
 
-            int cost = skill.spCost;
+            int cost = skill.skillDetailShell.spCost;
 
             if (text != null)
             {

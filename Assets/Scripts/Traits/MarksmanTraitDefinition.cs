@@ -32,14 +32,14 @@ public class MarksmanTraitDefinition : TraitDefinition
         if (skill == null) return;
 
         // Only apply to skills that use ammo
-        if (skill.ammoCost <= 0f)
+        if (skill.skillDetailShell.ammoCost <= 0f)
             return;
 
         if (user.ConstantMaxAmmo <= 0 || user.CurrentAmmo <= 0)
             return;
 
         // Determine ammo cost from skill percent
-        float percent = Mathf.Clamp01(skill.ammoCost);
+        float percent = Mathf.Clamp01(skill.skillDetailShell.ammoCost);
         int needed = Mathf.CeilToInt(percent * user.ConstantMaxAmmo);
         if (needed <= 0) return;
 

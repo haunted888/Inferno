@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9b93bfd8a5502c49a961b4514b8c0e7, type: 3}
+  m_Name: Stance Change Buff Offensive
+  m_EditorClassIdentifier: Assembly-CSharp::StatBoostPercentPassiveDefinition
+  displayName: Stat Modification
+  type: 3
+  isInstance: 1
+  icon: {fileID: 21300000, guid: 5d979a81d58a02642a336d2f04365b99, type: 3}
+  description: 
+  attackBoostPercent: 0.05
+  elementalPowerBoostPercent: 0.05
+  defenseBoostPercent: 0
+  elementalResistanceBoostPercent: 0
+  duration: 2

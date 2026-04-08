@@ -15,6 +15,9 @@ public class ChargeSkill : Skill
     {
         List<BattleCharacter> group;
 
+        
+        BeforeSkillExecute(user, target);
+
         switch (characters)
         {
             case affectsCharacters.Allies:
@@ -33,6 +36,9 @@ public class ChargeSkill : Skill
 
         }
         
+        
         ExecuteFollowUps(user, target);
+        
+        EndExecution();
     }
 }

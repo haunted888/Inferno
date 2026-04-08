@@ -186,8 +186,10 @@ public class CampEditorScreenController : MonoBehaviour
                     : (def.characterPrefab != null ? def.characterPrefab.name : "Unnamed");
                 text.text = name;
             }
+            
             btn.onClick.AddListener(() => SelectCharacter(def));
         }
+
     }
 
     void SelectCharacter(MapPartyMemberDefinition def)
@@ -212,7 +214,12 @@ public class CampEditorScreenController : MonoBehaviour
         currentScreen = CurrentScreen.Stat;
         if (statScreenRoot != null) statScreenRoot.SetActive(true);
         if (statScreenScrollRect != null) statScreenScrollRect.verticalNormalizedPosition = 1f;
-        if (statScreenUI != null && current != null) statScreenUI.UpdateStats(current.stats);
+        if (statScreenUI != null && current != null) {
+            var preview = BattleCharacterPreviewFactory.Build(new List<MapPartyMemberDefinition>(){current}, null);
+            CombatStats stats = preview.party[0].GetEffectiveStats();
+            statScreenUI.UpdateStats(stats);
+            preview.Dispose();
+        }
     }
     void OpenSkillScreen()
     {
@@ -279,6 +286,8 @@ public class CampEditorScreenController : MonoBehaviour
             talentScreenRoot.gameObject.SetActive(false);
         if(levelUpStatsScreenRoot != null && currentScreen != CurrentScreen.LevelUp)
             levelUpStatsScreenRoot.SetActive(false);
+
+        
         
         // Refresh current screen
         if(currentScreen == CurrentScreen.Stat)
@@ -297,6 +306,7 @@ public class CampEditorScreenController : MonoBehaviour
         {
             OpenTalentScreen();
         }
+
     }
 
     public void RefreshCharacterPortrait()

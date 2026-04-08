@@ -125,8 +125,8 @@ public class MapCombatTransfer : MonoBehaviour
                 var def = bc.sourceDefinition;
                 if (def == null) continue;
 
-                def.health = Mathf.Max(0, bc.CurrentHealth);
-                def.sp     = Mathf.Max(0, bc.CurrentSp);   // NEW
+                def.health = Mathf.Max(0, bc.CurrentHealth); // Maintain hp changes across battles
+                //def.sp     = Mathf.Max(0, bc.CurrentSp);   // Maintain sp changes across battles
             }
         }
 

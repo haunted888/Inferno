@@ -18,6 +18,7 @@ MonoBehaviour:
   damageType: 2
   spCost: 0
   hpCost: 0
+  delay: 0
   followUpSkills: []
   traitTags: 
   ammoCost: 0

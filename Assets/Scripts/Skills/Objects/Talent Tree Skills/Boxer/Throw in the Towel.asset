@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa2c5088a3cbf7a479c2289fa803ce06, type: 3}
+  m_Name: Throw in the Towel
+  m_EditorClassIdentifier: Assembly-CSharp::BoxerThrowInTheTowel
+  skillName: Throw in the Towel
+  description: 
+  targetType: 3
+  damageType: 2
+  spCost: 0
+  hpCost: 0
+  delay: 0
+  followUpSkills: []
+  traitTags: 
+  ammoCost: 0
+  buffToApply: {fileID: 11400000, guid: bc889e41458cb2a4085f16db89b13940, type: 2}

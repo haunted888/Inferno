@@ -11,6 +11,11 @@ public class ApplyPassivesSkill : Skill
     {
         if (user == null || target == null || target.IsDead) return;
         if (passivesToApply == null || passivesToApply.Count == 0) return;
+        if (Random.value > skillDetailShell.bonusEffectChance) return;
+
+        
+        BeforeSkillExecute(user, target);
+
 
         for (int i = 0; i < passivesToApply.Count; i++)
         {
@@ -21,6 +26,10 @@ public class ApplyPassivesSkill : Skill
         }
 
 
+        
+        
         ExecuteFollowUps(user, target);
+        
+        EndExecution();
     }
 }

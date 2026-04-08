@@ -23,6 +23,7 @@ public class ExpeditionistTraitDefinition : TraitDefinition
 
     public void addReward()
     {
+        if(BattleTurnManager.Instance == null) return;
         MapRewardDefinition chosen = null;
         int total = 0;
 

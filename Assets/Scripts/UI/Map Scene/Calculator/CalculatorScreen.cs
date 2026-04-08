@@ -661,6 +661,7 @@ public class CalculatorScreen : MonoBehaviour
                             t,
                             () => t.passives,
                             p => p.OnSkillReceived(t, caster, skill),
+                            PassivesDefinition.PassiveHook.OnSkillReceived,
                             t.passiveMutationContext
                         );
         }
@@ -669,15 +670,16 @@ public class CalculatorScreen : MonoBehaviour
             caster,
             () => caster.passives,
             p => p.OnSkillUsed(caster, target, skill),
+            PassivesDefinition.PassiveHook.OnSkillUsed,
             caster.passiveMutationContext
         );
 
         // Match battle SP behavior for party-side casters
         if (currentParty != null && previewPartyLookup.Contains(caster))
         {
-            if (!caster.TrySpendSp(skill.spCost))
+            if (!caster.TrySpendSp(skill.skillDetailShell.spCost))
                 return;
-            if(!caster.TrySpendHp(skill.hpCost))
+            if(!caster.TrySpendHp(skill.skillDetailShell.hpCost))
                 return;
         }
 
@@ -687,6 +689,7 @@ public class CalculatorScreen : MonoBehaviour
             caster,
             () => caster.passives,
             p => p.OnSkillUsedEnd(caster, target, skill),
+            PassivesDefinition.PassiveHook.OnSkillUsedEnd,
             caster.passiveMutationContext
         );
 
@@ -698,6 +701,7 @@ public class CalculatorScreen : MonoBehaviour
                 t,
                 () => t.passives,
                 p => p.OnSkillReceivedEnd(t, caster, skill),
+                PassivesDefinition.PassiveHook.OnSkillReceivedEnd,
                 t.passiveMutationContext
             );
         }

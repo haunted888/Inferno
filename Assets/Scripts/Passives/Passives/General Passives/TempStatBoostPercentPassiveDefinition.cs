@@ -3,10 +3,10 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Passives/Temp Stat Boost Percent")]
 public class TempStatBoostPercent : PassivesDefinition
 {
-    [Range(0f, 1f)] public float attackBoostPercent = 0.00f;
-    [Range(0f, 1f)] public float elementalPowerBoostPercent = 0.00f;
-    [Range(0f, 1f)] public float defenseBoostPercent = 0.00f;
-    [Range(0f, 1f)] public float elementalResistanceBoostPercent = 0.00f;
+    public float attackBoostPercent = 0.00f;
+    public float elementalPowerBoostPercent = 0.00f;
+    public float defenseBoostPercent = 0.00f;
+    public float elementalResistanceBoostPercent = 0.00f;
 
 
     public void setStatBoosts(
@@ -38,6 +38,8 @@ public class TempStatBoostPercent : PassivesDefinition
     public override void GetStatBoosts(BattleCharacter self)
     {
         if (self == null) return;
+        Debug.Log($"Applying stat boosts: {attackBoostPercent*100}% attack, {elementalPowerBoostPercent*100}% elemental power, {defenseBoostPercent*100}% defense, {elementalResistanceBoostPercent*100}% elemental resistance");
+        
         
         self.bonusStats.physicalAttack += Mathf.CeilToInt(self.baseStats.physicalAttack * Mathf.Abs(attackBoostPercent)) * (int)Mathf.Sign(attackBoostPercent);
         self.bonusStats.elementalPower += Mathf.CeilToInt(self.baseStats.elementalPower * Mathf.Abs(elementalPowerBoostPercent)) * (int)Mathf.Sign(elementalPowerBoostPercent);
@@ -49,6 +51,17 @@ public class TempStatBoostPercent : PassivesDefinition
     public override void OnResolvePhaseEnd(BattleCharacter self)
     {
         if (self == null) return;
-        self.QueuePassiveToRemove(this);
+        self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
+    }
+
+    public override string GetDescription(BattleCharacter character)
+    {
+        if (character == null) return description;
+        string descriptionReturn = "";
+        if (attackBoostPercent != 0) descriptionReturn += $"Attack: {(attackBoostPercent > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(attackBoostPercent) * character.baseStats.physicalAttack)}\n";
+        if (elementalPowerBoostPercent != 0) descriptionReturn += $"Elemental Power: {(elementalPowerBoostPercent > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(elementalPowerBoostPercent) * character.baseStats.elementalPower)}\n";
+        if (defenseBoostPercent != 0) descriptionReturn += $"Defense: {(defenseBoostPercent > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(defenseBoostPercent) * character.baseStats.defense)}\n";
+        if (elementalResistanceBoostPercent != 0) descriptionReturn += $"Elemental Resistance: {(elementalResistanceBoostPercent > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(elementalResistanceBoostPercent) * character.baseStats.elementalResistance)}\n";
+        return descriptionReturn.TrimEnd('\n');
     }
 }

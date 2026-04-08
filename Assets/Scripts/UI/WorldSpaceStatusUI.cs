@@ -1,3 +1,4 @@
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,8 +10,10 @@ public class WorldSpaceStatusUI : MonoBehaviour
     public Slider hpSlider;
     public TMP_Text hpText;
     public Vector3 worldOffset = new Vector3(0, 2f, 0);
+    public PassiveContainerManagerUI passiveContainerManagerUI;
 
     private Camera cam;
+
 
     public void Initialize(BattleCharacter chr)
     {
@@ -24,6 +27,8 @@ public class WorldSpaceStatusUI : MonoBehaviour
             hpSlider.value = target.CurrentHealth;
         }
 
+        target.OnPassivesChanged.AddListener(OnPassivesChanged);
+        OnPassivesChanged(target.passives.ToArray());
         UpdateTexts();
     }
 
@@ -55,5 +60,13 @@ public class WorldSpaceStatusUI : MonoBehaviour
             nameText.text = target.name;
         if (hpText != null && target != null)
             hpText.text = $"{target.CurrentHealth}/{target.MaxHealth}";
+    }
+
+    private void OnPassivesChanged(PassivesDefinition[] passives)
+    {
+
+        Debug.Log($"Passives changed for {target.name}, updating UI with {passives.Length} passives.");
+        if (passives.Length > 0) Debug.Log($"Current passives: {string.Join(", ", passives.Select(p => p.name)  )}");
+        passiveContainerManagerUI.UpdatePassives(passives, target);
     }
 }

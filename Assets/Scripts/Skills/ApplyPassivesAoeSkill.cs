@@ -13,6 +13,9 @@ public class ApplyPassivesAoeSkill : Skill
         if (user == null || target == null) return;
         if (passivesToApply == null || passivesToApply.Count == 0) return;
 
+        
+        BeforeSkillExecute(user, target);
+
         List<BattleCharacter> group;
 
         
@@ -46,6 +49,7 @@ public class ApplyPassivesAoeSkill : Skill
         foreach (var member in group)
         {
             if (member == null || member.IsDead) continue;
+            if (Random.value > skillDetailShell.bonusEffectChance) continue;
 
             for (int i = 0; i < passivesToApply.Count; i++)
             {
@@ -56,6 +60,10 @@ public class ApplyPassivesAoeSkill : Skill
             }
         }
 
+        
+        
         ExecuteFollowUps(user, target);
+        
+        EndExecution();
     }
 }

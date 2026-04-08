@@ -11,13 +11,15 @@ public class HealAllAlliesSkill : Skill
     {
         if (user == null) return;
 
+        BeforeSkillExecute(user, target);
+
+        BeforeHealingSkillExecute(user, target);
+
         var group = user.GetAllies();
 
         foreach (var ally in group)
         {
             if (ally == null || ally.IsDead) continue;
-
-            BeforeHealingSkillExecute(user, ally);
             
             int healing = ally.ApplyIncomingHealingModifiers(healAmount);
 
@@ -26,7 +28,11 @@ public class HealAllAlliesSkill : Skill
             ally.ClearIncomingHealingModifiers();
         }
 
+        
+        
         ExecuteFollowUps(user, target);
+        
+        EndExecution();
     }
 
 }

@@ -5,11 +5,14 @@ public class NoHonorPassive : PassivesDefinition
 {
     public int spRestore = 100;
 
+
     public override void OnResolvePhaseEnd(BattleCharacter self)
     {
-        if(self.CurrentSp < spRestore)
+        int maxSp = self.MaxSp < spRestore ? self.MaxSp : spRestore;
+
+        if(self.CurrentSp < maxSp)
         {
-            int spToRestore = spRestore - self.CurrentSp;
+            int spToRestore = maxSp - self.CurrentSp;
             BattleCharacter rightAlly = GetRightAlly(self);
             if (rightAlly == null) return;
                          

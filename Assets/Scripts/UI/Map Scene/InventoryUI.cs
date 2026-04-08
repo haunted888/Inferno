@@ -11,6 +11,7 @@ public class InventoryUI : MonoBehaviour
     public Transform contentParent;     // ScrollView/Viewport/Content
     public GameObject itemEntryPrefab;  // InventoryItemEntry prefab
     public TMP_Text emptyText;          // optional “No items”
+    public TMP_Text goldText;           // optional gold display
     public CampUIManager campUIManager; // for opening camp if needed
 
     void Start()
@@ -71,6 +72,7 @@ public class InventoryUI : MonoBehaviour
         bool hasItems = items != null && items.Count > 0;
 
         if (emptyText != null) emptyText.gameObject.SetActive(!hasItems);
+        if (goldText != null) goldText.text = transfer != null ? transfer.GetMoney().ToString() : "0";
 
         if (!hasItems || itemEntryPrefab == null || contentParent == null) return;
 

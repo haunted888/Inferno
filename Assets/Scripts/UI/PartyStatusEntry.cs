@@ -10,6 +10,8 @@ public class PartyStatusEntry : MonoBehaviour
     public TMP_Text hpText;
     public TMP_Text spText;
 
+    public PassiveContainerManagerUI passiveContainerManagerUI;
+
     private BattleCharacter character;
 
     public void Initialize(BattleCharacter chr)
@@ -39,6 +41,8 @@ public class PartyStatusEntry : MonoBehaviour
             spSlider.value = character.CurrentSp;
         }
 
+        character.OnPassivesChanged.AddListener(OnPassivesChanged);
+        OnPassivesChanged(character.passives.ToArray());
         UpdateTexts();
     }
 
@@ -62,5 +66,10 @@ public class PartyStatusEntry : MonoBehaviour
 
         if (spText != null)
             spText.text = $"{character.CurrentSp}/{character.MaxSp}";
+    }
+
+    private void OnPassivesChanged(PassivesDefinition[] passives)
+    {
+        passiveContainerManagerUI.UpdatePassives(passives, character);
     }
 }

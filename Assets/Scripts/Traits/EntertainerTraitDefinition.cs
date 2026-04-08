@@ -18,6 +18,6 @@ public class EntertainerTraitDefinition : TraitDefinition
     public override void OnBattleStart(BattleCharacter self)
     {
         entertainerPassive.setSpHeal(spHeal);
-        self.QueuePassiveToAdd(entertainerPassive);
+        self.QueuePassiveToAdd(entertainerPassive, PassivesDefinition.PassiveHook.OnBattleStart);
     }
 }

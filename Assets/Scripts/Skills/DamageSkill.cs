@@ -7,7 +7,7 @@ public class DamageSkill : DamageSkillParent
 
     public override int EstimateDamage(BattleCharacter user, BattleCharacter target)
     {
-        SkillDamageType damageType = this.damageType;
+        SkillDamageType damageType = this.skillDetailShell.damageType;
 
         if (damageType == SkillDamageType.Adaptive)
         {
@@ -40,9 +40,13 @@ public class DamageSkill : DamageSkillParent
     {
         if (user == null || target == null || target.IsDead) return;
 
-        BeforeDamageSkillExecute(user, target);
+        
+        BeforeSkillExecute(user, target);
 
-        SkillDamageType damageType = this.damageType;
+        BeforeDamageSkillExecute(user, target);
+        
+
+        SkillDamageType damageType = this.skillDetailShell.damageType;
 
         if (damageType == SkillDamageType.Adaptive)
         {
@@ -58,7 +62,7 @@ public class DamageSkill : DamageSkillParent
                     damageType = subTypeToDamageType[subType];
                 }
             }
-            Debug.Log($"{this.damageType} damage type determined: {damageType} based on sub-type {subType}");
+            Debug.Log($"{this.skillDetailShell.damageType} damage type determined: {damageType} based on sub-type {subType}");
         }
 
         int powerRange = Random.Range(power - damageVariance, power + damageVariance);
@@ -84,7 +88,11 @@ public class DamageSkill : DamageSkillParent
 
         
         AfterExecute(user, target);
+        
+        
         ExecuteFollowUps(user, target);
+        
+        EndExecution();
     }
 
 

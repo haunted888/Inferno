@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8cc942ca55e5d7429a503b460e06295, type: 3}
+  m_Name: 2Defensive Style0
+  m_EditorClassIdentifier: Assembly-CSharp::TalentDefinition
+  id: 2
+  displayName: Defensive Style
+  cost: 0
+  statBonus:
+    maxHealth: 0
+    maxSp: 0
+    speed: 0
+    physicalAttack: 0
+    elementalPower: 0
+    defense: 0
+    elementalResistance: 0
+    critChance: 0
+    critDamage: 0
+    bludgeoningAttack: 0
+    slashingAttack: 0
+    piercingAttack: 0
+    bludgeoningDefense: 0
+    slashingDefense: 0
+    piercingDefense: 0
+    fireAttack: 0
+    iceAttack: 0
+    stormAttack: 0
+    acidAttack: 0
+    psychicAttack: 0
+    bloodAttack: 0
+    fireDefense: 0
+    iceDefense: 0
+    stormDefense: 0
+    acidDefense: 0
+    psychicDefense: 0
+    bloodDefense: 0
+  grantSkills: []
+  grantPassives:
+  - {fileID: 11400000, guid: 225e71e843519214f83037d7b06f69fd, type: 2}

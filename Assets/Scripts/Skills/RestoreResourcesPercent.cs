@@ -16,6 +16,9 @@ public class RestoreResourcesPercent : Skill
 
     public override void Execute(BattleCharacter user, BattleCharacter target)
     {
+
+        BeforeSkillExecute(user, target);
+
         if(!percentMissing)
         {
             user.RecoverSp(Mathf.RoundToInt(spRestore * user.MaxSp));
@@ -30,7 +33,10 @@ public class RestoreResourcesPercent : Skill
         }
 
         
+        
         ExecuteFollowUps(user, target);
+        
+        EndExecution();
     }
 
     

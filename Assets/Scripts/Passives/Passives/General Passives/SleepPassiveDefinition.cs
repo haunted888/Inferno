@@ -28,12 +28,15 @@ public class SleepPassiveDefinition : PassivesDefinition
         counter--;
         if (counter <= 0)
         {
-            self.QueuePassiveToRemove(this);
+            
+            SetDisplayText($"{self.name} wakes up!");
+            self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
         }
     }
 
     public override void OnDestroyed(BattleCharacter self)
     {
+        
         self.IsAsleep = false;
     }
 

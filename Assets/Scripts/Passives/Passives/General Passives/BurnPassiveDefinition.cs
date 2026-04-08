@@ -22,6 +22,7 @@ public class BurnPassiveDefinition : PassivesDefinition
         if (removeThisBurn)
         {
             self.RemovePassive(this);
+            Debug.Log($"{self.name} already has burn, increasing counter to {counter} and removing duplicate.");
         }
     }
 
@@ -29,11 +30,14 @@ public class BurnPassiveDefinition : PassivesDefinition
     {
         if (self == null) return;
         int burnDamage = Mathf.CeilToInt(self.MaxHealth * burnDamagePercent);
+        
         self.TakeDamage(burnDamage);
+        SetDisplayText($"{self.name} is hurt by their burn!");
+
         counter--;
         if (counter <= 0)
         {
-            self.QueuePassiveToRemove(this);
+            self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
         }
     }
     

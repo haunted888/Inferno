@@ -11,16 +11,16 @@ public class BleedingPassiveDefinition : PassivesDefinition
     
     public override void OnCreated(BattleCharacter self)
     {
-        bool removeThisBurn = false;
+        bool removeThisBleed = false;
         foreach(var passive in self.passives)
         {
-            if(passive is BurnPassiveDefinition && passive != this)
+            if(passive is BleedingPassiveDefinition && passive != this)
             {
-                ((BurnPassiveDefinition)passive).counter++;
-                removeThisBurn = true;
+                ((BleedingPassiveDefinition)passive).counter++;
+                removeThisBleed = true;
             }
         }
-        if (removeThisBurn)
+        if (removeThisBleed)
         {
             self.RemovePassive(this);
         }
@@ -51,7 +51,7 @@ public class BleedingPassiveDefinition : PassivesDefinition
         counter--;
         if (counter <= 0)
         {
-            self.QueuePassiveToRemove(this);
+            self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
         }
     }
 

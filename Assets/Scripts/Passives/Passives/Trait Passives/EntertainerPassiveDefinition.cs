@@ -16,7 +16,7 @@ public class EntertainerPassiveDefinition : PassivesDefinition
         foreach (var a in allies)
         {
             if (a == self) continue;
-            a.RecoverSp(Mathf.RoundToInt(spHealPercentage * skill.spCost));
+            a.RecoverSp(Mathf.RoundToInt(spHealPercentage * skill.skillDetailShell.spCost));
         }
     }
 }

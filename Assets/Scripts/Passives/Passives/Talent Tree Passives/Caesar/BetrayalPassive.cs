@@ -21,6 +21,6 @@ public class BetrayalPassive : PassivesDefinition
     public override void OnResolvePhaseEnd(BattleCharacter self)
     {
         if (self == null) return;
-        self.QueuePassiveToRemove(this);
+        self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
     }
 }

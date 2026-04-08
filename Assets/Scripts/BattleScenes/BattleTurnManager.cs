@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -41,6 +42,7 @@ public class BattleTurnManager : MonoBehaviour
     public SkillSelectionUI      skillSelectionUI;
     public BattleItemSelectionUI itemSelectionUI;
     public BattleCommandUI       commandUI;
+    public BattleText            battleText;
 
     public IReadOnlyList<BattleCharacter> PlayerParty => playerParty;
 
@@ -57,6 +59,8 @@ public class BattleTurnManager : MonoBehaviour
     private Dictionary<BattleCharacter, int>             chosenSkillIndices = new Dictionary<BattleCharacter, int>();
     private Dictionary<BattleCharacter, BattleCharacter> chosenTargets      = new Dictionary<BattleCharacter, BattleCharacter>();
     private Dictionary<BattleCharacter, ItemDefinition>  chosenItems        = new Dictionary<BattleCharacter, ItemDefinition>();
+
+    private bool waiting = true;
 
     [NonSerialized] public PassiveMutationUtility.PassiveMutationContext passiveMutationContext = new PassiveMutationUtility.PassiveMutationContext();
     private void EnsureCommandOrder(BattleCharacter chr)
@@ -148,7 +152,11 @@ public class BattleTurnManager : MonoBehaviour
         }
     }
 
-    
+    public void SetBattleText(string message)
+    {
+        if (battleText != null)
+            battleText.SetText(message);
+    }
 
     void Awake()
     {
@@ -167,7 +175,12 @@ public class BattleTurnManager : MonoBehaviour
         StartCoroutine(TurnLoop());
     }
 
-    public void setEnemyParty(List<BattleCharacter> enemies)
+    public void SetWaiting(bool value)
+    {
+        waiting = value;
+    }
+
+    public void SetEnemyParty(List<BattleCharacter> enemies)
     {
         enemyParty = enemies;
     }
@@ -365,9 +378,27 @@ public class BattleTurnManager : MonoBehaviour
             if (action.user == null || action.user.IsDead) continue;
             if (action.user.IsAsleep)
             {
-                Debug.Log($"{action.user.name} is asleep and skips their turn!");
+                SetBattleText($"{action.user.name} is asleep and cannot act!");
                 action.user.HandleSkippedAction();
                 
+                yield return new WaitForSeconds(1f);
+                continue;
+            }
+            if (action.user.IsDazed)
+            {
+                SetBattleText($"{action.user.name} is dazed and cannot act!");
+                action.user.HandleSkippedAction();
+
+                var passivesToRemove = action.user.passives.Where(p => p is DazedPassiveDefinition).ToList();
+
+                foreach(var passive in passivesToRemove)
+                {
+                    action.user.RemovePassive(passive);
+                }
+
+                action.user.IsDazed = false;
+                
+                yield return new WaitForSeconds(1f);
                 continue;
             }
 
@@ -379,14 +410,13 @@ public class BattleTurnManager : MonoBehaviour
                 if (action.user.DelayedCastTurns <= 0)
                 {
                     delayFinished = true;
-                    Debug.Log($"{action.user.name} finishes casting {action.skill.skillName}!");
                     action = action.user.DelayedCastSkill;
                     action.user.DelayedCastSkill = null;
                     action.user.DelayedCastTurns = 0;
                 }
                 else
                 {
-                    Debug.Log($"{action.user.name} is still casting {action.skill.skillName}, {action.user.DelayedCastTurns} turns remaining.");
+                    SetBattleText($"{action.user.name} is still preparing.");
                     continue;
                 }
             }
@@ -396,11 +426,11 @@ public class BattleTurnManager : MonoBehaviour
                 case ActionKind.Skill:
                 {
                     if (action.skill == null) break;
-                    if (action.skill.delay > 0 && !delayFinished) // Handle delayed cast: store skill and remaining turns on character, skip execution for now
+                    if (action.skill.skillDetailShell.delay > 0 && !delayFinished) // Handle delayed cast: store skill and remaining turns on character, skip execution for now
                     {
                         action.user.DelayedCastSkill = action;
-                        action.user.DelayedCastTurns = action.skill.delay;
-                        Debug.Log($"{action.user.name} begins casting {action.skill.skillName}, which will execute in {action.skill.delay} turns!");
+                        action.user.DelayedCastTurns = action.skill.skillDetailShell.delay;
+                        SetBattleText($"{action.user.name} begins preparing.");
                         break;
                     }
 
@@ -420,6 +450,7 @@ public class BattleTurnManager : MonoBehaviour
                             action.user,
                             () => action.user.passives,
                             p => p.OnSkillUsed(action.user, action.target, action.skill),
+                            PassivesDefinition.PassiveHook.OnSkillUsed,
                             passiveMutationContext
                         );
                     }
@@ -431,10 +462,19 @@ public class BattleTurnManager : MonoBehaviour
                             t,
                             () => t.passives,
                             p => p.OnSkillReceived(t, action.user, action.skill),
+                            PassivesDefinition.PassiveHook.OnSkillReceived,
                             passiveMutationContext
                         );
 
                     }
+
+                    if (!action.user.HasEnoughResourcesFor(action.skill))
+                    {
+                        SetBattleText($"{action.user.name} tried to use {action.skill.skillName}, but did not have enough resources.");
+                        break;
+                    }
+
+                    SetBattleText($"{action.user.name} uses {action.skill.skillName}!");
 
                     // Players spend SP via UseSkill; enemies ignore SP
                     if (playerParty.Contains(action.user))
@@ -449,6 +489,7 @@ public class BattleTurnManager : MonoBehaviour
                             action.user,
                             () => action.user.passives,
                             p => p.OnSkillUsedEnd(action.user, action.target, action.skill),
+                            PassivesDefinition.PassiveHook.OnSkillUsedEnd,
                             passiveMutationContext
                         );
                     }
@@ -459,6 +500,7 @@ public class BattleTurnManager : MonoBehaviour
                             t,
                             () => t.passives,
                             p => p.OnSkillReceivedEnd(t, action.user, action.skill),
+                            PassivesDefinition.PassiveHook.OnSkillReceivedEnd,
                             passiveMutationContext
                         );
                     }
@@ -479,17 +521,30 @@ public class BattleTurnManager : MonoBehaviour
                     if (bc.RequiresTarget && !bc.CanTarget(action.user, tgt))
                         break;
 
+                    
+                    SetBattleText($"{action.user.name} uses {def.displayName}.");
                     bc.Execute(action.user, tgt, def);
                     break;
                 }
             }
+            
+            yield return new WaitForSeconds(1f);
 
-            if (IsSideDefeated(playerParty)) { OnBattleEnd(false); yield break; }
-            if (IsSideDefeated(enemyParty))  { OnBattleEnd(true);  yield break; }
+            if (IsSideDefeated(playerParty)) { 
+                    SetBattleText("All members of your party have been defeated."); 
+                    yield return new WaitForSeconds(1f); 
+                    OnBattleEnd(false);  
+                    yield break; 
+                }
+            if (IsSideDefeated(enemyParty))  { 
+                    SetBattleText("All enemies have been defeated."); 
+                    yield return new WaitForSeconds(1f); 
+                    OnBattleEnd(true); 
+                    yield break; 
+                }
 
-            yield return new WaitForSeconds(0.3f);
         }
-        Trigger_ResolvePhaseEnd();
+        yield return StartCoroutine(Trigger_ResolvePhaseEnd());
     }
 
     private IEnumerable<QueuedAction> EnumerateQueuedActions()
@@ -742,16 +797,9 @@ public class BattleTurnManager : MonoBehaviour
             source,
             () => source.passives,
             p => p.OnAfterDealDamage(source, target, amount),
+            PassivesDefinition.PassiveHook.OnAfterDealDamage,
             passiveMutationContext
         );
-
-        PassiveMutationUtility.InvokePassivesWithMutation(
-            target,
-            () => target.passives,
-            p => p.OnAfterTakeDamage(target, source, amount),
-            passiveMutationContext
-        );
-
             
         if (source == null || amount <= 0) return;
         if (playerParty.Contains(source))
@@ -768,13 +816,14 @@ public class BattleTurnManager : MonoBehaviour
             EvaluateEnemyAction(enemy, out int skillIndex, out BattleCharacter target);
             
             Skill skill = null;
-            if (skillIndex > 0) skill = enemy.Skills[skillIndex];;
+            if (skillIndex > 0) skill = enemy.Skills[skillIndex];
 
-
-            if ((skill.targetType == SkillTargetType.SingleEnemy ||
-                 skill.targetType == SkillTargetType.SingleAlly) &&
-                (target == null || target.IsDead))
-                continue;
+            if(skill != null){
+                if ((skill.targetType == SkillTargetType.SingleEnemy ||
+                    skill.targetType == SkillTargetType.SingleAlly) &&
+                    (target == null || target.IsDead))
+                    continue;
+            }
 
             chosenSkillIndices[enemy] = skillIndex;
             chosenTargets[enemy]      = target;
@@ -903,6 +952,7 @@ public class BattleTurnManager : MonoBehaviour
                 c,
                 () => c.passives,
                 p => p.OnBattleStart(c),
+                PassivesDefinition.PassiveHook.OnBattleStart,
                 passiveMutationContext
             );
         });
@@ -910,13 +960,19 @@ public class BattleTurnManager : MonoBehaviour
 
     void Trigger_CommandPhaseStart()
     {
+        ForEachCombatant(c => { foreach (var s in c.Skills) s.OnCommandPhaseStart(); });
+
         ForEachCombatant(c => { PassiveMutationUtility.InvokePassivesWithMutation(
                 c,
                 () => c.passives,
                 p => p.OnCommandPhaseStart(c),
+                PassivesDefinition.PassiveHook.OnCommandPhaseStart,
                 passiveMutationContext
             );
         });
+
+        if (battleText != null)
+            battleText.Hide();
     }
 
     void Trigger_ResolvePhaseStart()
@@ -926,21 +982,46 @@ public class BattleTurnManager : MonoBehaviour
                 c,
                 () => c.passives,
                 p => p.OnResolvePhaseStart(c),
+                PassivesDefinition.PassiveHook.OnResolvePhaseStart,
                 passiveMutationContext
             );
         });
+
+        if(battleText != null)
+        {
+            battleText.Show();
+            SetBattleText("...");
+        }
 
     }
 
-    void Trigger_ResolvePhaseEnd()
+    private IEnumerator Trigger_ResolvePhaseEnd()
     {
-        ForEachCombatant(c => { PassiveMutationUtility.InvokePassivesWithMutation(
+        foreach (var c in playerParty)
+        {
+            if (c == null) continue;
+
+            yield return PassiveMutationUtility.InvokePassivesWithMutationCoroutine(
                 c,
                 () => c.passives,
                 p => p.OnResolvePhaseEnd(c),
+                PassivesDefinition.PassiveHook.OnResolvePhaseEnd,
                 passiveMutationContext
             );
-        });
+        }
+
+        foreach (var c in enemyParty)
+        {
+            if (c == null) continue;
+
+            yield return PassiveMutationUtility.InvokePassivesWithMutationCoroutine(
+                c,
+                () => c.passives,
+                p => p.OnResolvePhaseEnd(c),
+                PassivesDefinition.PassiveHook.OnResolvePhaseEnd,
+                passiveMutationContext
+            );
+        }
     }
 
     private void AssignPassiveMutationContext()

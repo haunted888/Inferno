@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ebe133ae227aa642bc2b3aef0b3387d, type: 3}
   m_Name: Burn Passive
   m_EditorClassIdentifier: Assembly-CSharp::BurnPassiveDefinition
-  displayName: Burn
+  displayName: Burning
   type: 2
+  icon: {fileID: 21300000, guid: 884b2537c24a9d64bab896cc214bf721, type: 3}
+  description: 'Burning: Takes 6% max health damage at the end of the turn.'
   counter: 1

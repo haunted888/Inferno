@@ -16,5 +16,5 @@ MonoBehaviour:
   type: 1
   attackBoostPercent: 0
   elementalPowerBoostPercent: 0
-  defenseBoostPercent: 0.1
-  elementalResistanceBoostPercent: 0.1
+  defenseBoostPercent: -0.1
+  elementalResistanceBoostPercent: -0.1

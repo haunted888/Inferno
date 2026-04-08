@@ -22,7 +22,7 @@ public class DamageBonusPassiveDefinition : PassivesDefinition
         turnsToLast--;
         if (turnsToLast <= 0)
         {
-            self.QueuePassiveToRemove(this);
+            self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
         }
     }
 }

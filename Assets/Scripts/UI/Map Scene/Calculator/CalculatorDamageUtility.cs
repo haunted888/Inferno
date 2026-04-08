@@ -6,8 +6,8 @@ public static class CalculatorDamageUtility
     {
         if (skill == null) return 0;
 
-        int baseOff = (skill.damageType == SkillDamageType.Physical) ? userStats.physicalAttack : userStats.elementalPower;
-        int baseDef = (skill.damageType == SkillDamageType.Physical) ? targetStats.defense : targetStats.elementalResistance;
+        int baseOff = (skill.skillDetailShell.damageType == SkillDamageType.Physical) ? userStats.physicalAttack : userStats.elementalPower;
+        int baseDef = (skill.skillDetailShell.damageType == SkillDamageType.Physical) ? targetStats.defense : targetStats.elementalResistance;
 
         int subOff = GetSubAttack(userStats, skill.subType);
         int subDef = GetSubDefense(targetStats, skill.subType);

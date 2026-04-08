@@ -15,6 +15,6 @@ public class CalcSkillPrefab : MonoBehaviour
     public void SetSkillWithSPCost(Skill skill)
     {
         if (skillNameText != null)
-            skillNameText.text = $"{skill.skillName} (SP: {skill.spCost})";
+            skillNameText.text = $"{skill.skillName} (SP: {skill.skillDetailShell.spCost})";
     }
 }

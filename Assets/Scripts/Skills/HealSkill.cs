@@ -11,6 +11,9 @@ public class HealAllySkill : Skill
     {
         if (target == null || target.IsDead) return;
 
+        
+        BeforeSkillExecute(user, target);
+
         BeforeHealingSkillExecute(user, target);
 
         
@@ -21,7 +24,11 @@ public class HealAllySkill : Skill
 
         target.ClearIncomingHealingModifiers();
 
+        
+        
         ExecuteFollowUps(user, target);
+        
+        EndExecution();
     }
 }
 

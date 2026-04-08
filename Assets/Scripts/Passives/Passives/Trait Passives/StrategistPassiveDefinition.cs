@@ -7,10 +7,10 @@ public class StrategistPassiveDefinition : PassivesDefinition
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public override void OnSkillReceived(BattleCharacter self, BattleCharacter attacker, Skill skill)
     {
-        attacker.AddPassive(zeroLuckPassive);
+        attacker.QueuePassiveToAdd(zeroLuckPassive, PassivesDefinition.PassiveHook.OnSkillReceived);
     }
     public override void OnSkillUsed(BattleCharacter self, BattleCharacter target, Skill skill)
     {
-        self.AddPassive(zeroLuckPassive);
+        self.QueuePassiveToAdd(zeroLuckPassive, PassivesDefinition.PassiveHook.OnSkillUsed);
     }
 }
