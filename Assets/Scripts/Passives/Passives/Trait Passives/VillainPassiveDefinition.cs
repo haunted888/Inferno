@@ -23,9 +23,9 @@ public class VillainPassiveDefinition : PassivesDefinition
         int h = 1;
         h += self.traitTypes.Contains(CharacterTrait.Hero) ? 1 : 0;
         h -= self.traitTypes.Contains(CharacterTrait.Villain) ? 1 : 0;
-        self.bonusStats.physicalAttack += physicalAttackBoost * h;
-        self.bonusStats.elementalPower += elementalAttackBoost * h;
-        self.bonusStats.defense += defenseBoost * h;
-        self.bonusStats.elementalResistance += resistanceBoost * h;
+        self.bonusStats.physicalAttack += physicalAttackBoost * h * self.level;
+        self.bonusStats.elementalPower += elementalAttackBoost * h * self.level;
+        self.bonusStats.defense += defenseBoost * h * self.level;
+        self.bonusStats.elementalResistance += resistanceBoost * h * self.level;
     }
 }

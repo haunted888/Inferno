@@ -17,11 +17,17 @@ public class PartyStatusPanel : MonoBehaviour
         foreach (var chr in party)
         {
             if (chr == null) continue;
-
-            GameObject obj = Instantiate(entryPrefab, entriesParent);
-            var entry = obj.GetComponent<PartyStatusEntry>();
-            if (entry != null)
-                entry.Initialize(chr);
+            AddEntry(chr);
         }
+    }
+
+    public void AddEntry(BattleCharacter chr)
+    {
+        if (chr == null || entryPrefab == null || entriesParent == null) return;
+
+        GameObject obj = Instantiate(entryPrefab, entriesParent);
+        var entry = obj.GetComponent<PartyStatusEntry>();
+        if (entry != null)
+            entry.Initialize(chr);
     }
 }

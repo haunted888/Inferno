@@ -11,6 +11,7 @@ public class PassiveIconPrefab : MonoBehaviour, IPointerEnterHandler, IPointerEx
 
     public UnityEngine.UI.Image iconImage;
     public GameObject descriptionPanel;
+    public TMP_Text nameText;
     public TMP_Text descriptionText;
 
     public void Awake()
@@ -27,11 +28,17 @@ public class PassiveIconPrefab : MonoBehaviour, IPointerEnterHandler, IPointerEx
     {
         descriptionText.text = description;
     }
+    
+    public void SetName(string name)
+    {
+        nameText.text = name;
+    }
 
     public void SetData(PassivesDefinition passive)
     {
         SetIcon(passive.icon);
         SetDescription(passive.GetDescription(null));
+        SetName(passive.displayName);
 
     }
 
@@ -39,6 +46,7 @@ public class PassiveIconPrefab : MonoBehaviour, IPointerEnterHandler, IPointerEx
     {
         SetIcon(passive.icon);
         SetDescription(passive.GetDescription(character));
+        SetName(passive.displayName);
 
     }
 

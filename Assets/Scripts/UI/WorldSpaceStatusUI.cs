@@ -11,6 +11,7 @@ public class WorldSpaceStatusUI : MonoBehaviour
     public TMP_Text hpText;
     public Vector3 worldOffset = new Vector3(0, 2f, 0);
     public PassiveContainerManagerUI passiveContainerManagerUI;
+    public Transform rectTransform;
 
     private Camera cam;
 
@@ -48,9 +49,8 @@ public class WorldSpaceStatusUI : MonoBehaviour
         if (cam != null)
         {
             // Position above target
-            transform.position = target.transform.position + worldOffset;
-            // Face camera (optional, for readability)
-            transform.rotation = Quaternion.LookRotation(transform.position - cam.transform.position);
+            Vector3 screenPos = cam.WorldToScreenPoint(target.transform.position + worldOffset);
+            rectTransform.position = screenPos;
         }
     }
 

@@ -28,9 +28,9 @@ public class HeroPassiveDefinition : PassivesDefinition
             if (a.traitTypes.Contains(CharacterTrait.Villain)) continue;
             h++;
         }
-        self.bonusStats.physicalAttack += physicalAttackBoost * h;
-        self.bonusStats.elementalPower += elementalAttackBoost * h;
-        self.bonusStats.defense += defenseBoost * h;
-        self.bonusStats.elementalResistance += resistanceBoost * h;
+        self.bonusStats.physicalAttack += physicalAttackBoost * h * self.level;
+        self.bonusStats.elementalPower += elementalAttackBoost * h * self.level;
+        self.bonusStats.defense += defenseBoost * h * self.level;
+        self.bonusStats.elementalResistance += resistanceBoost * h * self.level;
     }
 }

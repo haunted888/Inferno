@@ -21,15 +21,15 @@ public class RestoreResourcesPercent : Skill
 
         if(!percentMissing)
         {
-            user.RecoverSp(Mathf.RoundToInt(spRestore * user.MaxSp));
-            if(user.traitTypes.Contains(CharacterTrait.Marksman))
-                user.AddAmmo(Mathf.RoundToInt(ammoRestore * user.MaxAmmo));
+            target.RecoverSp(Mathf.RoundToInt(spRestore * target.MaxSp));
+            if(target.traitTypes.Contains(CharacterTrait.Marksman))
+                target.AddAmmo(Mathf.RoundToInt(ammoRestore * target.MaxAmmo));
         }
         else
         {
-            user.RecoverSp(Mathf.RoundToInt(Mathf.RoundToInt(spRestore * (user.MaxSp - user.CurrentSp))));
-            if(user.traitTypes.Contains(CharacterTrait.Marksman))
-                user.AddAmmo(Mathf.RoundToInt(Mathf.RoundToInt(ammoRestore * (user.MaxAmmo - user.CurrentAmmo))));
+            target.RecoverSp(Mathf.RoundToInt(Mathf.RoundToInt(spRestore * (target.MaxSp - target.CurrentSp))));
+            if(target.traitTypes.Contains(CharacterTrait.Marksman))
+                target.AddAmmo(Mathf.RoundToInt(Mathf.RoundToInt(ammoRestore * (target.MaxAmmo - target.CurrentAmmo))));
         }
 
         

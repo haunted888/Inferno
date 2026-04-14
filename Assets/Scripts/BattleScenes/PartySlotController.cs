@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Linq;
 
 public class PartySlotController : MonoBehaviour
 {
@@ -35,20 +36,13 @@ public class PartySlotController : MonoBehaviour
                 : Mathf.Clamp(def.sp, 0, maxSp);
 
             chr.ApplyStats(stats, currentHp);
-            chr.setName(def.GetDisplayName());
+            chr.SetName(def.GetDisplayName());
+            chr.SetLevel(def.level);
             
             chr.SetMaxSp(maxSp, fillToMax: false);
             chr.SetSp(currentSp);
 
-            chr.ClearPassives();
-            foreach (var p in def.passives)
-                if (p != null) chr.AddPassive(p);
-
-            chr.ClearSkills();
-            foreach (var s in def.GetEffectiveSkills())
-                if (s != null) chr.AddSkill(s);
-                // Copy traits
-            
+            // Traits must be set up before passives/skills since they can be affected by those
             chr.ClearTraits();
             if (def.traits != null)
                 chr.Traits.AddRange(def.traits);
@@ -66,6 +60,17 @@ public class PartySlotController : MonoBehaviour
                     t.SetupForBattle(def, chr);
             }
 
+            chr.ClearPassives();
+            foreach (var p in def.passives)
+                if (p != null) chr.AddPassive(p);
+
+            chr.ClearSkills();
+            foreach (var s in def.GetEffectiveSkills())
+                if (s != null) chr.AddSkill(s);
+
+            
+            
+
             if(inst.GetComponent<Outline>() != null)
                 inst.GetComponent<Outline>().enabled = false; // Disable outline by default; can be enabled later when selecting targets, etc.
 
@@ -75,9 +80,7 @@ public class PartySlotController : MonoBehaviour
 
     void Start()
     {
-        partyMembers = GetComponentsInChildren<BattleCharacter>();
-        partyHomes = battleSlots.GetSlots(true, partyMembers, 1);
-        GoToHome();
+        RefreshPositions();
     }
 
     // Update is called once per frame
@@ -93,5 +96,15 @@ public class PartySlotController : MonoBehaviour
         {
             partyMembers[i].transform.position = partyHomes[i].position;
         }
+    }
+
+    public void RefreshPositions()
+    {
+        partyMembers = GetComponentsInChildren<BattleCharacter>(false)
+            .Where(c => c != null && c.gameObject.activeSelf)
+            .ToArray();
+
+        partyHomes = battleSlots.GetSlots(true, partyMembers, 1);
+        GoToHome();
     }
 }

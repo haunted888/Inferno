@@ -25,6 +25,7 @@ public class DamageSkill : DamageSkillParent
             }
         }
 
+
         return EstimateExpectedDamageInternal(
             user.GetEffectiveStats(),
             target.GetEffectiveStats(),
@@ -33,6 +34,9 @@ public class DamageSkill : DamageSkillParent
             skillCritChance,
             skillCritDamage,
             subType);
+
+        
+    
     }
 
     //NOTE: When you add animations, add them directly to the skill and have them execute in this function.
@@ -83,7 +87,8 @@ public class DamageSkill : DamageSkillParent
         target.ClearIncomingDamageModifiers();
         user.ClearOutgoingDamageModifiers();
 
-        BattleTurnManager.Instance?.RegisterDamage(user, target, dealt);
+        if(BattleTurnManager.Instance != null)
+            BattleTurnManager.Instance.RegisterDamage(user, target, dealt);
 
 
         

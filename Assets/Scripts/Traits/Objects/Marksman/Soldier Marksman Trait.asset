@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b596454cc8f2234796c5fca5fddb2ba, type: 3}
   m_Name: Soldier Marksman Trait
   m_EditorClassIdentifier: Assembly-CSharp::MarksmanTraitDefinition
-  traitName: 
+  traitName: Marksman - M4
   description: Based on M4 military rifle
   traitType: 5
   constantMaxAmmo: 30

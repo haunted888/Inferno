@@ -97,16 +97,20 @@ public abstract class Skill : ScriptableObject
     [Header("Marksman")]
     [Range(0f, 1f)]
     public float ammoCost = 0f;
+    public int flatAmmoCost = 0;
 
     [NonSerialized] public Skill skillDetailShell;
 
+    private bool triggeredOnCommandPhaseStart = false;
 
 
     public virtual void OnCreated(BattleCharacter self)
     {
-        if(skillDetailShell != null) Destroy(skillDetailShell);
+        if (skillDetailShell != null) return;
+        
+        Destroy(skillDetailShell);
         skillDetailShell = Instantiate(this);
-
+        
         foreach (var s in followUpSkills)
         {
             if (s == null) continue;
@@ -116,9 +120,18 @@ public abstract class Skill : ScriptableObject
 
     public void OnCommandPhaseStart()
     {
+        if (triggeredOnCommandPhaseStart)
+        {
+            
+            Debug.Log($"OnCommandPhaseStart triggered for skill {skillName} / detail shell {skillDetailShell.name}");
+            triggeredOnCommandPhaseStart = false;
+            return;
+        }
+        triggeredOnCommandPhaseStart = true;
         if(skillDetailShell != null) Destroy(skillDetailShell);
 
         skillDetailShell = Instantiate(this);
+
 
         foreach (var s in followUpSkills)
         {
@@ -127,10 +140,22 @@ public abstract class Skill : ScriptableObject
         }
     }
 
+    public virtual int GetDamageEstimate(BattleCharacter user, BattleCharacter target)
+    {
+        int returnDamage = EstimateDamage(user, target);
+
+        foreach (var s in followUpSkills)
+        {
+            if (s == null) continue;
+            returnDamage += s.GetDamageEstimate(user, target);
+        }
+
+        return returnDamage;
+    }
+
     public virtual int EstimateDamage(BattleCharacter user, BattleCharacter target)
     {
-        // Default: non-damaging skills
-        return 0;
+        return 0; // Default for non-damage skills
     }
 
     public void BeforeDamageSkillExecute(BattleCharacter user, BattleCharacter target)

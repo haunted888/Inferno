@@ -19,31 +19,7 @@ public class ApplyPassivesAoeSkill : Skill
         List<BattleCharacter> group;
 
         
-        switch (characters)
-        {
-            case affectsCharacters.Target:
-                group = new List<BattleCharacter> { target };
-                break;
-            case affectsCharacters.TargetTeam:
-                group = new List<BattleCharacter>(target.GetAllies());
-                break;
-            case affectsCharacters.Self:
-                group = new List<BattleCharacter> { user };
-                break;
-            case affectsCharacters.Allies:
-                group = new List<BattleCharacter>(user.GetAllies());
-                break;
-            case affectsCharacters.Enemies:
-                group = new List<BattleCharacter>(user.GetEnemies());
-                break;
-            case affectsCharacters.AllOtherAllies:
-                group = new List<BattleCharacter>(user.GetAllies());
-                group.Remove(user);
-                break;
-            default:
-                group = new List<BattleCharacter>(target.GetAllies());
-                break;
-        }
+        group = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target);
         
 
         foreach (var member in group)

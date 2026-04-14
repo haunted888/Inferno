@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c44a56fb74205754d9585d41625e3f15, type: 3}
+  m_Name: Laser Fire Resource Check
+  m_EditorClassIdentifier: Assembly-CSharp::CheckResourceRequirements
+  skillName: 
+  description: Fire 20 shots into the enemy
+  targetType: 0
+  damageType: 0
+  spCost: 0
+  hpCost: 0
+  delay: 0
+  followUpSkills:
+  - {fileID: 11400000, guid: 8020fbdba7eb59f48bdc7f53bc8272fe, type: 2}
+  bonusEffectChance: 1
+  traitTags: 
+  ammoCost: 0
+  flatAmmoCost: 0
+  skillReference: {fileID: 11400000, guid: 8020fbdba7eb59f48bdc7f53bc8272fe, type: 2}

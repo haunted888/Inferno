@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bee834a593fe8ec48b85aa97ed138a05, type: 3}
+  m_Name: Fire at Will!
+  m_EditorClassIdentifier: Assembly-CSharp::RandomizeTarget
+  skillName: Fire at Will!
+  description: 
+  targetType: 1
+  damageType: 2
+  spCost: 20
+  hpCost: 0
+  delay: 0
+  followUpSkills:
+  - {fileID: 11400000, guid: 9a8ec68b2cf0ca5439d780dc1770d708, type: 2}
+  - {fileID: 11400000, guid: 4f7d61632dc33d842b5e7b034e13108c, type: 2}
+  - {fileID: 11400000, guid: 4f7d61632dc33d842b5e7b034e13108c, type: 2}
+  - {fileID: 11400000, guid: 4f7d61632dc33d842b5e7b034e13108c, type: 2}
+  - {fileID: 11400000, guid: 4f7d61632dc33d842b5e7b034e13108c, type: 2}
+  - {fileID: 11400000, guid: 4f7d61632dc33d842b5e7b034e13108c, type: 2}
+  - {fileID: 11400000, guid: 4f7d61632dc33d842b5e7b034e13108c, type: 2}
+  - {fileID: 11400000, guid: 4f7d61632dc33d842b5e7b034e13108c, type: 2}
+  - {fileID: 11400000, guid: 4f7d61632dc33d842b5e7b034e13108c, type: 2}
+  - {fileID: 11400000, guid: 4f7d61632dc33d842b5e7b034e13108c, type: 2}
+  bonusEffectChance: 1
+  traitTags: 05000000
+  ammoCost: 0
+  flatAmmoCost: 1

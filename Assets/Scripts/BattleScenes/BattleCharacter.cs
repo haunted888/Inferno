@@ -10,6 +10,8 @@ public class BattleCharacter : MonoBehaviour
     public int slotSize = 1;   // how many slots this character “occupies”
 
 
+    public int level = 1;
+
     //NOTE: Check later to see if these need to be serialized
     [Header("Health")]
     [SerializeField] private int maxHealth = 100;
@@ -50,6 +52,8 @@ public class BattleCharacter : MonoBehaviour
     public UnityEvent<PassivesDefinition[]> OnPassivesChanged;
 
     public List<QueuedAction> currentActionOrder;
+
+    [NonSerialized] public bool hideWhileSummonIsAlive;
     
 
     void Awake()
@@ -326,12 +330,17 @@ public class BattleCharacter : MonoBehaviour
         return result;
     }
 
-    public void setName(string newName)
+    public void SetName(string newName)
     {
         this.name = newName;
     }
 
-    public int getSpeed()
+    public void SetLevel(int newLevel)
+    {
+        level = Mathf.Max(1, newLevel);
+    }
+
+    public int GetSpeed()
     {
         return baseStats.speed + bonusStats.speed;
     }
@@ -469,6 +478,12 @@ public class BattleCharacter : MonoBehaviour
         CurrentAmmo     = Mathf.Clamp(current, 0, MaxAmmo);
     }
 
+    public void SetAmmo(int max, int current)
+    {
+        MaxAmmo         = Mathf.Max(0, max);
+        CurrentAmmo     = Mathf.Clamp(current, 0, MaxAmmo);
+    }
+
     public void SpendAmmo(int amount)
     {
         if (amount <= 0) return;
@@ -489,7 +504,7 @@ public class BattleCharacter : MonoBehaviour
             return true;
 
         // If the skill has no ammo requirement, it's always usable.
-        if (skill.skillDetailShell.ammoCost <= 0f)
+        if (skill.skillDetailShell.ammoCost <= 0f && skill.skillDetailShell.flatAmmoCost <= 0)
             return true;
 
         if (ConstantMaxAmmo <= 0)
@@ -498,6 +513,7 @@ public class BattleCharacter : MonoBehaviour
         // Required ammo = ceil(percent * constantMaxAmmo)
         float percent = Mathf.Clamp01(skill.skillDetailShell.ammoCost);
         int needed = Mathf.CeilToInt(percent * ConstantMaxAmmo);
+        needed += skill.skillDetailShell.flatAmmoCost;
 
         return CurrentAmmo >= needed;
     }
@@ -646,5 +662,17 @@ public class BattleCharacter : MonoBehaviour
     {
         DelayedCastSkill = null;
         DelayedCastTurns = 0;
+    }
+
+
+
+    //SUMMON
+    [NonSerialized] public BattleCharacter activeSummon;
+    [NonSerialized] public BattleCharacter summoner;
+    [NonSerialized] public PassivesDefinition onSummonDeathPassive;
+
+    public bool HasLivingSummon()
+    {
+        return activeSummon != null && !activeSummon.IsDead;
     }
 }

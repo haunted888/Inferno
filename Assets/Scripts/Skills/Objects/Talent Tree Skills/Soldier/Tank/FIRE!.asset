@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be77378e34270ae44bb0cfbb82be15d5, type: 3}
+  m_Name: FIRE!
+  m_EditorClassIdentifier: Assembly-CSharp::DamageAllEnemiesSkill
+  skillName: FIRE!
+  description: Fire a missile dealing 30-70 piercing and 30-70 fire damage to all
+    enemies
+  targetType: 1
+  damageType: 0
+  spCost: 100
+  hpCost: 0
+  delay: 0
+  followUpSkills:
+  - {fileID: 11400000, guid: 3baf0c52cae41f8409d2f1ec3383523e, type: 2}
+  bonusEffectChance: 1
+  traitTags: 
+  ammoCost: 0
+  flatAmmoCost: 0
+  power: 50
+  subType: 3
+  skillCritChance: 0
+  skillCritDamage: 0
+  damageVariance: 20
+  characters: 4

@@ -44,6 +44,10 @@ public class BattleTurnManager : MonoBehaviour
     public BattleCommandUI       commandUI;
     public BattleText            battleText;
 
+    [Header("Summon UI")]
+    public PartyStatusPanel partyStatusPanel;
+    public GameObject enemyHealthBarPrefab;
+
     public IReadOnlyList<BattleCharacter> PlayerParty => playerParty;
 
     private List<BattleCharacter> commandOrder = new List<BattleCharacter>();
@@ -99,7 +103,7 @@ public class BattleTurnManager : MonoBehaviour
             return false;
 
         var lastChar = commandOrder[commandOrder.Count - 1];
-        if(lastChar.DelayedCastSkill != null)
+        if(lastChar.DelayedCastSkill != null || lastChar.HasLivingSummon())
         {
             if(!TryStepBack(1))
                 return false;
@@ -121,7 +125,7 @@ public class BattleTurnManager : MonoBehaviour
             return false;
 
         var lastChar = commandOrder[commandOrder.Count - steps - 1];
-        if(lastChar.DelayedCastSkill != null)
+        if(lastChar.DelayedCastSkill != null || lastChar.HasLivingSummon())
         {
             if(!TryStepBack(1 + steps))
                 return false;
@@ -221,6 +225,12 @@ public class BattleTurnManager : MonoBehaviour
             if (chr == null || chr.IsDead)
             {
                 currentPlayerIndex++;
+                continue;
+            }
+
+            if (chr.HasLivingSummon())
+            {
+                QueueSkip(chr);
                 continue;
             }
 
@@ -726,10 +736,11 @@ public class BattleTurnManager : MonoBehaviour
     {
         if (skill == null || user == null || clicked == null) return false;
         if (clicked.IsDead) return false;
+        if (IsUntargetableBecauseOfSummon(clicked)) return false;
 
         bool clickedIsAlly  = GetAlliesOf(user).Contains(clicked);
         bool clickedIsEnemy = GetEnemiesOf(user).Contains(clicked);
-        bool clickedIsSelf   = (user == clicked);
+        bool clickedIsSelf  = user == clicked;
 
         switch (skill.targetType)
         {
@@ -752,7 +763,39 @@ public class BattleTurnManager : MonoBehaviour
     public void HandleCharacterDeath(BattleCharacter c)
     {
         if (c == null) return;
-        foreach (var t in c.Traits) t.OnDeath(c);
+
+        foreach (var t in c.Traits)
+            t.OnDeath(c);
+
+        if (c.summoner != null)
+        {
+            var owner = c.summoner;
+            owner.activeSummon = null;
+
+            if (owner.hideWhileSummonIsAlive)
+            {
+                owner.gameObject.SetActive(true);
+                owner.transform.position = c.transform.position;
+                owner.transform.rotation = c.transform.rotation;
+            }
+            else
+            {
+                owner.transform.position = c.transform.position;
+                owner.transform.rotation = c.transform.rotation;
+            }
+
+            owner.hideWhileSummonIsAlive = false;
+
+            if (!owner.IsDead && c.onSummonDeathPassive != null)
+                owner.AddPassive(c.onSummonDeathPassive);
+
+            var partyController = playerPartyParent.GetComponent<PartySlotController>();
+            if (partyController != null) partyController.RefreshPositions();
+
+            var enemyController = enemyPartyParent.GetComponent<EnemySlotController>();
+            if (enemyController != null) enemyController.RefreshPositions();
+        }
+
         c.gameObject.SetActive(false);
     }
 
@@ -770,7 +813,13 @@ public class BattleTurnManager : MonoBehaviour
 
         var type = action.skill.targetType;
 
-        // AoE skills: we don't need a specific clicked target
+        if (type == SkillTargetType.Self)
+        {
+            if (IsUntargetableBecauseOfSummon(action.user))
+                return null;
+            return action.user;
+        }
+
         if (type == SkillTargetType.AllEnemies || type == SkillTargetType.AllAllies)
             return action.target;
 
@@ -779,12 +828,19 @@ public class BattleTurnManager : MonoBehaviour
 
         var candidates = new List<BattleCharacter>();
         foreach (var c in pool)
-            if (c != null && !c.IsDead) candidates.Add(c);
+        {
+            if (c == null || c.IsDead) continue;
+            if (IsUntargetableBecauseOfSummon(c)) continue;
+            candidates.Add(c);
+        }
 
         if (candidates.Count == 0)
             return null;
 
-        if (action.target != null && !action.target.IsDead && candidates.Contains(action.target))
+        if (action.target != null &&
+            !action.target.IsDead &&
+            !IsUntargetableBecauseOfSummon(action.target) &&
+            candidates.Contains(action.target))
             return action.target;
 
         int idx = UnityEngine.Random.Range(0, candidates.Count);
@@ -836,7 +892,7 @@ public class BattleTurnManager : MonoBehaviour
         bestSkillIndex = -1;
         bestTarget     = null;
 
-        if(enemy.DelayedCastSkill != null)
+        if(enemy.DelayedCastSkill != null || enemy.HasLivingSummon())
         {
             return;
         }
@@ -893,7 +949,8 @@ public class BattleTurnManager : MonoBehaviour
                 int effectiveThreat = target.Threat;
                 int value = baseValue;
 
-                int estDamage = skill.EstimateDamage(enemy, target);
+                int estDamage = skill.GetDamageEstimate(enemy, target);
+            
                 if (estDamage > 0 && estDamage >= target.CurrentHealth)
                 {
                     bool isAoE = skill.targetType == SkillTargetType.AllEnemies ||
@@ -1059,5 +1116,184 @@ public class BattleTurnManager : MonoBehaviour
         SetOutlineEnabled(enemyParty, false);
     }
     
+
+
+
+    public BattleCharacter SpawnSummon(
+        BattleCharacter summoner,
+        MapPartyMemberDefinition partySummonDef,
+        MapEnemyDefinition enemySummonDef,
+        PassivesDefinition onSummonDeathPassive,
+        bool hideSummonerWhileSummonIsAlive)
+    {
+
+        if (summoner == null) return null;
+        if (summoner.HasLivingSummon()) return null;
+
+        bool summonForPlayerSide = playerParty.Contains(summoner);
+        BattleCharacter summon = null;
+
+        if (partySummonDef != null)
+        {
+            partySummonDef.EnsureInitializedFromAsset();
+
+            var inst = Instantiate(
+                partySummonDef.characterPrefab,
+                summonForPlayerSide ? playerPartyParent : enemyPartyParent
+            );
+
+            summon = inst.GetComponent<BattleCharacter>();
+            if (summon == null) return null;
+
+            partySummonDef.ResetProgression();
+            partySummonDef.level = summoner.level;
+
+            for (int i = 2; i <= partySummonDef.level; i++)
+            {
+                partySummonDef.ApplyLevelUpEffects(i);
+            }
+
+            CombatStats stats = partySummonDef.GetEffectiveStats();
+            int maxHp = stats.maxHealth;
+
+            int maxSp = partySummonDef.GetMaxSp();
+
+            summon.ApplyStats(stats, maxHp);
+            summon.SetName(partySummonDef.GetDisplayName());
+            summon.SetMaxSp(maxSp, fillToMax: true);
+
+            summon.ClearPassives();
+            if (partySummonDef.passives != null)
+            {
+                foreach (var p in partySummonDef.passives)
+                    if (p != null) summon.AddPassive(p);
+            }
+
+            summon.ClearSkills();
+            foreach (var s in partySummonDef.GetEffectiveSkills())
+                if (s != null) summon.AddSkill(s);
+
+            summon.ClearTraits();
+            if (partySummonDef.traits != null)
+            {
+                summon.Traits.AddRange(partySummonDef.traits);
+                foreach (var t in summon.Traits)
+                {
+                    if (t == null) continue;
+                    summon.traitTypes.Add(t.traitType);
+                    t.SetupForBattle(partySummonDef, summon);
+                }
+            }
+        }
+        else if (enemySummonDef != null)
+        {
+            enemySummonDef.EnsureInitializedFromAsset();
+
+            enemySummonDef.EnsureInitializedFromAsset();
+
+            enemySummonDef.ResetProgression();
+            enemySummonDef.level = summoner.sourceDefinition.level;
+
+            for (int i = 2; i <= summoner.sourceDefinition.level; i++)
+            {
+                enemySummonDef.ApplyLevelUpEffects(i);
+            }
+
+            var inst = Instantiate(
+                enemySummonDef.enemyPrefab,
+                summonForPlayerSide ? playerPartyParent : enemyPartyParent
+            );
+
+            summon = inst.GetComponent<BattleCharacter>();
+            if (summon == null) return null;
+
+            CombatStats stats = enemySummonDef.GetEffectiveStats();
+            int maxHp = stats.maxHealth;
+
+            summon.ApplyStats(stats, maxHp);
+            summon.SetName(enemySummonDef.GetDisplayName());
+
+            int maxSp = enemySummonDef.GetMaxSp();
+            summon.SetMaxSp(maxSp, fillToMax: false);
+            summon.SetSp(maxSp);
+
+            summon.ClearPassives();
+            if (enemySummonDef.passives != null)
+            {
+                foreach (var p in enemySummonDef.passives)
+                    if (p != null) summon.AddPassive(p);
+            }
+
+            summon.ClearSkills();
+            foreach (var s in enemySummonDef.GetEffectiveSkills())
+                if (s != null) summon.AddSkill(s);
+        }
+
+        if (summon == null) return null;
+
+        summon.passiveMutationContext = passiveMutationContext;
+        summon.summoner = summoner;
+        summon.onSummonDeathPassive = onSummonDeathPassive;
+        summoner.activeSummon = summon;
+        summoner.hideWhileSummonIsAlive = hideSummonerWhileSummonIsAlive;
+
+        // Spawn in summoner's exact spot
+        summon.transform.position = summoner.transform.position;
+        summon.transform.rotation = summoner.transform.rotation;
+
+        // Either hide summoner or leave it behind summon
+        if (hideSummonerWhileSummonIsAlive)
+        {
+            summoner.gameObject.SetActive(false);
+        }
+        else
+        {
+            var offset = summoner.transform.position;
+            offset.z += 1f;
+            summoner.transform.position = offset;
+        }
+
+        
+
+        if (summonForPlayerSide)
+            playerParty.Add(summon);
+        else
+            enemyParty.Add(summon);
+
+        if (summonForPlayerSide)
+{
+    if (partyStatusPanel != null)
+            partyStatusPanel.AddEntry(summon);
+    }
+    else
+    {
+        if (enemyHealthBarPrefab != null)
+        {
+            var barObj = Instantiate(enemyHealthBarPrefab);
+            var bar = barObj.GetComponent<WorldSpaceStatusUI>();
+            if (bar != null)
+                bar.Initialize(summon);
+
+            barObj.transform.SetParent(summon.transform);
+        }
+    }
+
+        var outline = summon.GetComponent<Outline>();
+        if (outline != null)
+            outline.enabled = false;
+
+        var partyController = playerPartyParent.GetComponent<PartySlotController>();
+        if (partyController != null) partyController.RefreshPositions();
+
+        var enemyController = enemyPartyParent.GetComponent<EnemySlotController>();
+        if (enemyController != null) enemyController.RefreshPositions();
+
+        return summon;
+    }
+
+    private bool IsUntargetableBecauseOfSummon(BattleCharacter target)
+    {
+        return target != null && target.HasLivingSummon();
+    }
 
 }

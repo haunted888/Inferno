@@ -7,6 +7,7 @@ public class StatBoostPercentPassiveDefinition : PassivesDefinition
     public float elementalPowerBoostPercent = 0.00f;
     public float defenseBoostPercent = 0.00f;
     public float elementalResistanceBoostPercent = 0.00f;
+    public float speedBoostPercent = 0.00f;
 
     public int duration = int.MaxValue; // Duration in turns, default to max for "until end of battle" behavior
 
@@ -15,12 +16,15 @@ public class StatBoostPercentPassiveDefinition : PassivesDefinition
         float attackBoostPercent, 
         float elementalPowerBoostPercent, 
         float defenseBoostPercent, 
-        float elementalResistanceBoostPercent)
+        float elementalResistanceBoostPercent,
+        float speedBoostPercent
+        )
     {
         this.attackBoostPercent = attackBoostPercent;
         this.elementalPowerBoostPercent = elementalPowerBoostPercent;
         this.defenseBoostPercent = defenseBoostPercent;
         this.elementalResistanceBoostPercent = elementalResistanceBoostPercent;
+        this.speedBoostPercent = speedBoostPercent;
     }
 
     public override void OnCreated(BattleCharacter self)
@@ -47,9 +51,7 @@ public class StatBoostPercentPassiveDefinition : PassivesDefinition
         self.bonusStats.elementalPower += Mathf.CeilToInt(self.baseStats.elementalPower * Mathf.Abs(elementalPowerBoostPercent)) * (int)Mathf.Sign(elementalPowerBoostPercent);
         self.bonusStats.defense += Mathf.CeilToInt(self.baseStats.defense * Mathf.Abs(defenseBoostPercent)) * (int)Mathf.Sign(defenseBoostPercent);
         self.bonusStats.elementalResistance += Mathf.CeilToInt(self.baseStats.elementalResistance * Mathf.Abs(elementalResistanceBoostPercent)) * (int)Mathf.Sign(elementalResistanceBoostPercent);
-
-
-        
+        self.bonusStats.speed += Mathf.CeilToInt(self.baseStats.speed * Mathf.Abs(speedBoostPercent)) * (int)Mathf.Sign(speedBoostPercent);
     }
 
     public override void OnResolvePhaseEnd(BattleCharacter self)
@@ -70,6 +72,8 @@ public class StatBoostPercentPassiveDefinition : PassivesDefinition
         if (elementalPowerBoostPercent != 0) descriptionReturn += $"Elemental Power: {(elementalPowerBoostPercent > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(elementalPowerBoostPercent) * character.baseStats.elementalPower)}\n";
         if (defenseBoostPercent != 0) descriptionReturn += $"Defense: {(defenseBoostPercent > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(defenseBoostPercent) * character.baseStats.defense)}\n";
         if (elementalResistanceBoostPercent != 0) descriptionReturn += $"Elemental Resistance: {(elementalResistanceBoostPercent > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(elementalResistanceBoostPercent) * character.baseStats.elementalResistance)}\n";
+        if (speedBoostPercent != 0) descriptionReturn += $"Speed: {(speedBoostPercent > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(speedBoostPercent) * character.baseStats.speed)}\n";
+        
         return descriptionReturn.TrimEnd('\n');
     }
 }

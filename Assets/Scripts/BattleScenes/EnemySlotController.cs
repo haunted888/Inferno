@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Linq;
+
 
 public class EnemySlotController : MonoBehaviour
 {
@@ -6,6 +8,7 @@ public class EnemySlotController : MonoBehaviour
     private BattleCharacter[] enemies;
     private Transform[] enemyHomes;
     public GameObject enemyHealthBarPrefab;
+    public Transform healthBarParent;
 
 
     //Awake is called when the script instance is being loaded
@@ -35,7 +38,8 @@ public class EnemySlotController : MonoBehaviour
             int currentSp = maxSp;          
 
             chr.ApplyStats(stats, currentHp);
-            chr.setName(def.GetDisplayName());
+            chr.SetName(def.GetDisplayName());
+            chr.SetLevel(def.level);
 
             chr.ClearSkills();
             foreach (var s in def.GetEffectiveSkills())
@@ -47,13 +51,11 @@ public class EnemySlotController : MonoBehaviour
             // Spawn health bar
             if (enemyHealthBarPrefab != null)
             {
-                var barObj = Instantiate(enemyHealthBarPrefab);
+                var barObj = Instantiate(enemyHealthBarPrefab, healthBarParent);
                 var bar    = barObj.GetComponent<WorldSpaceStatusUI>();
                 if (bar != null)
                     bar.Initialize(chr);
 
-                // Optional: parent to enemy so it moves with them
-                barObj.transform.SetParent(chr.transform);
             }
             
             if(inst.GetComponent<Outline>() != null)
@@ -66,17 +68,8 @@ public class EnemySlotController : MonoBehaviour
     void Start()
     {
         
-        enemies = GetComponentsInChildren<BattleCharacter>();
-        Debug.Log("EnemySlotController found " + enemies.Length + " enemies.");
-        enemyHomes = battleSlots.GetSlots(false, enemies, 1);
-        GoToHome();
+        RefreshPositions();
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     void GoToHome()
@@ -86,5 +79,15 @@ public class EnemySlotController : MonoBehaviour
         {
             enemies[i].transform.position = enemyHomes[i].position;
         }
+    }
+
+    public void RefreshPositions()
+    {
+        enemies = GetComponentsInChildren<BattleCharacter>(false)
+            .Where(c => c != null && c.gameObject.activeSelf)
+            .ToArray();
+
+        enemyHomes = battleSlots.GetSlots(false, enemies, 1);
+        GoToHome();
     }
 }

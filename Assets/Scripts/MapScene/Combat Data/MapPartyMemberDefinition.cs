@@ -130,12 +130,14 @@ public class MapPartyMemberDefinition
         if (!initializedFromAssetStats && !overrideStats)
         {
             stats = characterAsset.baseStats;
+            Debug.Log(displayName + " max sp is " + stats.maxSp);
             stats.maxHealth = Mathf.Max(1, stats.maxHealth);
             stats.maxSp     = Mathf.Max(0, stats.maxSp);
 
             initializedFromAssetStats = true;
         }
         baseStats = stats;
+        levelUpStats = new CombatStats();
 
         if (!initializedFromAssetSkills && !overrideSkills &&
             characterAsset.skills != null && characterAsset.skills.Count > 0)
@@ -293,6 +295,7 @@ public class MapPartyMemberDefinition
         stats.acidDefense          += sign * d.acidDefense;
         stats.psychicDefense       += sign * d.psychicDefense;
         stats.bloodDefense         += sign * d.bloodDefense;
+
     }
     public void InitializeTalentPointsIfFresh(int defaultPoints = 1)
     {
@@ -305,6 +308,10 @@ public class MapPartyMemberDefinition
     {
         level = 1;
         currentXp = 0;
+
+        ApplyStatsDelta(levelUpStats, -1);
+        levelUpStats = new CombatStats();
+
     }
 
     public void SetLevelFromReward(int currentLevel)
@@ -398,6 +405,39 @@ public class MapPartyMemberDefinition
         
     }
 
+    public void ApplyLevelUpEffects(int level)
+    {
+        talentPoints += 1; // add 1 talent point per level-up
+
+        // apply level-up stats
+        CombatStats delta = new CombatStats
+        {
+            maxHealth          = Mathf.RoundToInt(baseStats.maxHealth * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            maxSp              = Mathf.RoundToInt(baseStats.maxSp * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            speed              = Mathf.RoundToInt(baseStats.speed * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            physicalAttack     = Mathf.RoundToInt(baseStats.physicalAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            elementalPower     = Mathf.RoundToInt(baseStats.elementalPower * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            defense            = Mathf.RoundToInt(baseStats.defense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            elementalResistance= Mathf.RoundToInt(baseStats.elementalResistance * (levelUpBaseMultiplier + level * levelUpLevelMultiplier))
+        };
+
+        ApplyStatsDelta(delta, +1);
+
+        levelUpStats.maxHealth += delta.maxHealth;
+        levelUpStats.maxSp     += delta.maxSp;
+        levelUpStats.speed     += delta.speed;
+        levelUpStats.physicalAttack     += delta.physicalAttack;
+        levelUpStats.elementalPower     += delta.elementalPower;
+        levelUpStats.defense              += delta.defense;
+        levelUpStats.elementalResistance  += delta.elementalResistance;
+        levelUpStats.critChance           += delta.critChance;
+        levelUpStats.critDamage           += delta.critDamage;
+
+        health = stats.maxHealth;
+        sp = stats.maxSp;
+        
+    }
+
     public void ApplyLevelUpBonusStats(CombatStats delta)
     {
         ApplyStatsDelta(delta, +1);
@@ -442,7 +482,8 @@ public class MapPartyMemberDefinition
     {
         if (characterAsset == null) return;
         var seed = characterAsset.predeterminedSubStats;
-        if (seed == null || seed.Count != 6)
+        if(seed == null || seed.Count == 0) return;
+        if (seed.Count != 6)
         {
             
             var substats = Enum.GetValues(typeof(CombatSubStat)).Cast<CombatSubStat>().ToList();

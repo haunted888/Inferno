@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VillainPassiveDefinition
   displayName: On Guard
   type: 5
+  isInstance: 0
+  icon: {fileID: 0}
+  description: 

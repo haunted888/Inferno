@@ -11,7 +11,7 @@ public static class ActionOrderUtility
 
         var orderedActions = actions
             .Where(a => a != null && a.user != null && !a.user.IsDead)
-            .OrderByDescending(a => a.user.getSpeed())
+            .OrderByDescending(a => a.user.GetSpeed())
             .ThenBy(_ => Random.value)
             .ToList();
 

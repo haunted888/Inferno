@@ -32,20 +32,23 @@ public class MarksmanTraitDefinition : TraitDefinition
         if (skill == null) return;
 
         // Only apply to skills that use ammo
-        if (skill.skillDetailShell.ammoCost <= 0f)
-            return;
-
-        if (user.ConstantMaxAmmo <= 0 || user.CurrentAmmo <= 0)
+        if (skill.skillDetailShell.ammoCost <= 0f && skill.skillDetailShell.flatAmmoCost <= 0)
             return;
 
         // Determine ammo cost from skill percent
         float percent = Mathf.Clamp01(skill.skillDetailShell.ammoCost);
         int needed = Mathf.CeilToInt(percent * user.ConstantMaxAmmo);
+        needed += skill.skillDetailShell.flatAmmoCost;
         if (needed <= 0) return;
 
         // Spend what we actually have
         int spend = Mathf.Min(needed, user.CurrentAmmo);
-        if (spend <= 0) return;
+
+        if(needed > user.CurrentAmmo)
+        {
+            damage = 0;
+            return; // Not enough ammo to use the skill, so it misses (0 damage)
+        }
 
         user.SpendAmmo(spend);
 
