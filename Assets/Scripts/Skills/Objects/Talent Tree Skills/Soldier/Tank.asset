@@ -34,13 +34,13 @@ MonoBehaviour:
     traits:
     - {fileID: 11400000, guid: 54505966645dc8e49aceb90d54313894, type: 2}
     stats:
-      maxHealth: 408
-      maxSp: 204
-      speed: 9
-      physicalAttack: 102
-      elementalPower: 102
-      defense: 102
-      elementalResistance: 102
+      maxHealth: 304
+      maxSp: 152
+      speed: 8
+      physicalAttack: 76
+      elementalPower: 76
+      defense: 76
+      elementalResistance: 76
       critChance: 0
       critDamage: 150
       bludgeoningAttack: 0
@@ -69,7 +69,7 @@ MonoBehaviour:
     currentXp: 0
     passives: []
     talentTreePrefab: {fileID: 0}
-    talentPoints: 9
+    talentPoints: 23
     learnedTalentIds: []
     mainSubStats: 
     subSubStats: 
@@ -113,4 +113,4 @@ MonoBehaviour:
     initializedFromAssetSkills: 0
     passives: []
   dazedPassiveOnSummonDeath: {fileID: 11400000, guid: e2da678b471e22748b2d8145dcfb06ce, type: 2}
-  hideSummonerWhileSummonIsAlive: 0
+  hideSummonerWhileSummonIsAlive: 1

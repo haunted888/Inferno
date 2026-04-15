@@ -537,7 +537,19 @@ public class BattleTurnManager : MonoBehaviour
                     break;
                 }
             }
-            
+
+            if (action.user.HasLivingSummon())
+            {
+                foreach (var act in actions)
+                {
+                    if(act.target == action.user)
+                    {
+                        act.target = action.user.activeSummon;
+                    }
+                }
+            }
+
+
             yield return new WaitForSeconds(1f);
 
             if (IsSideDefeated(playerParty)) { 
@@ -1237,20 +1249,34 @@ public class BattleTurnManager : MonoBehaviour
         summoner.activeSummon = summon;
         summoner.hideWhileSummonIsAlive = hideSummonerWhileSummonIsAlive;
 
-        // Spawn in summoner's exact spot
-        summon.transform.position = summoner.transform.position;
-        summon.transform.rotation = summoner.transform.rotation;
+        var battleSlots = FindFirstObjectByType<BattleSlots>();
+        int summonerSlotIndex = -1;
 
-        // Either hide summoner or leave it behind summon
+        if (battleSlots != null)
+            summonerSlotIndex = battleSlots.GetClosestSlotIndex(summonForPlayerSide, summoner.transform.position);
+
+
+        Vector3 originalPosition = summoner.transform.position;
+        Quaternion originalRotation = summoner.transform.rotation;
+
+        // Summon takes the summoner's current battle slot
+        summon.transform.position = originalPosition;
+        summon.transform.rotation = originalRotation;
+
         if (hideSummonerWhileSummonIsAlive)
         {
             summoner.gameObject.SetActive(false);
         }
-        else
+        else if (battleSlots != null && summonerSlotIndex >= 0)
         {
-            var offset = summoner.transform.position;
-            offset.z += 1f;
-            summoner.transform.position = offset;
+            var summonerSlots = battleSlots.GetRawSummonerSlots(summonForPlayerSide);
+            if (summonerSlots != null &&
+                summonerSlotIndex < summonerSlots.Length &&
+                summonerSlots[summonerSlotIndex] != null)
+            {
+                summoner.transform.position = summonerSlots[summonerSlotIndex].position;
+                summoner.transform.rotation = summonerSlots[summonerSlotIndex].rotation;
+            }
         }
 
         

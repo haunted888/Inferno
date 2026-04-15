@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,8 @@ public class BattleCommandUI : MonoBehaviour
     public Button skipButton;
     public Button backButton;
 
+    public TMP_Text nameTag;
+
     private Action<BattleCommandType> onCommandChosen;
 
     public void ShowForCharacter(BattleCharacter character, bool canGoBack, Action<BattleCommandType> callback)
@@ -26,6 +29,7 @@ public class BattleCommandUI : MonoBehaviour
         onCommandChosen = callback;
 
         backButton.gameObject.SetActive(canGoBack);
+        nameTag.text = character.name;
 
         skillsButton.onClick.RemoveAllListeners();
         itemsButton.onClick.RemoveAllListeners();
