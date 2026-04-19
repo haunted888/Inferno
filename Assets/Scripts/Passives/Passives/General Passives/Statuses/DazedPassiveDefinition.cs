@@ -1,10 +1,11 @@
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Passives/Statuses/Dazed")]
-public class DazedPassiveDefinition : PassivesDefinition
+public class DazedPassiveDefinition : StatusPassiveDefinition
 {
     public override void OnCreated(BattleCharacter self)
     {
+        if(CharHasStatus(self)) return;
         bool removeThisDazed = false;
         foreach(var passive in self.passives)
         {
@@ -25,6 +26,7 @@ public class DazedPassiveDefinition : PassivesDefinition
     {
         
         self.IsDazed = false;
+        ApplyStatusBuffer(self);
     }
 
     

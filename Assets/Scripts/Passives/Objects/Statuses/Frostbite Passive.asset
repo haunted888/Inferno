@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c4d9c4ce2ffba248a26acb4e290b270, type: 3}
+  m_Name: Frostbite Passive
+  m_EditorClassIdentifier: Assembly-CSharp::FrostbitePassiveDefinition
+  displayName: Frostbite
+  type: 2
+  isInstance: 1
+  icon: {fileID: 21300000, guid: f12a1aec95c9df149b5b9a354cc02696, type: 3}
+  description: Has a 1 in 3 chance of freezing up when it acts.
+  statusBufferPrefab: {fileID: 11400000, guid: 5a7ed86d813ee80499776ba16996a016, type: 2}

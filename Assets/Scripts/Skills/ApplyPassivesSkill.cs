@@ -21,7 +21,7 @@ public class ApplyPassivesSkill : Skill
         {
             var passive = passivesToApply[i];
             if (passive == null) continue;
-            target.AddPassive(passive);
+            target.AddPassive(passive, user);
 
         }
 

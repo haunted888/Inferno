@@ -52,6 +52,8 @@ public abstract class PassivesDefinition : ScriptableObject
 
     private string displayText = "";
 
+    [NonSerialized]public BattleCharacter applicator = null;
+
     // Passive stats
     public virtual void GetStatBoosts(BattleCharacter self) {  }
 
@@ -93,5 +95,13 @@ public abstract class PassivesDefinition : ScriptableObject
     {
         return displayText;
     }
+
+
+
+
+
+    
+
+
 
 }

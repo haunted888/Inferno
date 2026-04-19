@@ -32,7 +32,7 @@ public class ApplyPassivesAoeSkill : Skill
                 var passive = passivesToApply[i];
                 if (passive == null) continue;
 
-                member.AddPassive(passive);
+                member.AddPassive(passive, user);
             }
         }
 

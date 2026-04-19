@@ -11,7 +11,7 @@ public class ApplyPassiveFuture : PassivesDefinition
         turnsUntilApply--;
         if (turnsUntilApply <= 0)
         {
-            self.QueuePassiveToAdd(passiveToApply, PassivesDefinition.PassiveHook.OnCommandPhaseStart);
+            self.QueuePassiveToAdd(passiveToApply, PassivesDefinition.PassiveHook.OnCommandPhaseStart, applicator);
             self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnCommandPhaseStart);
         }
     }

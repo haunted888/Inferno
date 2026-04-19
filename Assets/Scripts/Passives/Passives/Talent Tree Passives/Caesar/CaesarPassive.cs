@@ -31,7 +31,7 @@ public class CaesarPassive : PassivesDefinition
                     defenseBoostPercent,
                     elementalResistanceBoostPercent
                 );
-                action.user.AddPassive(passiveBoost);
+                action.user.AddPassive(passiveBoost, self);
                 Debug.Log($"CaesarPassive triggered for {action.user.name}.");
             }
 

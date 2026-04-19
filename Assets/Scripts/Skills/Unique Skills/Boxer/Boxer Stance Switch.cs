@@ -23,14 +23,14 @@ public class PassiveSwap : Skill
             if (hasOffensivePassive && !hasDefensivePassive)
             {
                 user.RemovePassive(offensivePassive);
-                user.AddPassive(defensivePassive);
-                user.AddPassive(defensiveFollowUp);
+                user.AddPassive(defensivePassive, user);
+                user.AddPassive(defensiveFollowUp, user);
             }
             else if (!hasOffensivePassive && hasDefensivePassive)
             {
                 user.RemovePassive(defensivePassive);
-                user.AddPassive(offensivePassive);
-                user.AddPassive(offensiveFollowUp);
+                user.AddPassive(offensivePassive, user);
+                user.AddPassive(offensiveFollowUp, user);
             }
         }
         

@@ -1,0 +1,28 @@
+using UnityEngine;
+
+[CreateAssetMenu(menuName = "Passives/Statuses/Alchemist/Frostburn Passive")]
+public class FrostburnPassiveDefinition : StatusPassiveDefinition
+{
+    public float frostburnDamagePercentMax = 0.05f;
+    public float frostburnDamagePercentMin = 0.01f;
+
+    public float healingCutAmount = 0.5f;
+
+    
+
+    public override void OnSkillUsedEnd(BattleCharacter self, BattleCharacter attacker, Skill skill)
+    {
+        int damage = Mathf.RoundToInt(self.MaxHealth * Random.Range(frostburnDamagePercentMin, frostburnDamagePercentMax));
+        self.TakeDamage(damage);
+    }
+
+    public override void BeforeReceivingHealing(BattleCharacter self, int healingAmount)
+    {
+        self.ModifyIncomingHealingMultiplier(1 - healingCutAmount);
+    }
+
+    public override void OnDestroyed(BattleCharacter self)
+    {
+        ApplyStatusBuffer(self);
+    }
+}

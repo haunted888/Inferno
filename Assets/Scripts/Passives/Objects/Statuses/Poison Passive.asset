@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PoisonPassiveDefinition
   displayName: Poisoned
   type: 2
+  isInstance: 1
   icon: {fileID: 21300000, guid: cb3fff705000a7640bebc8eee6860961, type: 3}
   description: 'Poisoned: Takes 1% max health damage per stack of poison at the end
     of turn.'
+  statusBufferPrefab: {fileID: 11400000, guid: 5a7ed86d813ee80499776ba16996a016, type: 2}
   counter: 1

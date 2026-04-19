@@ -23,7 +23,7 @@ public class GeneralPassive : PassivesDefinition
         {
             if (ally == self) continue; // Skip self
             heroPassive.SetStatBoosts(trait.physicalAttackBoost, trait.elementalAttackBoost, trait.physicalDefenseBoost, trait.elementalResistanceBoost);
-            ally.AddPassive(heroPassive);
+            ally.AddPassive(heroPassive, self);
         }
     }
 }

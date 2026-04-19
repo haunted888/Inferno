@@ -1,12 +1,14 @@
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Passives/Statuses/Sleep")]
-public class SleepPassiveDefinition : PassivesDefinition
+public class SleepPassiveDefinition : StatusPassiveDefinition
 {
     public int counter = 1;
 
     public override void OnCreated(BattleCharacter self)
     {
+        if(CharHasStatus(self)) return;
+
         bool removeThisSleep = false;
         foreach(var passive in self.passives)
         {
@@ -38,6 +40,7 @@ public class SleepPassiveDefinition : PassivesDefinition
     {
         
         self.IsAsleep = false;
+        ApplyStatusBuffer(self);
     }
 
     

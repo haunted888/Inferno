@@ -25,7 +25,7 @@ public class PassiveStealAOESkill : Skill
 
             foreach (var passive in passivesToSteal)
             {
-                user.AddPassive(passive);
+                user.AddPassive(passive, character);
                 character.RemovePassive(passive);
             }
         }

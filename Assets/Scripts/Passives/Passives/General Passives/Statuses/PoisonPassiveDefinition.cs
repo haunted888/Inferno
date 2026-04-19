@@ -1,13 +1,15 @@
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Passives/Statuses/Poison")]
-public class PoisonPassiveDefinition : PassivesDefinition
+public class PoisonPassiveDefinition : StatusPassiveDefinition
 {
 
-    private const float poisonDamagePercent = .01f;
+    private const int poisonDamageAmount = 1;
     public int counter = 1;
     public override void OnCreated(BattleCharacter self)
     {
+        if(CharHasStatus(self)) return;
+
         bool removeThisPoison = false;
         foreach(var passive in self.passives)
         {
@@ -27,7 +29,7 @@ public class PoisonPassiveDefinition : PassivesDefinition
     public override void OnResolvePhaseEnd(BattleCharacter self)
     {
         if (self == null) return;
-        int poisonDamage = Mathf.CeilToInt(self.MaxHealth * poisonDamagePercent * counter);
+        int poisonDamage = poisonDamageAmount * counter;
 
         self.TakeDamage(poisonDamage);
         SetDisplayText($"{self.name} is hurt by poison!");
@@ -37,5 +39,11 @@ public class PoisonPassiveDefinition : PassivesDefinition
             self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
         }
     }
+
+    public override void OnDestroyed(BattleCharacter self)
+    {
+        ApplyStatusBuffer(self);
+    }
+
     
 }

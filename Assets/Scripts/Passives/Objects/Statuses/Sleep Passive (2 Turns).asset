@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SleepPassiveDefinition
   displayName: Sleeping
   type: 2
+  isInstance: 1
   icon: {fileID: 0}
   description: 
+  statusBufferPrefab: {fileID: 11400000, guid: 5a7ed86d813ee80499776ba16996a016, type: 2}
   counter: 2

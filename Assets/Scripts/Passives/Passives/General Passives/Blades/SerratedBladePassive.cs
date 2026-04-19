@@ -25,7 +25,7 @@ public class SerratedBladePassive : DamageConversionClass
         if(applyStatus)
         {
             //Use AddPasive instead of QueuePassiveToAdd to ensure the bleeding 
-            target.AddPassive(bleedingPassive);
+            target.AddPassive(bleedingPassive, self);
         }
         applyStatus = false;
     }

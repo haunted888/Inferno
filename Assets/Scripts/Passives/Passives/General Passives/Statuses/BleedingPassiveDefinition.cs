@@ -1,22 +1,21 @@
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Passives/Statuses/Bleeding")]
-public class BleedingPassiveDefinition : PassivesDefinition
+public class BleedingPassiveDefinition : StatusPassiveDefinition
 {
     public int bleedDamage = 1;
 
-    public float healCutPercent = .5f;
     public int counter = 1;
-    private bool canTrigger = false;
     
     public override void OnCreated(BattleCharacter self)
     {
+        if(CharHasStatus(self)) return;
         bool removeThisBleed = false;
         foreach(var passive in self.passives)
         {
-            if(passive is BleedingPassiveDefinition && passive != this)
+            if(passive is BleedingPassiveDefinition definition && passive != this)
             {
-                ((BleedingPassiveDefinition)passive).counter++;
+                definition.counter++;
                 removeThisBleed = true;
             }
         }
@@ -26,24 +25,15 @@ public class BleedingPassiveDefinition : PassivesDefinition
         }
     }
 
-    public override void OnSkillReceived(BattleCharacter self, BattleCharacter attacker, Skill skill)
-    {
-        canTrigger = true;
-    }
 
     public override void OnSkillReceivedEnd(BattleCharacter self, BattleCharacter attacker, Skill skill)
     {
 
         if(!skill.GetAllEffectTypes().Contains(SkillEffectType.Damage)) return;
         if (bleedDamage <= 0) return;
-        if (!canTrigger) return;
         self.TakeDamage(bleedDamage);
     }
 
-    public override void BeforeReceivingHealing(BattleCharacter self, int healingAmount)
-    {
-        self.ModifyIncomingHealingMultiplier(1 -healCutPercent);
-    }
 
     public override void OnResolvePhaseEnd(BattleCharacter self)
     {
@@ -54,5 +44,11 @@ public class BleedingPassiveDefinition : PassivesDefinition
             self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
         }
     }
+
+    public override void OnDestroyed(BattleCharacter self)
+    {
+        ApplyStatusBuffer(self);
+    }
+
 
 }

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9632b1e0315f1c442acbc7e4975e4ca1, type: 3}
+  m_Name: Alchemist Trait
+  m_EditorClassIdentifier: Assembly-CSharp::AlchemistTraitDefinition
+  traitName: Alchemist
+  description: 
+  traitType: 9
+  soakedFrostbitePassive: {fileID: 11400000, guid: 8caf250e7758c9942932ed56e196eeae, type: 2}
+  soakedPoisonPassive: {fileID: 11400000, guid: a9e445de0b89d8c44ab71eda36fa5595, type: 2}
+  soakedBurnPassive: {fileID: 11400000, guid: 368c95803ce661f458536083e017168a, type: 2}
+  frostbiteBurnPassive: {fileID: 11400000, guid: 382aeecd129d5d848875ee9c64131d81, type: 2}
+  frostbitePoisonPassive: {fileID: 11400000, guid: 8047871292d30a84c9d2f245b81fdbaf, type: 2}
+  burnPoisonPassive: {fileID: 11400000, guid: 612c9eea92f4c4a44b9cac209f6455cc, type: 2}

@@ -24,7 +24,7 @@ public class PoisonedBladePassive : DamageConversionClass
         if(!(skill is DamageSkillParent)) return;
         if(applyStatus)
         {
-            target.AddPassive(poisonPassive);
+            target.AddPassive(poisonPassive, self);
         }
         applyStatus = false;
     }

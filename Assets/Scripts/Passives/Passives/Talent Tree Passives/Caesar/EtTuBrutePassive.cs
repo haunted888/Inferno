@@ -47,7 +47,7 @@ public class EtTuBrutePassive : PassivesDefinition
             } 
             else if (userActed && action?.user != null && allies.Contains(action.user) && action.user != self && !action.user.IsDead)
             {
-                action.user.AddPassive(passiveToApply);
+                action.user.AddPassive(passiveToApply, self);
                 Debug.Log($"Betrayal applied to {action.user.name}.");
             }
 

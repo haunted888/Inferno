@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BleedingPassiveDefinition
   displayName: Passive
   type: 2
+  isInstance: 1
+  icon: {fileID: 0}
+  description: 
+  statusBufferPrefab: {fileID: 11400000, guid: 5a7ed86d813ee80499776ba16996a016, type: 2}
   bleedDamage: 1
-  healCutPercent: 0.5
   counter: 1

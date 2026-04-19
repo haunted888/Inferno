@@ -15,10 +15,10 @@ public class GuerillaWarfarePassive : PassivesDefinition
                 if(ally.passives.Contains(passiveToApply)) continue; // Skip if the ally already has the passive
                 if(ally == self)
                 {
-                    self.QueuePassiveToAdd(passiveToApply, PassivesDefinition.PassiveHook.OnCommandPhaseStart);
+                    self.QueuePassiveToAdd(passiveToApply, PassivesDefinition.PassiveHook.OnCommandPhaseStart, self);
                     continue;
                 }
-                ally.AddPassive(passiveToApply);
+                ally.AddPassive(passiveToApply, self);
                 
             }
         }

@@ -22,6 +22,11 @@ public class BattleCharacter : MonoBehaviour
     public bool IsDead => currentHealth <= 0;
     [NonSerialized] public bool IsAsleep = false;
     [NonSerialized] public bool IsDazed = false;
+    [NonSerialized] public bool IsSoaked = false;
+    [NonSerialized] public bool IsSteamed = false;
+    [NonSerialized] public bool IsFrostbitten = false;
+    [NonSerialized] public float FrostBitePercent = 1.0f/3.0f;
+    [NonSerialized] public bool IsFrozen = false;
     [NonSerialized] public int DelayedCastTurns = 0;
     [NonSerialized] public QueuedAction DelayedCastSkill = null;
 
@@ -66,6 +71,14 @@ public class BattleCharacter : MonoBehaviour
         currentSp = Mathf.Max(0, maxSp);
 
         IsAsleep = false;
+        IsDazed = false;
+        IsSoaked = false;
+        IsSteamed = false;
+        IsFrostbitten = false;
+        IsFrozen = false;
+        FrostBitePercent = 1.0f/3.0f;
+        DelayedCastTurns = 0;
+        DelayedCastSkill = null;
     }
 
     public int TakeDamage(int amount)
@@ -99,6 +112,18 @@ public class BattleCharacter : MonoBehaviour
         }
 
         return dealt;
+    }
+
+    public void Die()
+    {
+        if (IsDead) return;
+
+        currentHealth = 0;
+        Debug.Log($"{name} has died.");
+
+        if (BattleTurnManager.Instance != null)
+            BattleTurnManager.Instance.HandleCharacterDeath(this);
+
     }
 
 
@@ -227,14 +252,23 @@ public class BattleCharacter : MonoBehaviour
     }
 
     public void ClearPassives() => passives.Clear();
-    public void AddPassive(PassivesDefinition p)
+    public void AddPassive(PassivesDefinition p, BattleCharacter applicator = null)
     {
         var passive = p;
         if (p != null) {
             if(p.isInstance)
                 passive = Instantiate(p);
+                passive.applicator = applicator;
             passives.Add(passive);
             passive.OnCreated(this);
+
+            if(passive.applicator != null){
+                foreach(var t in passive.applicator.Traits)
+                {
+                    t.OnPassiveApplied(passive.applicator, passive, this);
+                }
+            }
+
             OnPassivesChanged?.Invoke(passives.ToArray());
         }
         
@@ -245,6 +279,14 @@ public class BattleCharacter : MonoBehaviour
         if (p != null) {
             passives.Add(p);
             p.OnCreated(this);
+            
+            if(p.applicator != null){
+                foreach(var t in p.applicator.Traits)
+                {
+                    t.OnPassiveApplied(p.applicator, p, this);
+                }
+            }
+
             OnPassivesChanged?.Invoke(passives.ToArray());
         }
         
@@ -327,6 +369,29 @@ public class BattleCharacter : MonoBehaviour
             bloodDefense     = baseStats.bloodDefense     + bonusStats.bloodDefense
         };
 
+        if (IsSoaked)
+        {
+            var soak = passives.Find(p => p is SoakedPassiveDefinition) as SoakedPassiveDefinition;
+            if(soak != null)
+            {
+                result.physicalAttack = (int)(result.physicalAttack * soak.GetSoakMultiplier());
+                result.elementalPower = (int)(result.elementalPower * soak.GetSoakMultiplier());
+                result.speed = (int)(result.speed * soak.GetSoakMultiplier());
+                Debug.Log($"{result.speed} is the new speed after soak multiplier");
+            }
+
+        }
+
+        if (IsSteamed)
+        {
+            var steamed = passives.Find(p => p is SteamedPassiveDefinition) as SteamedPassiveDefinition;
+            if(steamed != null)
+            {
+                result.defense = (int)(result.defense * steamed.GetSteamedMultiplier());
+                result.elementalResistance = (int)(result.elementalResistance * steamed.GetSteamedMultiplier());
+            }
+        }
+
         return result;
     }
 
@@ -342,7 +407,8 @@ public class BattleCharacter : MonoBehaviour
 
     public int GetSpeed()
     {
-        return baseStats.speed + bonusStats.speed;
+        var stats = GetEffectiveStats();
+        return stats.speed;
     }
 
     public Dictionary<DamageSubType, int> GetSubAttackStats()
@@ -547,7 +613,7 @@ public class BattleCharacter : MonoBehaviour
         return previewEnemies ?? Array.Empty<BattleCharacter>();
     }
 
-    public void QueuePassiveToAdd(PassivesDefinition passive, PassivesDefinition.PassiveHook hook)
+    public void QueuePassiveToAdd(PassivesDefinition passive, PassivesDefinition.PassiveHook hook, BattleCharacter applicator = null)
     {
         if (passive == null) return;
 
@@ -555,11 +621,12 @@ public class BattleCharacter : MonoBehaviour
         {
             if(passive.isInstance)
                 passive = Instantiate(passive);
+                passive.applicator = applicator;
             passiveMutationContext.passivesToAdd.Add(passive, hook);
         }
         else
         {
-            AddPassive(passive);
+            AddPassive(passive, applicator);
         }
     }
 

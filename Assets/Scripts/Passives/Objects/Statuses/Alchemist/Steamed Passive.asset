@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5007dcdae12d5354c8f190c375538687, type: 3}
+  m_Name: Steamed Passive
+  m_EditorClassIdentifier: Assembly-CSharp::SteamedPassiveDefinition
+  displayName: Steamed
+  type: 2
+  isInstance: 1
+  icon: {fileID: 21300000, guid: ddd4bee0ef6da374a8740d3e7be55477, type: 3}
+  description: Soft and squishy, this character has decreased defenses, but has its
+    healing multiplied by 150%.
+  statusBufferPrefab: {fileID: 11400000, guid: 5a7ed86d813ee80499776ba16996a016, type: 2}
+  steamedMultiplier: 0.8
+  healingIncreasePercent: 0.5

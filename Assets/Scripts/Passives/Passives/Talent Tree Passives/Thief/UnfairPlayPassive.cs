@@ -15,6 +15,6 @@ public class UnfairPlayPassive : PassivesDefinition
         }
         if (self == target) return;
 
-        target.AddPassive(passiveToApply);
+        target.AddPassive(passiveToApply, self);
     }
 }

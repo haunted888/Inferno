@@ -20,7 +20,7 @@ public class BoxerThrowInTheTowel : Skill
         foreach (var a in user.GetAllies())
         {
             if(a == user) continue;
-            a.AddPassive(buffToApply);
+            a.AddPassive(buffToApply, user);
             a.RecoverSp(a.MaxSp);
         }
 

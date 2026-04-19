@@ -2,20 +2,24 @@ using System;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Passives/Statuses/Burn")]
-public class BurnPassiveDefinition : PassivesDefinition
+public class BurnPassiveDefinition : StatusPassiveDefinition
 {
 
-    private const float burnDamagePercent = .0625f;
+    private const float burnDamagePercent = .02f;
+    
+    public float healCutPercent = .5f;
     public int counter = 1;
 
     public override void OnCreated(BattleCharacter self)
     {
+        if(CharHasStatus(self)) return;
+
         bool removeThisBurn = false;
         foreach(var passive in self.passives)
         {
-            if(passive is BurnPassiveDefinition && passive != this)
+            if(passive is BurnPassiveDefinition definition && passive != this)
             {
-                ((BurnPassiveDefinition)passive).counter++;
+                definition.counter++;
                 removeThisBurn = true;
             }
         }
@@ -40,5 +44,16 @@ public class BurnPassiveDefinition : PassivesDefinition
             self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
         }
     }
+
     
+    public override void BeforeReceivingHealing(BattleCharacter self, int healingAmount)
+    {
+        self.ModifyIncomingHealingMultiplier(1-healCutPercent);
+    }
+    
+    public override void OnDestroyed(BattleCharacter self)
+    {
+        ApplyStatusBuffer(self);
+    }
+
 }

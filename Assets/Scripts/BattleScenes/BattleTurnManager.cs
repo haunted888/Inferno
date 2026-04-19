@@ -27,6 +27,8 @@ public class QueuedAction
 
 public class BattleTurnManager : MonoBehaviour
 {
+    private static readonly WaitForSeconds _waitForSeconds1 = new WaitForSeconds(1f);
+
     public static BattleTurnManager Instance { get; private set; }
 
     private int turnIndex = 0;
@@ -391,8 +393,29 @@ public class BattleTurnManager : MonoBehaviour
                 SetBattleText($"{action.user.name} is asleep and cannot act!");
                 action.user.HandleSkippedAction();
                 
-                yield return new WaitForSeconds(1f);
+                yield return _waitForSeconds1;
                 continue;
+            }
+            if (action.user.IsFrozen)
+            {
+                SetBattleText($"{action.user.name} is frozen and cannot act!");
+                action.user.HandleSkippedAction();
+                
+                yield return _waitForSeconds1;
+                continue;
+            }
+            if (action.user.IsFrostbitten)
+            {
+                Debug.Log($"{action.user.name} is frostbitten and has a {action.user.FrostBitePercent * 100}% chance to be frozen this turn.");
+                if(UnityEngine.Random.value < action.user.FrostBitePercent)
+                {
+                    Debug.Log($"{action.user.name} has been frozen solid by frostbite!");
+                    SetBattleText($"{action.user.name} is frozen and cannot act!");
+                    action.user.HandleSkippedAction();
+                    
+                    yield return _waitForSeconds1;
+                    continue;
+                }
             }
             if (action.user.IsDazed)
             {
@@ -408,7 +431,7 @@ public class BattleTurnManager : MonoBehaviour
 
                 action.user.IsDazed = false;
                 
-                yield return new WaitForSeconds(1f);
+                yield return _waitForSeconds1;
                 continue;
             }
 

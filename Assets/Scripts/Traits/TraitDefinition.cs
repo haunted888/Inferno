@@ -10,7 +10,8 @@ public enum CharacterTrait
     Marksman,
     Rogue,
     Strategist,
-    Expeditionist
+    Expeditionist,
+    Alchemist,
 }
 
 public abstract class TraitDefinition : ScriptableObject
@@ -28,6 +29,12 @@ public abstract class TraitDefinition : ScriptableObject
         Skill skill,
         BattleCharacter target,
         ref int damage)
+    { }
+
+    public virtual void OnPassiveApplied(
+        BattleCharacter user,
+        PassivesDefinition passive,
+        BattleCharacter target)
     { }
 
     public virtual void OnBattleStart(BattleCharacter user) { }
