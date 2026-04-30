@@ -201,6 +201,15 @@ public abstract class Skill : ScriptableObject
         skillDetailShell = Instantiate(this);
     }
 
+    public void InstantiateDetailShells()
+    {
+        skillDetailShell = Instantiate(this);
+        foreach (var s in followUpSkills)        {
+            if (s == null) continue;
+            s.InstantiateDetailShells();
+        }
+    }
+
     public bool CanBeLearnedBy(MapPartyMemberDefinition member)
     {
         if (member == null) return false;

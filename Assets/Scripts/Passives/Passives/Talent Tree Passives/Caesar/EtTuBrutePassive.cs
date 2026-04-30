@@ -33,7 +33,7 @@ public class EtTuBrutePassive : PassivesDefinition
         passiveToApply.betrayed = self;
     }
 
-    public override void OnSkillUsedEnd(BattleCharacter self, BattleCharacter target, Skill skill)
+    public override void OnActionEnd(BattleCharacter self, BattleCharacter target)
     {
         var actionOrder = self.GetCurrentActionOrder();
         bool userActed = false;

@@ -18,6 +18,7 @@ public abstract class PassivesDefinition : ScriptableObject
     {
         GetStatBoosts,
         OnBattleStart,
+        OnBattleEnd,
         OnCommandPhaseStart,
         OnResolvePhaseStart,
         OnResolvePhaseEnd,
@@ -32,6 +33,7 @@ public abstract class PassivesDefinition : ScriptableObject
         OnSkillUsedEnd,
         OnSkillReceived,
         OnSkillReceivedEnd,
+        OnActionEnd,
         OnActionOrdered,
         OnCreated,
         OnDestroyed
@@ -59,6 +61,7 @@ public abstract class PassivesDefinition : ScriptableObject
 
     // Phase hooks
     public virtual void OnBattleStart(BattleCharacter self) { }
+    public virtual void OnBattleEnd(BattleCharacter self, bool playerWon) { }
     public virtual void OnCommandPhaseStart(BattleCharacter self) { }
     public virtual void OnResolvePhaseStart(BattleCharacter self) { }
     public virtual void OnResolvePhaseEnd(BattleCharacter self) { }
@@ -75,6 +78,7 @@ public abstract class PassivesDefinition : ScriptableObject
     public virtual void OnSkillUsedEnd(BattleCharacter self, BattleCharacter target, Skill skill) { }
     public virtual void OnSkillReceived(BattleCharacter self, BattleCharacter attacker, Skill skill) { }
     public virtual void OnSkillReceivedEnd(BattleCharacter self, BattleCharacter attacker, Skill skill) { }
+    public virtual void OnActionEnd(BattleCharacter self, BattleCharacter target) { }
     public virtual void OnActionOrdered(QueuedAction action, List<QueuedAction> actions) { }
 
     // Existence hooks

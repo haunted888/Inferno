@@ -6,9 +6,9 @@ public class StatusBufferPassiveDefinition : StatusPassiveDefinition
 {
     
 
-    public override void OnSkillUsedEnd(BattleCharacter self, BattleCharacter target, Skill skill)
+    public override void OnActionEnd(BattleCharacter self, BattleCharacter target)
     {
-        self.QueuePassiveToRemove(this, PassiveHook.OnSkillUsedEnd);
+        self.QueuePassiveToRemove(this, PassiveHook.OnActionEnd);
     }
 
 }

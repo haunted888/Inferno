@@ -17,11 +17,16 @@ MonoBehaviour:
   targetType: 0
   damageType: 0
   spCost: 10
+  hpCost: 0
+  delay: 0
   followUpSkills:
   - {fileID: 11400000, guid: 1356d001a331fe944a4176fe2ef7d9e0, type: 2}
-  traitTags: 00000000
+  bonusEffectChance: 1
+  traitTags: 
   ammoCost: 0
+  flatAmmoCost: 0
   power: 20
   subType: 2
   skillCritChance: 0
   skillCritDamage: 0
+  damageVariance: 0

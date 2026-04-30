@@ -106,7 +106,7 @@ public class CampEditorScreenController : MonoBehaviour
             {
                 if(current != null)
                 {
-                    if (current.tryToLevelUp())
+                    if (current.TryToLevelUp())
                     {
                         Debug.Log($"Opening level up screen for {current.displayName}");
                         OpenLevelUpScreen();

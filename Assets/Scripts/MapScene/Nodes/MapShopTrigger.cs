@@ -8,14 +8,11 @@ public class MapShopTrigger : MonoBehaviour
     [Header("Shop Stock (per node)")]
     public List<ItemDefinition> stock = new List<ItemDefinition>();
 
-    private ShopOpenButton shopButton;
+    public ShopOpenButton shopButton;
 
     void Awake()
     {
         mapNode = GetComponent<MapNode>();
-        shopButton = FindFirstObjectByType<ShopOpenButton>();
-        if (shopButton == null)
-            Debug.LogError("MapShopTrigger: No ShopOpenButton found in scene.");
     }
 
     void OnEnable()

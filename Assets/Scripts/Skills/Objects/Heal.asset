@@ -17,7 +17,11 @@ MonoBehaviour:
   targetType: 2
   damageType: 2
   spCost: 5
+  hpCost: 0
+  delay: 0
   followUpSkills: []
+  bonusEffectChance: 1
   traitTags: 
   ammoCost: 0
-  healAmount: 20
+  flatAmmoCost: 0
+  healAmount: 10

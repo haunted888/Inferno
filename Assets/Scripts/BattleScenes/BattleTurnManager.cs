@@ -434,6 +434,17 @@ public class BattleTurnManager : MonoBehaviour
                 yield return _waitForSeconds1;
                 continue;
             }
+            foreach(var passive in action.user.passives)
+            {
+                if(passive is StasisPassiveDefinition stasis)
+                {
+                    SetBattleText($"{action.user.name} is {stasis.turnSkipDisplayText} and cannot act!");
+                    action.user.HandleSkippedAction();
+                    
+                    yield return _waitForSeconds1;
+                    continue;
+                }
+            }
 
             //Handle delayed skills
             bool delayFinished = false;
@@ -476,6 +487,23 @@ public class BattleTurnManager : MonoBehaviour
                         effectiveTarget == null)
                         break;
 
+
+
+                    
+                    List<BattleCharacter> targets = BattleUtility.GetTargetsForSkill(action.skill, action.user, action.target);
+
+                    if (!action.user.HasEnoughResourcesFor(action.skill))
+                    {
+                        SetBattleText($"{action.user.name} tried to use {action.skill.skillName}, but did not have enough resources.");
+                        break;
+                    }
+
+                    if(targets.Count == 0)
+                    {
+                        SetBattleText($"{action.user.name} uses {action.skill.skillName}... But it failed.");
+                        break;
+                    }
+
                     // Apply passive effects (NOTE: Kinda janky, might fix later)
                     if (action.user.passives != null)
                     {
@@ -488,7 +516,6 @@ public class BattleTurnManager : MonoBehaviour
                         );
                     }
 
-                    List<BattleCharacter> targets = BattleUtility.GetTargetsForSkill(action.skill, action.user, action.target);
                     foreach (var t in targets)
                     {
                         PassiveMutationUtility.InvokePassivesWithMutation(
@@ -501,11 +528,7 @@ public class BattleTurnManager : MonoBehaviour
 
                     }
 
-                    if (!action.user.HasEnoughResourcesFor(action.skill))
-                    {
-                        SetBattleText($"{action.user.name} tried to use {action.skill.skillName}, but did not have enough resources.");
-                        break;
-                    }
+                    
 
                     SetBattleText($"{action.user.name} uses {action.skill.skillName}!");
 
@@ -545,7 +568,7 @@ public class BattleTurnManager : MonoBehaviour
                 case ActionKind.Item:
                 {
                     var def = action.item;
-                    var bc  = def?.battleConsumable;
+                    var bc  = def != null ? def.battleConsumable : null;
                     if (bc == null) break;
 
                     // Self if no targeting requested
@@ -561,6 +584,14 @@ public class BattleTurnManager : MonoBehaviour
                 }
             }
 
+            PassiveMutationUtility.InvokePassivesWithMutation(
+                action.user,
+                () => action.user.passives,
+                p => p.OnActionEnd(action.user, action.target),
+                PassivesDefinition.PassiveHook.OnActionEnd,
+                passiveMutationContext
+            );
+
             if (action.user.HasLivingSummon())
             {
                 foreach (var act in actions)
@@ -573,17 +604,17 @@ public class BattleTurnManager : MonoBehaviour
             }
 
 
-            yield return new WaitForSeconds(1f);
+            yield return _waitForSeconds1;
 
             if (IsSideDefeated(playerParty)) { 
                     SetBattleText("All members of your party have been defeated."); 
-                    yield return new WaitForSeconds(1f); 
+                    yield return _waitForSeconds1; 
                     OnBattleEnd(false);  
                     yield break; 
                 }
             if (IsSideDefeated(enemyParty))  { 
                     SetBattleText("All enemies have been defeated."); 
-                    yield return new WaitForSeconds(1f); 
+                    yield return _waitForSeconds1; 
                     OnBattleEnd(true); 
                     yield break; 
                 }
@@ -1018,6 +1049,20 @@ public class BattleTurnManager : MonoBehaviour
 
     private void OnBattleEnd(bool playerWon)
     {
+        ForEachCombatant(c => { foreach (var t in c.Traits) t.OnBattleEnd(c, playerWon); });
+        foreach (var c in playerParty)
+        {
+            if (c == null) continue;
+
+            PassiveMutationUtility.InvokePassivesWithMutation(
+                c,
+                () => c.passives,
+                p => p.OnBattleEnd(c, playerWon),
+                PassivesDefinition.PassiveHook.OnBattleEnd,
+                passiveMutationContext
+            );
+        }
+
         MapCombatTransfer.Instance.ApplyBattleResult(playerWon, playerParty);
         SceneManager.LoadScene("Scenes/Map Scene");
     }

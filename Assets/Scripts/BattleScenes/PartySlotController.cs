@@ -44,6 +44,9 @@ public class PartySlotController : MonoBehaviour
 
             // Traits must be set up before passives/skills since they can be affected by those
             chr.ClearTraits();
+            chr.ClearPassives();
+            chr.ClearSkills();
+
             if (def.traits != null)
                 chr.Traits.AddRange(def.traits);
                 foreach (var t in chr.Traits)
@@ -60,11 +63,9 @@ public class PartySlotController : MonoBehaviour
                     t.SetupForBattle(def, chr);
             }
 
-            chr.ClearPassives();
             foreach (var p in def.passives)
                 if (p != null) chr.AddPassive(p);
 
-            chr.ClearSkills();
             foreach (var s in def.GetEffectiveSkills())
                 if (s != null) chr.AddSkill(s);
 

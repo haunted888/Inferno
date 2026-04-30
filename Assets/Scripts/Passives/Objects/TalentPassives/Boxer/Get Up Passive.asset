@@ -17,3 +17,5 @@ MonoBehaviour:
   isInstance: 1
   icon: {fileID: 0}
   description: 
+  healthToRestore: 1
+  healthPercentToRestore: 0

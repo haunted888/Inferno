@@ -16,12 +16,13 @@ public class ExpeditionistTraitDefinition : TraitDefinition
         traitType = CharacterTrait.Expeditionist;
     }
 
-    public override void OnBattleStart(BattleCharacter user)
+    public override void OnBattleEnd(BattleCharacter user, bool playerWon)
     {
-        addReward();
+        if(user == null || user.IsDead) return;
+        AddReward();
     }
 
-    public void addReward()
+    public void AddReward()
     {
         if(BattleTurnManager.Instance == null) return;
         MapRewardDefinition chosen = null;

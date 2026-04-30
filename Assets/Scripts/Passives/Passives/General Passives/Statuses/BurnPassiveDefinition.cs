@@ -19,14 +19,14 @@ public class BurnPassiveDefinition : StatusPassiveDefinition
         {
             if(passive is BurnPassiveDefinition definition && passive != this)
             {
-                definition.counter++;
+                definition.counter += counter;
                 removeThisBurn = true;
             }
         }
         if (removeThisBurn)
         {
             self.RemovePassive(this);
-            Debug.Log($"{self.name} already has burn, increasing counter to {counter} and removing duplicate.");
+            Debug.Log($"{self.name} already has burn, increasing counter by {counter} and removing duplicate.");
         }
     }
 

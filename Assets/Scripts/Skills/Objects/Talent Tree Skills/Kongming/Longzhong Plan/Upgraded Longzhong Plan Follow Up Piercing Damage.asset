@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be77378e34270ae44bb0cfbb82be15d5, type: 3}
+  m_Name: Upgraded Longzhong Plan Follow Up Piercing Damage
+  m_EditorClassIdentifier: Assembly-CSharp::DamageAllEnemiesSkill
+  skillName: 
+  description: 
+  targetType: 1
+  damageType: 0
+  spCost: 0
+  hpCost: 0
+  delay: 0
+  followUpSkills:
+  - {fileID: 11400000, guid: 7b851a234e40f034badadd0f7665945b, type: 2}
+  bonusEffectChance: 1
+  traitTags: 
+  ammoCost: 0
+  flatAmmoCost: 0
+  power: 2
+  subType: 3
+  skillCritChance: 0
+  skillCritDamage: 0
+  damageVariance: 0
+  characters: 1

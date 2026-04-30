@@ -43,7 +43,7 @@ public class FullStatScreenUI : MonoBehaviour
         if (defenseStatText != null)
             defenseStatText.text = $"Defense: {stats.defense}";
         if (subDefenseStatText != null)
-            subDefenseStatText.text = $"<color=#DBB543>Physical: {stats.piercingDefense} <br>" +
+            subDefenseStatText.text = $"<color=#DBB543>Piercing: {stats.piercingDefense} <br>" +
                 $"<color=#79A49B>Bludgeoning: {stats.bludgeoningDefense} <br>" +
                 $"<color=#9774AA>Slashing: {stats.slashingDefense}";
         if (resistanceStatText != null)

@@ -61,7 +61,7 @@ public class RewardUIManager : MonoBehaviour
         }
         else
         {
-            ApplyRewards();  // nothing party-related for now, but keeps logic centralized
+            ApplyRewards();
             ShowSummary();
         }
     }

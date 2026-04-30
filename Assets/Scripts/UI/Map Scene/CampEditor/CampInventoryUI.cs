@@ -70,6 +70,7 @@ public class CampInventoryUI : MonoBehaviour
             if (!stack.item.itemTypes.Contains(inventoryTab))
                 continue;
             if (stack == null || stack.item == null) continue;
+            if(stack.quantity <= 0) continue;
             var row = Instantiate(itemEntryPrefab, contentParent);
             var entry = row.GetComponent<InventoryItemEntry>();
             if (entry != null) entry.Set(stack.item, stack.quantity, OnItemClicked);
@@ -83,8 +84,8 @@ public class CampInventoryUI : MonoBehaviour
         if (item == null) return;
 
 
-        // Only map consumables act here (battle use comes later)
         if (item.mapConsumable != null)
+            Debug.Log($"Using {item.displayName} on {member.displayName} in camp.");
             item.mapConsumable.UseInCamp(item, member);
             Refresh();
         if (item.heldEquippable != null)

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 169ddb241b4d58746855197353b49c7b, type: 3}
+  m_Name: Longzhong Plan
+  m_EditorClassIdentifier: Assembly-CSharp::LongzhongPlanSkillDefinition
+  skillName: Longzhong Plan
+  description: 
+  targetType: 0
+  damageType: 2
+  spCost: 20
+  hpCost: 0
+  delay: 0
+  followUpSkills:
+  - {fileID: 11400000, guid: 0c4f930d628b8f746b8a4f9b698d997d, type: 2}
+  bonusEffectChance: 1
+  traitTags: 
+  ammoCost: 0
+  flatAmmoCost: 0
+  counterPassive: {fileID: 11400000, guid: b4bf903c0f2869f478fe5c972ed3e8d1, type: 2}
+  followUpSkill: {fileID: 11400000, guid: 6943222462464e54ea190b0bebffe3ac, type: 2}
+  upgradedSkill: {fileID: 11400000, guid: aa87cb4f3763af6439622a146fe00316, type: 2}
+  counterBreakpoint: 5

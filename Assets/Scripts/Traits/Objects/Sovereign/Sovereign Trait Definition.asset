@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c38b9ed5f62e3444e94efd3422d1ed60, type: 3}
+  m_Name: Sovereign Trait Definition
+  m_EditorClassIdentifier: Assembly-CSharp::SovereignTraitDefinition
+  traitName: Sovereign
+  description: If there is only one sovereign, they bless their allies with 20% of
+    their highest subattack and subdefense stats.
+  traitType: 10
+  sovereignPassive: {fileID: 11400000, guid: e6c554d9b3602e34bae5e4a1eb14b057, type: 2}

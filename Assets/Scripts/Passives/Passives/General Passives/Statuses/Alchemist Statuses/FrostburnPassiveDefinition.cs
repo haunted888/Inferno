@@ -10,7 +10,7 @@ public class FrostburnPassiveDefinition : StatusPassiveDefinition
 
     
 
-    public override void OnSkillUsedEnd(BattleCharacter self, BattleCharacter attacker, Skill skill)
+    public override void OnActionEnd(BattleCharacter self, BattleCharacter target)
     {
         int damage = Mathf.RoundToInt(self.MaxHealth * Random.Range(frostburnDamagePercentMin, frostburnDamagePercentMax));
         self.TakeDamage(damage);

@@ -311,6 +311,13 @@ public class BattleCharacter : MonoBehaviour
         if (s != null) skills.Add(s);
         s.OnCreated(this);
     }
+    public void RemoveSkill(Skill s)
+    {
+        if (s != null)
+        {
+            skills.Remove(s);
+        }
+    }
 
     public void ClearTraits() { 
         Traits.Clear(); 
@@ -741,5 +748,21 @@ public class BattleCharacter : MonoBehaviour
     public bool HasLivingSummon()
     {
         return activeSummon != null && !activeSummon.IsDead;
+    }
+
+    public bool HasTrait(CharacterTrait trait)
+    {
+        return traitTypes.Contains(trait);
+    }
+
+    public bool IsProtectedFromSkills()
+    {
+        foreach (var p in passives)
+        {
+            if (p == null) continue;
+            if (p is StasisPassiveDefinition)
+                return true;
+        }
+        return false;
     }
 }

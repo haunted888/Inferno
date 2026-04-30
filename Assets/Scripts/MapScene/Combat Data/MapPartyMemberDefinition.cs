@@ -118,26 +118,23 @@ public class MapPartyMemberDefinition
         if (characterAsset == null)
             return;
 
-        if (!initializedFromAssetTraits && !overrideTraits)
-        {
-            traits = new List<TraitDefinition>(characterAsset.traits);
-            traitTypes = new List<CharacterTrait>();
-            foreach (var t in traits)
-                traitTypes.Add(t.traitType);
-            initializedFromAssetTraits  = true;
-        }
 
-        if (!initializedFromAssetStats && !overrideStats)
+        if (!initializedFromAssetStats)
         {
-            stats = characterAsset.baseStats;
-            Debug.Log(displayName + " max sp is " + stats.maxSp);
-            stats.maxHealth = Mathf.Max(1, stats.maxHealth);
-            stats.maxSp     = Mathf.Max(0, stats.maxSp);
+            
+            if(!overrideStats){
+                stats = characterAsset.baseStats;
+                Debug.Log(displayName + " max sp is " + stats.maxSp);
+                stats.maxHealth = Mathf.Max(1, stats.maxHealth);
+                stats.maxSp     = Mathf.Max(0, stats.maxSp);
+            }
+
+            baseStats = stats;
+            levelUpStats = new CombatStats();
 
             initializedFromAssetStats = true;
         }
-        baseStats = stats;
-        levelUpStats = new CombatStats();
+            
 
         if (!initializedFromAssetSkills && !overrideSkills &&
             characterAsset.skills != null && characterAsset.skills.Count > 0)
@@ -157,6 +154,26 @@ public class MapPartyMemberDefinition
             InitializeTalents();
             initializedTalents = true;
         }
+
+        
+        if (!initializedFromAssetTraits) //Necessary to run after every other initialization since traits modify stats/skills
+        {
+            if(!overrideTraits){
+                traits = new List<TraitDefinition>(characterAsset.traits);
+                traitTypes = new List<CharacterTrait>();
+                
+            }
+            foreach (var t in traits)
+            {
+                traitTypes.Add(t.traitType);
+                t.OnInitialize(this);
+            }
+            
+            initializedFromAssetTraits  = true;
+            
+        } 
+
+        
 
 
     }
@@ -336,7 +353,7 @@ public class MapPartyMemberDefinition
 
     }
 
-    public bool tryToLevelUp()
+    public bool TryToLevelUp()
     {
         if (level >= MaxLevel) return false; // cannot level past max
        
@@ -349,6 +366,9 @@ public class MapPartyMemberDefinition
 
         // apply level-up effects
         ApplyLevelUpEffects();
+
+        ApplyTraitLevelUpEffects();
+
         return true;
     }
 
@@ -694,8 +714,8 @@ public class MapPartyMemberDefinition
             {
                 mainStatGroupA[i % mainStatGroupA.Count],
                 mainStatGroupB[i % mainStatGroupB.Count],
-                mainSubStats[i % mainSubStats.Count],
-                subSubStats[i % subSubStats.Count]
+                mainSubStats.Count > 0 ? mainSubStats[i % mainSubStats.Count] : CombatSubStat.PiercingAttack,
+                subSubStats.Count > 0 ? subSubStats[i % subSubStats.Count] : CombatSubStat.PiercingDefense
             };
 
             List<int> keyRemovealIndices = new List<int>();
@@ -743,5 +763,26 @@ public class MapPartyMemberDefinition
         }
 
         
+    }
+
+    public void ApplyTraitLevelUpEffects()
+    {
+        if (traits == null || traits.Count == 0) return;
+
+        foreach (var trait in traits)
+        {
+            trait.OnLevelUp(this);
+        }
+    }
+
+    public void ApplyMapItemUseTraitEffects(ItemDefinition item)
+    {
+        if (item == null) return;
+        if (traits == null || traits.Count == 0) return;
+
+        foreach (var trait in traits)
+        {
+            trait.OnMapItemUsed(this, item);
+        }
     }
 }

@@ -19,6 +19,8 @@ public class HealthPotionMap : ItemConsumableInMap
             // Full heal
             member.health = member.GetMaxHealth();
 
+            member.ApplyMapItemUseTraitEffects(item);
+
             // Consume 1 from inventory
             MapCombatTransfer.Instance.RemoveItem(item, 1);
 
@@ -36,6 +38,9 @@ public class HealthPotionMap : ItemConsumableInMap
         
         // Full heal
         member.health = member.GetMaxHealth();
+
+        
+        member.ApplyMapItemUseTraitEffects(item);
 
         // Consume 1 from inventory
         MapCombatTransfer.Instance.RemoveItem(item, 1);

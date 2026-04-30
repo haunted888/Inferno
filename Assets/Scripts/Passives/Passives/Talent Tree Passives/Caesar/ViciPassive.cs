@@ -3,8 +3,9 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Passives/Caesar/Vici")]
 public class ViciPassive : PassivesDefinition
 {
-    public override void OnBattleStart(BattleCharacter self)
+    public override void OnBattleEnd(BattleCharacter self, bool playerWon)
     {
+        if(self == null || self.IsDead) return;
         foreach (var ally in self.GetAllies())
         {
             if (ally == null || ally.IsDead) continue;
@@ -14,7 +15,7 @@ public class ViciPassive : PassivesDefinition
                 if (t is ExpeditionistTraitDefinition)
                 {
                     var expeditionistTrait = t as ExpeditionistTraitDefinition;
-                    expeditionistTrait.addReward();
+                    expeditionistTrait.AddReward();
                     Debug.Log($"ViciPassive triggered for {ally.name}.");
                 }
             }

@@ -24,10 +24,10 @@ public class BoxerStyleMultiplierPassive : PassivesDefinition
         {
             if (p is BoxerStylePassive stylePassive)
             {
-                attackBoostPercent += stylePassive.attackBoostPercent;
-                elementalPowerBoostPercent += stylePassive.elementalPowerBoostPercent;
-                defenseBoostPercent += stylePassive.defenseBoostPercent;
-                elementalResistanceBoostPercent += stylePassive.elementalResistanceBoostPercent;
+                attackBoostPercent += stylePassive.statBoostsPercent.physicalAttack * 0.01f;
+                elementalPowerBoostPercent += stylePassive.statBoostsPercent.elementalPower * 0.01f;
+                defenseBoostPercent += stylePassive.statBoostsPercent.defense * 0.01f;
+                elementalResistanceBoostPercent += stylePassive.statBoostsPercent.elementalResistance * 0.01f;
                 break;
             }
         }

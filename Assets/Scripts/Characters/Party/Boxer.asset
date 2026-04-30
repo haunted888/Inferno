@@ -19,7 +19,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 220bc1b6fd26c9c40a1de829e116ed11, type: 2}
   baseStats:
     maxHealth: 30
-    maxSp: 10
+    maxSp: 15
     speed: 12
     physicalAttack: 30
     elementalPower: 10

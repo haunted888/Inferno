@@ -12,6 +12,13 @@ public enum CharacterTrait
     Strategist,
     Expeditionist,
     Alchemist,
+    Sovereign,
+    Sage,
+    Academic,
+    Writer,
+    Healer,
+    Cleric,
+    Vampire,
 }
 
 public abstract class TraitDefinition : ScriptableObject
@@ -38,7 +45,14 @@ public abstract class TraitDefinition : ScriptableObject
     { }
 
     public virtual void OnBattleStart(BattleCharacter user) { }
+    public virtual void OnBattleEnd(BattleCharacter user, bool playerWon) { }
 
     public virtual void OnDeath(BattleCharacter user) { }
+
+    public virtual void OnLevelUp(MapPartyMemberDefinition member) { }
+
+    public virtual void OnMapItemUsed(MapPartyMemberDefinition user, ItemDefinition item) { }
+
+    public virtual void OnInitialize(MapPartyMemberDefinition member) { }
 
 }

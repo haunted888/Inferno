@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 723a1abb4f3e161409c461a8e90dd029, type: 3}
+  m_Name: Cleric Trait Tutankhamun
+  m_EditorClassIdentifier: Assembly-CSharp::ClericTraitDefinition
+  traitName: Cleric
+  description: 
+  traitType: 15
+  fireBlessingPassive: {fileID: 11400000, guid: 3375ee8f5c7cc844cb0a7c96cc736a29, type: 2}
+  stormBlessingPassive: {fileID: 11400000, guid: 44de9fc1547b8a041b9492400be31c3d, type: 2}
+  iceBlessingPassive: {fileID: 11400000, guid: 74c70e7bd31deb941889ab30c214d957, type: 2}
+  bloodBlessingPassive: {fileID: 11400000, guid: 3b3038612ba7fed4780c79d1726c2402, type: 2}
+  acidBlessingPassive: {fileID: 11400000, guid: 10e5da20e8a82d04abcaff855e2ff998, type: 2}
+  psychicBlessingPassive: {fileID: 11400000, guid: 9b1ae3b8cd4a16f4db891b9228259a94, type: 2}

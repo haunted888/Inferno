@@ -17,7 +17,33 @@ MonoBehaviour:
   isInstance: 0
   icon: {fileID: 21300000, guid: 5d979a81d58a02642a336d2f04365b99, type: 3}
   description: 
-  attackBoostPercent: 0
-  elementalPowerBoostPercent: 0
-  defenseBoostPercent: 0.1
-  elementalResistanceBoostPercent: 0.1
+  statBoostsPercent:
+    maxHealth: 0
+    maxSp: 0
+    speed: 0
+    physicalAttack: 0
+    elementalPower: 0
+    defense: 10
+    elementalResistance: 10
+    critChance: 0
+    critDamage: 0
+    bludgeoningAttack: 0
+    slashingAttack: 0
+    piercingAttack: 0
+    bludgeoningDefense: 0
+    slashingDefense: 0
+    piercingDefense: 0
+    fireAttack: 0
+    iceAttack: 0
+    stormAttack: 0
+    acidAttack: 0
+    psychicAttack: 0
+    bloodAttack: 0
+    fireDefense: 0
+    iceDefense: 0
+    stormDefense: 0
+    acidDefense: 0
+    psychicDefense: 0
+    bloodDefense: 0
+  duration: 2147483647
+  restoreResources: 0

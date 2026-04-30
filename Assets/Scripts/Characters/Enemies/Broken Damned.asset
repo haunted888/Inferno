@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Broken Damned
   m_EditorClassIdentifier: Assembly-CSharp::CharacterTemplate
   displayName: Broken Damned
+  traits: []
   baseStats:
     maxHealth: 10
     maxSp: 10
@@ -29,7 +30,7 @@ MonoBehaviour:
     bludgeoningDefense: 0
     slashingDefense: 0
     piercingDefense: 0
-    fireAttack: 0
+    fireAttack: 1
     iceAttack: 0
     stormAttack: 0
     acidAttack: 0
@@ -43,3 +44,4 @@ MonoBehaviour:
     bloodDefense: 0
   skills:
   - {fileID: 11400000, guid: 08cae2a978420734c8aa7a056471542b, type: 2}
+  predeterminedSubStats: 

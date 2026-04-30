@@ -116,14 +116,16 @@ public class PathfindingManager : MonoBehaviour
             {
                 if (neighbor == null) continue;
                 if (cameFrom.ContainsKey(neighbor)) continue; // visited
-
                 queue.Enqueue(neighbor);
                 cameFrom[neighbor] = current;
             }
         }
 
         if (!cameFrom.ContainsKey(goal))
-            return null; // unreachable
+        {
+            Debug.Log("No path found from " + start.name + " to " + goal.name);
+            return null; 
+        }
 
         var path = new List<PathNode>();
         PathNode node = goal;

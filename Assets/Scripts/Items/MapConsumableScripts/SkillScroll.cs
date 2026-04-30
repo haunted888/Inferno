@@ -29,6 +29,9 @@ public class TeachSkillMap : ItemConsumableInMap
             current.Add(skillToTeach);
             member.skills = current;
 
+            
+            member.ApplyMapItemUseTraitEffects(item);
+
             // Consume item (keeps zero-qty entries)
             MapCombatTransfer.Instance.RemoveItem(item, 1);
 
@@ -47,12 +50,13 @@ public class TeachSkillMap : ItemConsumableInMap
         var current = member.skills != null ? new List<Skill>(member.skills) : new List<Skill>();
         if (current.Contains(skillToTeach)) return;
 
-
-        if (!member.traitTypes.Intersect(skillToTeach.traitTags).Any()) return; // Ensure member has required traits
+        if (!member.traitTypes.Intersect(skillToTeach.traitTags).Any() && skillToTeach.traitTags.Count > 0) return; // Ensure member has required traits
 
         current.Add(skillToTeach);
         member.skills = current;
 
+        member.ApplyMapItemUseTraitEffects(item);
+        
         // Consume item (keeps zero-qty entries)
         MapCombatTransfer.Instance.RemoveItem(item, 1);
     }

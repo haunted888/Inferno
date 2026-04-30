@@ -52,6 +52,7 @@ public static class BattleUtility
         {
             if (c == null || c.IsDead) continue;
             if (c.HasLivingSummon()) continue;
+            if (c.IsProtectedFromSkills()) continue;
             candidates.Add(c);
         }
         return candidates;
@@ -96,6 +97,7 @@ public static class BattleUtility
         {
             if (c == null || c.IsDead) continue;
             if (c.HasLivingSummon()) continue;
+            if (c.IsProtectedFromSkills()) continue;
             candidates.Add(c);
         }
 

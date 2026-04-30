@@ -12,6 +12,10 @@ public class AlchemistTraitDefinition : TraitDefinition
     public PassivesDefinition frostbitePoisonPassive;
     public PassivesDefinition burnPoisonPassive;
 
+    void Awake()
+    {
+        traitType = CharacterTrait.Alchemist;
+    }
 
     public override void OnPassiveApplied(BattleCharacter user, PassivesDefinition passive, BattleCharacter target)
     {   
