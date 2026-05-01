@@ -7,6 +7,7 @@ public class FullStatScreenUI : MonoBehaviour
 {
     public TMP_Text hpStatText;
     public TMP_Text spStatText;
+    public TMP_Text spGenerationStatText;
     public TMP_Text attackStatText;
     public TMP_Text subAttackStatText;
     public TMP_Text elementalStatText;
@@ -25,6 +26,8 @@ public class FullStatScreenUI : MonoBehaviour
             hpStatText.text = $"HP: {stats.maxHealth}";
         if (spStatText != null)
             spStatText.text = $"SP: {stats.maxSp}";
+        if (spGenerationStatText != null)
+            spGenerationStatText.text = $"SP Generation: {stats.spGeneration}%";
         if (attackStatText != null)
             attackStatText.text = $"Attack: {stats.physicalAttack}";
         if (subAttackStatText != null)

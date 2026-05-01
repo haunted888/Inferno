@@ -1097,6 +1097,13 @@ public class BattleTurnManager : MonoBehaviour
 
     void Trigger_CommandPhaseStart()
     {
+
+        ForEachCombatant(c =>
+        {
+            if (c == null || c.IsDead) return;
+            c.GenerateTurnSp();
+        });
+        
         ForEachCombatant(c => { foreach (var s in c.Skills) s.OnCommandPhaseStart(); });
 
         ForEachCombatant(c => { PassiveMutationUtility.InvokePassivesWithMutation(

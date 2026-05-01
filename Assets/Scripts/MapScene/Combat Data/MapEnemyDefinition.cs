@@ -27,6 +27,7 @@ public class MapEnemyDefinition
     {
         maxHealth          = 50,
         maxSp              = 10,
+        spGeneration       = 20,
         speed              = 10,
         physicalAttack     = 100,
         elementalPower     = 100,
@@ -56,6 +57,8 @@ public class MapEnemyDefinition
         if (!initializedFromAssetStats && !overrideStats)
         {
             stats = characterAsset.baseStats;
+            for(int i = 1; i < level; i++) // apply level-up effects for each level up to current level
+                ApplyLevelUpEffects(i); 
             stats.maxHealth = Mathf.Max(1, stats.maxHealth);
 
             initializedFromAssetStats = true;
@@ -102,8 +105,8 @@ public class MapEnemyDefinition
         return "Unnamed";
     }
 
-    private float levelUpBaseMultiplier = .06f;
-    private float levelUpLevelMultiplier = 0.02f;
+    private readonly float levelUpBaseMultiplier = .06f;
+    private readonly float levelUpLevelMultiplier = 0.02f;
     public void ApplyLevelUpEffects()
     {
 
@@ -116,7 +119,21 @@ public class MapEnemyDefinition
             physicalAttack     = Mathf.RoundToInt(baseStats.physicalAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
             elementalPower     = Mathf.RoundToInt(baseStats.elementalPower * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
             defense            = Mathf.RoundToInt(baseStats.defense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            elementalResistance= Mathf.RoundToInt(baseStats.elementalResistance * (levelUpBaseMultiplier + level * levelUpLevelMultiplier))
+            elementalResistance= Mathf.RoundToInt(baseStats.elementalResistance * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+
+            fireAttack           = Mathf.RoundToInt(baseStats.fireAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            iceAttack            = Mathf.RoundToInt(baseStats.iceAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            stormAttack          = Mathf.RoundToInt(baseStats.stormAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            acidAttack           = Mathf.RoundToInt(baseStats.acidAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            psychicAttack        = Mathf.RoundToInt(baseStats.psychicAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            bloodAttack          = Mathf.RoundToInt(baseStats.bloodAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+
+            fireDefense          = Mathf.RoundToInt(baseStats.fireDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            iceDefense           = Mathf.RoundToInt(baseStats.iceDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            stormDefense         = Mathf.RoundToInt(baseStats.stormDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            acidDefense          = Mathf.RoundToInt(baseStats.acidDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            psychicDefense       = Mathf.RoundToInt(baseStats.psychicDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            bloodDefense         = Mathf.RoundToInt(baseStats.bloodDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier))
         };
 
         ApplyStatsDelta(delta, +1);
@@ -146,7 +163,21 @@ public class MapEnemyDefinition
             physicalAttack     = Mathf.RoundToInt(baseStats.physicalAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
             elementalPower     = Mathf.RoundToInt(baseStats.elementalPower * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
             defense            = Mathf.RoundToInt(baseStats.defense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            elementalResistance= Mathf.RoundToInt(baseStats.elementalResistance * (levelUpBaseMultiplier + level * levelUpLevelMultiplier))
+            elementalResistance= Mathf.RoundToInt(baseStats.elementalResistance * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+
+            fireAttack           = Mathf.RoundToInt(baseStats.fireAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            iceAttack            = Mathf.RoundToInt(baseStats.iceAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            stormAttack          = Mathf.RoundToInt(baseStats.stormAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            acidAttack           = Mathf.RoundToInt(baseStats.acidAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            psychicAttack        = Mathf.RoundToInt(baseStats.psychicAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            bloodAttack          = Mathf.RoundToInt(baseStats.bloodAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+
+            fireDefense          = Mathf.RoundToInt(baseStats.fireDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            iceDefense           = Mathf.RoundToInt(baseStats.iceDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            stormDefense         = Mathf.RoundToInt(baseStats.stormDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            acidDefense          = Mathf.RoundToInt(baseStats.acidDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            psychicDefense       = Mathf.RoundToInt(baseStats.psychicDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
+            bloodDefense         = Mathf.RoundToInt(baseStats.bloodDefense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier))
         };
 
         ApplyStatsDelta(delta, +1);

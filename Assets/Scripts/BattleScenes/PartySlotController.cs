@@ -31,9 +31,7 @@ public class PartySlotController : MonoBehaviour
                 : Mathf.Clamp(def.health, 0, maxHp);
 
             int maxSp    = def.GetMaxSp();
-            int currentSp = def.sp < 0
-                ? maxSp
-                : Mathf.Clamp(def.sp, 0, maxSp);
+            int currentSp = 0;
 
             chr.ApplyStats(stats, currentHp);
             chr.SetName(def.GetDisplayName());

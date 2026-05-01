@@ -5,6 +5,7 @@ public struct CombatStats
 {
     public int maxHealth;
     public int maxSp;
+    public int spGeneration;
     public int speed;
     public int physicalAttack;
     public int elementalPower;

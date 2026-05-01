@@ -33,13 +33,16 @@ public class EnemySlotController : MonoBehaviour
             int maxHp = stats.maxHealth;
             int currentHp = maxHp;
             
-            // SP for enemies: always full at start of each battle
-            int maxSp = def.GetMaxSp();     
-            int currentSp = maxSp;          
+            // SP for enemies: Not currently used, but can be implemented later if desired. For now, just initialize to 0.
+            //int maxSp = def.GetMaxSp();
+            //int currentSp = 0;    
 
             chr.ApplyStats(stats, currentHp);
             chr.SetName(def.GetDisplayName());
             chr.SetLevel(def.level);
+
+            //chr.SetMaxSp(maxSp, fillToMax: false);
+            //chr.SetSp(currentSp);
 
             chr.ClearSkills();
             foreach (var s in def.GetEffectiveSkills())

@@ -343,37 +343,38 @@ public class BattleCharacter : MonoBehaviour
             p.GetStatBoosts(this);
         }
         CombatStats result = new CombatStats(){
-            maxHealth      = baseStats.maxHealth      + bonusStats.maxHealth,
-            maxSp          = baseStats.maxSp          + bonusStats.maxSp,
-            physicalAttack = baseStats.physicalAttack + bonusStats.physicalAttack,
-            elementalPower = baseStats.elementalPower + bonusStats.elementalPower,
-            defense        = baseStats.defense        + bonusStats.defense,
+            maxHealth           = baseStats.maxHealth      + bonusStats.maxHealth,
+            maxSp               = baseStats.maxSp          + bonusStats.maxSp,
+            spGeneration        = baseStats.spGeneration + bonusStats.spGeneration,
+            physicalAttack      = baseStats.physicalAttack + bonusStats.physicalAttack,
+            elementalPower      = baseStats.elementalPower + bonusStats.elementalPower,
+            defense             = baseStats.defense + bonusStats.defense,
             elementalResistance = baseStats.elementalResistance + bonusStats.elementalResistance,
-            speed          = baseStats.speed          + bonusStats.speed,
-            critChance     = baseStats.critChance     + bonusStats.critChance,
-            critDamage = baseStats.critDamage + bonusStats.critDamage,
+            speed               = baseStats.speed + bonusStats.speed,
+            critChance          = baseStats.critChance + bonusStats.critChance,
+            critDamage          = baseStats.critDamage + bonusStats.critDamage,
 
-            piercingAttack = baseStats.piercingAttack + bonusStats.piercingAttack,
-            bludgeoningAttack = baseStats.bludgeoningAttack + bonusStats.bludgeoningAttack,
-            slashingAttack = baseStats.slashingAttack + bonusStats.slashingAttack,
+            piercingAttack      = baseStats.piercingAttack + bonusStats.piercingAttack,
+            bludgeoningAttack   = baseStats.bludgeoningAttack + bonusStats.bludgeoningAttack,
+            slashingAttack      = baseStats.slashingAttack + bonusStats.slashingAttack,
 
-            fireAttack = baseStats.fireAttack + bonusStats.fireAttack,
-            iceAttack  = baseStats.iceAttack  + bonusStats.iceAttack,
-            stormAttack  = baseStats.stormAttack  + bonusStats.stormAttack,
-            acidAttack   = baseStats.acidAttack   + bonusStats.acidAttack,
-            psychicAttack = baseStats.psychicAttack + bonusStats.psychicAttack,
-            bloodAttack    = baseStats.bloodAttack    + bonusStats.bloodAttack,
+            fireAttack          = baseStats.fireAttack + bonusStats.fireAttack,
+            iceAttack           = baseStats.iceAttack  + bonusStats.iceAttack,
+            stormAttack         = baseStats.stormAttack  + bonusStats.stormAttack,
+            acidAttack          = baseStats.acidAttack   + bonusStats.acidAttack,
+            psychicAttack       = baseStats.psychicAttack + bonusStats.psychicAttack,
+            bloodAttack         = baseStats.bloodAttack    + bonusStats.bloodAttack,
 
-            piercingDefense = baseStats.piercingDefense + bonusStats.piercingDefense,
-            bludgeoningDefense = baseStats.bludgeoningDefense + bonusStats.bludgeoningDefense,
-            slashingDefense  = baseStats.slashingDefense  + bonusStats.slashingDefense,
+            piercingDefense     = baseStats.piercingDefense + bonusStats.piercingDefense,
+            bludgeoningDefense  = baseStats.bludgeoningDefense + bonusStats.bludgeoningDefense,
+            slashingDefense     = baseStats.slashingDefense  + bonusStats.slashingDefense,
 
-            fireDefense  = baseStats.fireDefense  + bonusStats.fireDefense,
-            iceDefense   = baseStats.iceDefense   + bonusStats.iceDefense,
-            stormDefense = baseStats.stormDefense + bonusStats.stormDefense,
-            acidDefense    = baseStats.acidDefense    + bonusStats.acidDefense,
-            psychicDefense = baseStats.psychicDefense + bonusStats.psychicDefense,
-            bloodDefense     = baseStats.bloodDefense     + bonusStats.bloodDefense
+            fireDefense         = baseStats.fireDefense  + bonusStats.fireDefense,
+            iceDefense          = baseStats.iceDefense   + bonusStats.iceDefense,
+            stormDefense        = baseStats.stormDefense + bonusStats.stormDefense,
+            acidDefense         = baseStats.acidDefense    + bonusStats.acidDefense,
+            psychicDefense      = baseStats.psychicDefense + bonusStats.psychicDefense,
+            bloodDefense        = baseStats.bloodDefense     + bonusStats.bloodDefense
         };
 
         if (IsSoaked)
@@ -512,6 +513,13 @@ public class BattleCharacter : MonoBehaviour
         if (!HasEnoughAmmoFor(skill)) return false;
 
         return true;
+    }
+
+    public void GenerateTurnSp()
+    {
+        CombatStats stats = GetEffectiveStats();
+        int amount = Mathf.CeilToInt(MaxSp * (stats.spGeneration / 100f));
+        RecoverSp(amount);
     }
 
     public void RecoverSp(int amount)

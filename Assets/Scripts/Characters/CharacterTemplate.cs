@@ -57,6 +57,7 @@ public class CharacterTemplate : ScriptableObject
     {
         maxHealth          = 100,
         maxSp              = 10,
+        spGeneration       = 20,
         speed              = 10,
         physicalAttack     = 10,
         elementalPower     = 10,

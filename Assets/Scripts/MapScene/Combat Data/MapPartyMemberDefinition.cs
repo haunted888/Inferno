@@ -48,6 +48,7 @@ public class MapPartyMemberDefinition
     {
         maxHealth          = 100,
         maxSp              = 10,
+        spGeneration       = 20,
         speed              = 10,
         physicalAttack     = 100,
         elementalPower     = 100,
@@ -390,8 +391,8 @@ public class MapPartyMemberDefinition
         return totalXp;
     }
 
-    private float levelUpBaseMultiplier = .06f;
-    private float levelUpLevelMultiplier = 0.02f;
+    private readonly float levelUpBaseMultiplier = .06f;
+    private readonly float levelUpLevelMultiplier = 0.02f;
     public void ApplyLevelUpEffects()
     {
         talentPoints += 1; // add 1 talent point per level-up
@@ -733,13 +734,13 @@ public class MapPartyMemberDefinition
                 int multiplier = Mathf.RoundToInt((float)statLevelUpMultipliers[keys[j]]);
                 Debug.Log($"Adding {splitValues[j]} * {multiplier} to {keys[j]}");
 
-                if (keys[j] is CombatMainStat)
+                if (keys[j] is CombatMainStat stat)
                 {
-                    AddMainStatToCombatStats((CombatMainStat)keys[j], ref bonusStatSet, splitValues[j] * multiplier);
+                    AddMainStatToCombatStats(stat, ref bonusStatSet, splitValues[j] * multiplier);
                 }
-                else if (keys[j] is CombatSubStat)
+                else if (keys[j] is CombatSubStat stat1)
                 {
-                    AddSubStatToCombatStats((CombatSubStat)keys[j], ref bonusStatSet, splitValues[j] * multiplier);
+                    AddSubStatToCombatStats(stat1, ref bonusStatSet, splitValues[j] * multiplier);
                 }
             }
             bonusStats.Add(bonusStatSet);
