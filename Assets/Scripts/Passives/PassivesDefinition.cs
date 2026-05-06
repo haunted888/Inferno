@@ -52,6 +52,8 @@ public abstract class PassivesDefinition : ScriptableObject
     [Header("Description")]
     [TextArea] public string description;
 
+    public int counter = 0;
+
     private string displayText = "";
 
     [NonSerialized]public BattleCharacter applicator = null;
@@ -67,8 +69,8 @@ public abstract class PassivesDefinition : ScriptableObject
     public virtual void OnResolvePhaseEnd(BattleCharacter self) { }
 
     // Combat event hooks
-    public virtual void OnAfterDealDamage(BattleCharacter self, BattleCharacter target, int amount) { }
-    public virtual void OnAfterTakeDamage(BattleCharacter self, int amount) { }
+    public virtual void OnAfterDealDamage(BattleCharacter self, BattleCharacter target, int amount, SkillDamageType damageType, DamageSubType subDamageType) { }
+    public virtual void OnAfterTakeDamage(BattleCharacter self, int amount, SkillDamageType damageType, DamageSubType subDamageType) { }
     public virtual void OnSkillUsed(BattleCharacter self, BattleCharacter target, Skill skill) { }
     public virtual void BeforeDamageSkillExecute(BattleCharacter self, BattleCharacter target, Skill skill) { }
     public virtual void BeforeHealingSkillExecute(BattleCharacter self, BattleCharacter target, Skill skill) { }

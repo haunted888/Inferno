@@ -13,7 +13,7 @@ public class FrostburnPassiveDefinition : StatusPassiveDefinition
     public override void OnActionEnd(BattleCharacter self, BattleCharacter target)
     {
         int damage = Mathf.RoundToInt(self.MaxHealth * Random.Range(frostburnDamagePercentMin, frostburnDamagePercentMax));
-        self.TakeDamage(damage);
+        self.TakeDamage(damage, SkillDamageType.Elemental, DamageSubType.Ice);
     }
 
     public override void BeforeReceivingHealing(BattleCharacter self, int healingAmount)

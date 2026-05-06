@@ -13,7 +13,7 @@ public class VampirePassiveDefinition : PassivesDefinition
             isVampiricDamage = true;
     }
 
-    public override void OnAfterDealDamage(BattleCharacter self, BattleCharacter target, int amount)
+    public override void OnAfterDealDamage(BattleCharacter self, BattleCharacter target, int amount, SkillDamageType damageType, DamageSubType subType)
     {
         if (!isVampiricDamage) return;
         

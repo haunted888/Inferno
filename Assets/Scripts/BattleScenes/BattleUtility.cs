@@ -60,7 +60,7 @@ public static class BattleUtility
 
 
     public static List<BattleCharacter> GetTargetsForEffectsCharacters(
-        Skill.affectsCharacters characters,
+        Skill.AffectsCharacters characters,
         BattleCharacter user,
         BattleCharacter target)
     {
@@ -69,22 +69,22 @@ public static class BattleUtility
         IEnumerable<BattleCharacter> targetsEnum;
         switch (characters)
         {
-            case Skill.affectsCharacters.Target:
+            case Skill.AffectsCharacters.Target:
                 targetsEnum = new List<BattleCharacter> { target };
                 break;
-            case Skill.affectsCharacters.TargetTeam:
+            case Skill.AffectsCharacters.TargetTeam:
                 targetsEnum = target != null ? target.GetAllies() : new List<BattleCharacter>();
                 break;
-            case Skill.affectsCharacters.Self:
+            case Skill.AffectsCharacters.Self:
                 targetsEnum = new List<BattleCharacter> { user };
                 break;
-            case Skill.affectsCharacters.Allies:
+            case Skill.AffectsCharacters.Allies:
                 targetsEnum = user.GetAllies();
                 break;
-            case Skill.affectsCharacters.Enemies:
+            case Skill.AffectsCharacters.Enemies:
                 targetsEnum = user.GetEnemies();
                 break;
-            case Skill.affectsCharacters.AllOtherAllies:
+            case Skill.AffectsCharacters.AllOtherAllies:
                 targetsEnum = user.GetAllies().Where(c => c != user);
                 break;
             default:

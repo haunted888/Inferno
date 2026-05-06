@@ -81,7 +81,7 @@ public class BattleCharacter : MonoBehaviour
         DelayedCastSkill = null;
     }
 
-    public int TakeDamage(int amount)
+    public int TakeDamage(int amount, SkillDamageType damageType = SkillDamageType.None, DamageSubType subType = DamageSubType.None)
     {
         if (amount <= 0 || IsDead) return 0;
 
@@ -93,7 +93,7 @@ public class BattleCharacter : MonoBehaviour
         PassiveMutationUtility.InvokePassivesWithMutation(
             this,
             () => passives,
-            p => p.OnAfterTakeDamage(this, amount),
+            p => p.OnAfterTakeDamage(this, amount, damageType, subType),
             PassivesDefinition.PassiveHook.OnAfterTakeDamage,
             passiveMutationContext
         );
@@ -308,8 +308,10 @@ public class BattleCharacter : MonoBehaviour
     public void ClearSkills() => skills.Clear();
     public void AddSkill(Skill s)
     {
-        if (s != null) skills.Add(s);
-        s.OnCreated(this);
+        if (s == null) return;
+        var skill = Instantiate(s);
+        skills.Add(skill);
+        skill.OnCreated(this);
     }
     public void RemoveSkill(Skill s)
     {

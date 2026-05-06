@@ -17,7 +17,7 @@ public class RaPassiveDefinition : PassivesDefinition
         if(enemies.Count == 0) return;
 
         BattleCharacter target = enemies[Random.Range(0, enemies.Count)];
-        target.TakeDamage(Mathf.CeilToInt(self.GetSubAttackStats()[DamageSubType.Fire] * damagePercent));
+        target.TakeDamage(Mathf.CeilToInt(self.GetSubAttackStats()[DamageSubType.Fire] * damagePercent), SkillDamageType.Elemental, DamageSubType.Fire);
 
     }
 }

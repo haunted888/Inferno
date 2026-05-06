@@ -51,7 +51,7 @@ public enum SkillEffectType
 public abstract class Skill : ScriptableObject
 {
     // Used internally for skill logic
-    public enum affectsCharacters
+    public enum AffectsCharacters
     {
         Target,
         TargetTeam,
@@ -87,6 +87,7 @@ public abstract class Skill : ScriptableObject
 
     [Header("Additional Effects")]
     public List<Skill> followUpSkills;   // skills to trigger after this one
+    public int priority = 0;
     public float bonusEffectChance = 1f;
 
     [Header("Trait Requirements")]
@@ -319,5 +320,10 @@ public abstract class Skill : ScriptableObject
             allSkills.RemoveAt(0);
         }
         return effectTypes;
+    }
+
+    public virtual void OnResolvePhaseStart(BattleCharacter self, BattleCharacter target)
+    {
+        // Default does nothing, override for skills that have effects during resolution phase
     }
 }

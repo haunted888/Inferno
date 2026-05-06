@@ -3,8 +3,6 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Passives/Trait Passives/Sage/Kongming/Longzhong Plan Counter")]
 public class LongzhongPlanCounter : PassivesDefinition
 {
-    public int counter = 1;
-
     public override void OnCreated(BattleCharacter self)
     {
         bool removeThis = false;

@@ -27,6 +27,14 @@ public class FlatDamageSkill : DamageSkillParent
         BeforeSkillExecute(user, target);
 
         BeforeDamageSkillExecute(user, target);
+
+        
+        
+        var damageSkillDetailShell = skillDetailShell as DamageSkillParent;
+        var power = damageSkillDetailShell.power;
+        var damageVariance = damageSkillDetailShell.damageVariance;
+        var skillCritChance = damageSkillDetailShell.skillCritChance;
+        var skillCritDamage = damageSkillDetailShell.skillCritDamage;
         
 
         SkillDamageType damageType = this.skillDetailShell.damageType;
@@ -62,12 +70,12 @@ public class FlatDamageSkill : DamageSkillParent
         damage = target.ApplyIncomingDamageModifiers(damage);
         damage = user.ApplyOutgoingDamageModifiers(damage);
 
-        int dealt = target.TakeDamage(powerRange);
+        int dealt = target.TakeDamage(powerRange, skillDetailShell.damageType, subType);
         target.ClearIncomingDamageModifiers();
         user.ClearOutgoingDamageModifiers();
 
         if(BattleTurnManager.Instance != null)
-            BattleTurnManager.Instance.RegisterDamage(user, target, dealt);
+            BattleTurnManager.Instance.RegisterDamage(user, target, dealt, skillDetailShell.damageType, subType);
 
 
         

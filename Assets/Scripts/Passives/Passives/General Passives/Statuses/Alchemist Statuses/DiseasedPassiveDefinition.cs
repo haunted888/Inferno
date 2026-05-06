@@ -4,7 +4,6 @@ using UnityEngine;
 public class DiseasedPassiveDefinition : StatusPassiveDefinition
 {
     private const float diseasedStatDecrease = 0.05f;
-    public int counter = 1;
 
 
     public override void GetStatBoosts(BattleCharacter self)

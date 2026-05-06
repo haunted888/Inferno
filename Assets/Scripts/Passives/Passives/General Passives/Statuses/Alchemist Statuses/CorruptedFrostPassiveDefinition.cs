@@ -5,9 +5,6 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Passives/Statuses/Alchemist/Corrupted Frost Passive")]
 public class CorruptedFrostPassiveDefinition : StatusPassiveDefinition
 {
-    public int counter = 0;
-  
-
     public override void OnResolvePhaseEnd(BattleCharacter self)
     {
         if (self == null) return;

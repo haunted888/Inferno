@@ -7,8 +7,6 @@ public abstract class DamageConversionClass : PassivesDefinition
     public SkillDamageType convertingDamageType = SkillDamageType.None;
     public DamageSubType conversionType = DamageSubType.None;
 
-    private int counter = 0;
-
     public bool ShouldConvert(BattleCharacter user, Skill skill)
     {
         if(convertingDamageType != skill.damageType)
@@ -28,7 +26,7 @@ public abstract class DamageConversionClass : PassivesDefinition
                 }
             }
         }
-        counter = counter % conversionCount;
+        counter %= conversionCount;
 
         if (this == damageConversionPassives[counter])
         {

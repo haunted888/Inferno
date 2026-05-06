@@ -5,7 +5,6 @@ public class PoisonPassiveDefinition : StatusPassiveDefinition
 {
 
     private const int poisonDamageAmount = 1;
-    public int counter = 1;
     public override void OnCreated(BattleCharacter self)
     {
         if(CharHasStatus(self)) return;
@@ -31,7 +30,7 @@ public class PoisonPassiveDefinition : StatusPassiveDefinition
         if (self == null) return;
         int poisonDamage = poisonDamageAmount * counter;
 
-        self.TakeDamage(poisonDamage);
+        self.TakeDamage(poisonDamage, SkillDamageType.Elemental, DamageSubType.Acid);
         SetDisplayText($"{self.name} is hurt by poison!");
 
         if (counter <= 0)

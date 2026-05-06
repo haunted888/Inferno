@@ -17,18 +17,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a6f405de52bdc584e8db27c71c0df4f7, type: 2}
   - {fileID: 11400000, guid: ab27e88e5e933a54480836c76abb27c0, type: 2}
   baseStats:
-    maxHealth: 15
-    maxSp: 20
-    speed: 14
-    physicalAttack: 30
-    elementalPower: 20
-    defense: 5
-    elementalResistance: 5
-    critChance: 5
+    maxHealth: 60
+    maxSp: 60
+    spGeneration: 20
+    speed: 40
+    physicalAttack: 85
+    elementalPower: 54
+    defense: 20
+    elementalResistance: 20
+    critChance: 0
     critDamage: 150
-    bludgeoningAttack: 5
-    slashingAttack: 5
-    piercingAttack: 5
+    bludgeoningAttack: 0
+    slashingAttack: 0
+    piercingAttack: 0
     bludgeoningDefense: 0
     slashingDefense: 0
     piercingDefense: 0

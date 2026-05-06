@@ -3,8 +3,6 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Passives/Statuses/Sleep")]
 public class SleepPassiveDefinition : StatusPassiveDefinition
 {
-    public int counter = 1;
-
     public override void OnCreated(BattleCharacter self)
     {
         if(CharHasStatus(self)) return;

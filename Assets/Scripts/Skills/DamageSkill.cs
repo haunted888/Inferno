@@ -44,11 +44,16 @@ public class DamageSkill : DamageSkillParent
     {
         if (user == null || target == null || target.IsDead) return;
 
-        
         BeforeSkillExecute(user, target);
 
         BeforeDamageSkillExecute(user, target);
+
         
+        var damageSkillDetailShell = skillDetailShell as DamageSkillParent;
+        var power = damageSkillDetailShell.power;
+        var damageVariance = damageSkillDetailShell.damageVariance;
+        var skillCritChance = damageSkillDetailShell.skillCritChance;
+        var skillCritDamage = damageSkillDetailShell.skillCritDamage;
 
         SkillDamageType damageType = this.skillDetailShell.damageType;
 
@@ -83,12 +88,12 @@ public class DamageSkill : DamageSkillParent
         damage = target.ApplyIncomingDamageModifiers(damage);
         damage = user.ApplyOutgoingDamageModifiers(damage);
 
-        int dealt = target.TakeDamage(damage);
+        int dealt = target.TakeDamage(damage, skillDetailShell.damageType, subType);
         target.ClearIncomingDamageModifiers();
         user.ClearOutgoingDamageModifiers();
 
         if(BattleTurnManager.Instance != null)
-            BattleTurnManager.Instance.RegisterDamage(user, target, dealt);
+            BattleTurnManager.Instance.RegisterDamage(user, target, dealt, skillDetailShell.damageType, subType);
 
 
         
@@ -130,17 +135,17 @@ public class DamageSkill : DamageSkillParent
         // Base damage
         float baseDamage = skillPower * casterOffense * 0.01f;
 
-        // Defense mitigation: def / (100 + def)
+        // Defense mitigation: def / (defenseScale + def)
         float defMitigation = (targetDef > 0)
-            ? (targetDef / (100f + targetDef))
-            : 0f;
+            ? (targetDef / (defenseScale + targetDef))
+            : targetDef / defenseScale;
 
         int totalCritChance = Mathf.Max(0, userStats.critChance + skillCritChance);
         int totalCritDamage = Mathf.Max(0, userStats.critDamage + skillCritDamage);
 
         bool isCrit = Random.Range(0f, 100f) < totalCritChance;
 
-        if (isCrit)
+        if (isCrit && defMitigation > 0)
             // Crits ignore 50% of defense mitigation
             defMitigation *= 0.5f;
 
@@ -179,14 +184,14 @@ public class DamageSkill : DamageSkillParent
         int subDef = GetSubTypeDefense(targetStats, subType);
 
         int casterOffense = baseOff + subOff;
-        int targetDef     = baseDef + subDef;
+        int targetDef     = Mathf.CeilToInt(baseDef * mainDefenseCalculated + subDef * subDefenseCalculated); // Sub-defense is partially calculated for flat damage skills
 
         float baseDamage = skillPower * casterOffense * 0.01f;
 
         // Defense mitigation term: def / (100 + def)
         float defMitigation = (targetDef > 0)
-            ? (targetDef / (100f + targetDef))
-            : 0f;
+            ? (targetDef / (defenseScale + targetDef))
+            : targetDef / defenseScale;
 
 
 
@@ -199,7 +204,8 @@ public class DamageSkill : DamageSkillParent
         {
             // Guaranteed crit: use full crit multiplier
             critMultiplier = totalCritDamage * 0.01f;
-            defMitigation *= 0.5f;
+            if(defMitigation > 0)
+                defMitigation *= 0.5f;
         }
         else
         {

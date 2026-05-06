@@ -8,7 +8,6 @@ public class BurnPassiveDefinition : StatusPassiveDefinition
     private const float burnDamagePercent = .02f;
     
     public float healCutPercent = .5f;
-    public int counter = 1;
 
     public override void OnCreated(BattleCharacter self)
     {
@@ -35,7 +34,7 @@ public class BurnPassiveDefinition : StatusPassiveDefinition
         if (self == null) return;
         int burnDamage = Mathf.CeilToInt(self.MaxHealth * burnDamagePercent);
         
-        self.TakeDamage(burnDamage);
+        self.TakeDamage(burnDamage, SkillDamageType.Elemental, DamageSubType.Fire);
         SetDisplayText($"{self.name} is hurt by their burn!");
 
         counter--;

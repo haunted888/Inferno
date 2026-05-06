@@ -6,7 +6,6 @@ public class ChemicalBurnPassiveDefinition : StatusPassiveDefinition
     public float burnDamagePercent = .01f;
     
     public float healCutPercent = 1.0f;
-    public int counter = 1;
     public float doubleCounterOdds = 0.5f;
 
 
@@ -16,7 +15,7 @@ public class ChemicalBurnPassiveDefinition : StatusPassiveDefinition
         int burnDamage = Mathf.CeilToInt(self.MaxHealth * burnDamagePercent * counter);
         SetDisplayText($"{self.name} takes {burnDamage} chemical burn damage!");
         
-        self.TakeDamage(burnDamage);
+        self.TakeDamage(burnDamage, SkillDamageType.Elemental, DamageSubType.Acid);
         
         if(Random.value < doubleCounterOdds)
         {

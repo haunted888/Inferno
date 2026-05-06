@@ -11,7 +11,7 @@ public class PtahPassiveDefinition : PassivesDefinition
         base.BeforeSkillExecuteReceived(self, attacker, skill);
     }
 
-    public override void OnAfterDealDamage(BattleCharacter self, BattleCharacter target, int amount)
+    public override void OnAfterDealDamage(BattleCharacter self, BattleCharacter target, int amount, SkillDamageType damageType, DamageSubType subType)
     {
         if (target == null || target.IsDead) return;
         if (target.CurrentHealth < target.MaxHealth * activationHealthPercent && target.CurrentHealth + amount >= target.MaxHealth * activationHealthPercent)

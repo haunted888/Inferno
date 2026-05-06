@@ -12,18 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e42da5fb73250d943a2c4e7959d4e8c9, type: 3}
   m_Name: Tutankhamun
   m_EditorClassIdentifier: Assembly-CSharp::CharacterTemplate
-  displayName: Unnamed
+  displayName: Tutankhamun
   traits:
   - {fileID: 11400000, guid: 7eb87c7e2542cfa49b16a732cf76cc1a, type: 2}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: bd9554cf47b436840831ca4ab20cdbf3, type: 2}
   baseStats:
-    maxHealth: 15
-    maxSp: 30
-    speed: 12
+    maxHealth: 45
+    maxSp: 90
+    spGeneration: 20
+    speed: 30
     physicalAttack: 5
-    elementalPower: 20
-    defense: 5
-    elementalResistance: 20
+    elementalPower: 80
+    defense: 35
+    elementalResistance: 60
     critChance: 0
     critDamage: 150
     bludgeoningAttack: 0
@@ -45,4 +46,4 @@ MonoBehaviour:
     psychicDefense: 0
     bloodDefense: 0
   skills: []
-  predeterminedSubStats: 0600000007000000090000000b0000000800000010000000
+  predeterminedSubStats: 0600000007000000090000000b0000000e00000010000000

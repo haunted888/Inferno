@@ -6,7 +6,7 @@ public class ApplyPassivesAoeSkill : Skill
 {
     [Header("Passives To Apply")]
     public List<PassivesDefinition> passivesToApply = new List<PassivesDefinition>();
-    public affectsCharacters characters;
+    public AffectsCharacters characters;
 
     public override void Execute(BattleCharacter user, BattleCharacter target)
     {

@@ -105,8 +105,8 @@ public class MapEnemyDefinition
         return "Unnamed";
     }
 
-    private readonly float levelUpBaseMultiplier = .06f;
-    private readonly float levelUpLevelMultiplier = 0.02f;
+    private readonly float levelUpBaseMultiplier = .14f;
+    private readonly float levelUpLevelMultiplier = 0.06f;
     public void ApplyLevelUpEffects()
     {
 

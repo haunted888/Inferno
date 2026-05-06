@@ -380,10 +380,20 @@ public class BattleTurnManager : MonoBehaviour
         Trigger_ResolvePhaseStart();
         var actions = ActionOrderUtility.GetOrderedActions(EnumerateQueuedActions().ToList());
 
-        // Execute
-        foreach (var a in actions)
+        foreach(var a in actions)
         {
-            var action = a;
+            if(a.skill != null)
+            {
+                a.skill.OnResolvePhaseStart(a.user, a.target);
+            }
+        }
+
+        // Execute
+        while (actions.Count > 0)
+        {
+            var action = actions[0];
+            actions.RemoveAt(0);
+
             if (IsSideDefeated(playerParty)) { OnBattleEnd(false); yield break; }
             if (IsSideDefeated(enemyParty))  { OnBattleEnd(true);  yield break; }
 
@@ -605,6 +615,7 @@ public class BattleTurnManager : MonoBehaviour
 
 
             yield return _waitForSeconds1;
+            
 
             if (IsSideDefeated(playerParty)) { 
                     SetBattleText("All members of your party have been defeated."); 
@@ -618,6 +629,17 @@ public class BattleTurnManager : MonoBehaviour
                     OnBattleEnd(true); 
                     yield break; 
                 }
+
+            if (action.user.HasLivingSummon())
+            {
+                foreach (var act in actions)
+                {
+                    if(act.target == action.user)
+                    {
+                        act.target = action.user.activeSummon;
+                    }
+                }
+            }
 
         }
         yield return StartCoroutine(Trigger_ResolvePhaseEnd());
@@ -669,6 +691,8 @@ public class BattleTurnManager : MonoBehaviour
 
         
     }
+
+
 
     private IEnumerator ItemsFlow(BattleCharacter chr, bool hasPrevious)
     {
@@ -913,12 +937,12 @@ public class BattleTurnManager : MonoBehaviour
         return candidates[idx];
     }
 
-    public void RegisterDamage(BattleCharacter source, BattleCharacter target, int amount)
+    public void RegisterDamage(BattleCharacter source, BattleCharacter target, int amount, SkillDamageType damageType = SkillDamageType.None, DamageSubType subDamageType = DamageSubType.None)
     {
         PassiveMutationUtility.InvokePassivesWithMutation(
             source,
             () => source.passives,
-            p => p.OnAfterDealDamage(source, target, amount),
+            p => p.OnAfterDealDamage(source, target, amount, damageType, subDamageType),
             PassivesDefinition.PassiveHook.OnAfterDealDamage,
             passiveMutationContext
         );
@@ -1122,7 +1146,7 @@ public class BattleTurnManager : MonoBehaviour
     void Trigger_ResolvePhaseStart()
     {
         
-         ForEachCombatant(c => { PassiveMutationUtility.InvokePassivesWithMutation(
+        ForEachCombatant(c => { PassiveMutationUtility.InvokePassivesWithMutation(
                 c,
                 () => c.passives,
                 p => p.OnResolvePhaseStart(c),
@@ -1130,6 +1154,7 @@ public class BattleTurnManager : MonoBehaviour
                 passiveMutationContext
             );
         });
+
 
         if(battleText != null)
         {

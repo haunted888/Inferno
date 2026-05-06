@@ -70,10 +70,13 @@ public class MapPartyMemberDefinition
     [Range(1, MaxLevel)] public int level = 1;
     [Min(0)] public int currentXp = 0;
 
-    [Header("Bonus stat")]
-    private int bonusStatsValue = 20;
-    private int bonusStatsMin = 2;
-    private int bonusStatsMax = 10;
+    [Header("Bonus stat")] //Base level up stats and substat allocation
+    private readonly int bonusStatsValue = 20;
+    private readonly int bonusStatsMin = 2;
+    private readonly int bonusStatsMax = 10;
+    private readonly int bonusSubStatsValue = 100;
+    private readonly int bonusMainSubStatsMin = 10;
+    private readonly int bonusSubStatsMax = 40;
 
     [NonSerialized] public int health = -1;
     [NonSerialized] public int sp     = -1; 
@@ -535,10 +538,10 @@ public class MapPartyMemberDefinition
 
         // Main substats +10 each (this is separate from the 100 pool)
         for (int i = 0; i < mainSubStats.Count; i++)
-            AddToSubStat(mainSubStats[i], 10);
+            AddToSubStat(mainSubStats[i], bonusMainSubStatsMin);
 
         // Pool allocation
-        int remaining = 100;
+        int remaining = bonusSubStatsValue;
         int index = 0;
 
         // Track only pool points for the 40-cap
@@ -551,7 +554,7 @@ public class MapPartyMemberDefinition
             var key = list[index];
 
             // If this stat hit 40 from pool, move on (no point spent)
-            if (poolAlloc[key] >= 40)
+            if (poolAlloc[key] >= bonusSubStatsMax)
             {
                 index = (index + 1) % 6;
                 continue;
@@ -603,7 +606,7 @@ public class MapPartyMemberDefinition
 
     private void SetupLevelMultiplierHashtable()
     {
-        statLevelUpMultipliers.Add(CombatMainStat.MaxHealth,            10f); //Max Health
+        statLevelUpMultipliers.Add(CombatMainStat.MaxHealth,            5f); //Max Health
         statLevelUpMultipliers.Add(CombatMainStat.MaxSp,                5f); //Max SP
         statLevelUpMultipliers.Add(CombatMainStat.PhysicalAttack,       1f); //Physical Attack
         statLevelUpMultipliers.Add(CombatMainStat.ElementalPower,       1f); //Elemental Power

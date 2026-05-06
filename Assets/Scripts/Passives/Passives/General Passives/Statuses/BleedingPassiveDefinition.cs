@@ -5,8 +5,6 @@ public class BleedingPassiveDefinition : StatusPassiveDefinition
 {
     public int bleedDamage = 1;
 
-    public int counter = 1;
-    
     public override void OnCreated(BattleCharacter self)
     {
         if(CharHasStatus(self)) return;
@@ -31,7 +29,7 @@ public class BleedingPassiveDefinition : StatusPassiveDefinition
 
         if(!skill.GetAllEffectTypes().Contains(SkillEffectType.Damage)) return;
         if (bleedDamage <= 0) return;
-        self.TakeDamage(bleedDamage);
+        self.TakeDamage(bleedDamage, SkillDamageType.Elemental, DamageSubType.Blood);
     }
 
 

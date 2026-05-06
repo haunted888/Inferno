@@ -7,7 +7,7 @@ public class ChargeSkill : Skill
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     [Header("Charge Skill")]
-    public affectsCharacters characters;
+    public AffectsCharacters characters;
     public Skill skillToUse;
 
 
@@ -20,7 +20,7 @@ public class ChargeSkill : Skill
 
         switch (characters)
         {
-            case affectsCharacters.Allies:
+            case AffectsCharacters.Allies:
                 group = new List<BattleCharacter>(user.GetAllies());
                 break;
             default:

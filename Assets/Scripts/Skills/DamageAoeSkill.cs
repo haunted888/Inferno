@@ -6,7 +6,7 @@ using UnityEngine;
 public class DamageAllEnemiesSkill : DamageSkillParent
 {
     [Header("AOE Skill")]
-    public affectsCharacters characters;
+    public AffectsCharacters characters;
 
 
     public override int EstimateDamage(BattleCharacter user, BattleCharacter target)
@@ -52,6 +52,13 @@ public class DamageAllEnemiesSkill : DamageSkillParent
         
         BeforeDamageSkillExecute(user, target);
 
+        
+        var damageSkillDetailShell = skillDetailShell as DamageSkillParent;
+        var power = damageSkillDetailShell.power;
+        var damageVariance = damageSkillDetailShell.damageVariance;
+        var skillCritChance = damageSkillDetailShell.skillCritChance;
+        var skillCritDamage = damageSkillDetailShell.skillCritDamage;
+
         List<BattleCharacter> group;
 
         group = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target);
@@ -74,6 +81,7 @@ public class DamageAllEnemiesSkill : DamageSkillParent
             }
         }
         
+
         foreach (var member in group)
         {
             if (member == null || member.IsDead) continue;
@@ -94,12 +102,12 @@ public class DamageAllEnemiesSkill : DamageSkillParent
             damage = member.ApplyIncomingDamageModifiers(damage);
             damage = user.ApplyOutgoingDamageModifiers(damage);
 
-            int dealt = member.TakeDamage(damage);
+            int dealt = member.TakeDamage(damage, skillDetailShell.damageType, subType);
             member.ClearIncomingDamageModifiers();
             user.ClearOutgoingDamageModifiers();
 
             if(BattleTurnManager.Instance != null)
-                BattleTurnManager.Instance.RegisterDamage(user, member, dealt);
+                BattleTurnManager.Instance.RegisterDamage(user, member, dealt, skillDetailShell.damageType, subType);
         }
 
         AfterExecute(user, target);
@@ -135,20 +143,20 @@ public class DamageAllEnemiesSkill : DamageSkillParent
         int subDef = GetSubTypeDefense(targetStats, subType);
 
         int casterOffense = baseOff + subOff;
-        int targetDef     = baseDef + subDef;
+        int targetDef     = Mathf.CeilToInt(baseDef * mainDefenseCalculated + subDef * subDefenseCalculated); // Sub-defense is partially calculated for flat damage skills
 
         float baseDamage = skillPower * casterOffense * 0.01f;
         
         float defMitigation = (targetDef > 0)
-            ? (targetDef / (100f + targetDef))
-            : 0f;
+            ? (targetDef / (defenseScale + targetDef))
+            : targetDef / defenseScale;
 
         int totalCritChance  = Mathf.Max(0, userStats.critChance + skillCritChance);
         int totalCritDamage  = Mathf.Max(0, userStats.critDamage + skillCritDamage);
 
         bool isCrit = Random.Range(0f, 100f) < totalCritChance;
 
-        if (isCrit)
+        if (isCrit && defMitigation > 0)
             //crit ignores 50% of defense mitigation
             defMitigation *= 0.5f;
 
@@ -191,8 +199,8 @@ public class DamageAllEnemiesSkill : DamageSkillParent
         float baseDamage = skillPower * casterOffense * 0.01f;
 
         float defMitigation = (targetDef > 0)
-            ? (targetDef / (100f + targetDef))
-            : 0f;
+            ? (targetDef / (defenseScale + targetDef))
+            : targetDef / defenseScale;
 
 
         int totalCritChance = Mathf.Max(0, userStats.critChance + skillCritChance);
@@ -203,7 +211,8 @@ public class DamageAllEnemiesSkill : DamageSkillParent
         if (totalCritChance >= 100)
         {
             critMultiplier = totalCritDamage * 0.01f;
-            defMitigation *= 0.5f;
+            if(defMitigation > 0)
+                defMitigation *= 0.5f;
         }
         else
         {

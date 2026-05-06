@@ -6,7 +6,7 @@ public class PhoenixPassiveDefinition : PassivesDefinition
 {
     public int healthToRestore = 1;
     public float healthPercentToRestore = .5f;
-    public override void OnAfterTakeDamage(BattleCharacter self, int amount)
+    public override void OnAfterTakeDamage(BattleCharacter self, int amount, SkillDamageType damageType, DamageSubType subDamageType)
     {
         if (self.IsDead)
         {

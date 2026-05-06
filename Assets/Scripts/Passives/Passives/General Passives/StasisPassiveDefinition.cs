@@ -4,7 +4,6 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Passives/Stasis")]
 public class StasisPassiveDefinition : PassivesDefinition
 {
-    public int counter = 2;
     [Header("'User is ____ and cannot act!'")]
     [TextArea] public string turnSkipDisplayText = "in stasis";
 

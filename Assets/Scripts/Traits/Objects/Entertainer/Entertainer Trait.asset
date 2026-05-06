@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8a0aff0daae2777469557801fadb1d27, type: 3}
-  m_Name: Entertainer Trait Test
+  m_Name: Entertainer Trait
   m_EditorClassIdentifier: Assembly-CSharp::EntertainerTraitDefinition
   traitName: Entertainer
   description: 
