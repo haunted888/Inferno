@@ -90,7 +90,10 @@ public class CharacterTemplate : ScriptableObject
         stormDefense      = 0,
         acidDefense       = 0,
         psychicDefense    = 0,
-        bloodDefense      = 0
+        bloodDefense      = 0,
+
+        accuracy = 0,
+        evasion = 0
     };
 
     [Header("Skills")]

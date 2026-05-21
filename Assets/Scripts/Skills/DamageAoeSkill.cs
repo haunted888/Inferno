@@ -14,7 +14,31 @@ public class DamageAllEnemiesSkill : DamageSkillParent
         if (user == null || target == null) return 0;
 
 
-        SkillDamageType damageType = this.skillDetailShell.damageType;
+        DamageSkillParent damageSkillDetailShell = skillDetailShell as DamageSkillParent;
+
+        SkillDamageType damageType = skillDetailShell.damageType;
+        DamageSubType subType = damageSkillDetailShell.subType;
+
+        if(subType == DamageSubType.Adaptive && damageType != SkillDamageType.Adaptive)
+        {
+            Dictionary<DamageSubType, int> subTypeCounts = user.GetSubAttackStats();
+            subType = DamageSubType.None;
+            List<DamageSubType> physicalSubTypes = new List<DamageSubType> { DamageSubType.Slashing, DamageSubType.Piercing, DamageSubType.Bludgeoning };
+            List<DamageSubType> elementalSubTypes = new List<DamageSubType> { DamageSubType.Fire, DamageSubType.Ice, DamageSubType.Storm, DamageSubType.Acid, DamageSubType.Psychic, DamageSubType.Blood };
+
+            
+            List<DamageSubType> subTypesToCheck = (damageType == SkillDamageType.Physical) ? physicalSubTypes : elementalSubTypes;
+
+            int highestCount = 0;
+            foreach (var kvp in subTypeCounts)
+            {
+                if (kvp.Value > highestCount && subTypesToCheck.Contains(kvp.Key))
+                {
+                    highestCount = kvp.Value;
+                    subType = kvp.Key;
+                }
+            }
+        }
 
         if (damageType == SkillDamageType.Adaptive)
         {
@@ -31,6 +55,7 @@ public class DamageAllEnemiesSkill : DamageSkillParent
                 }
             }
         }
+
 
         return EstimateExpectedDamageInternal(
             user.GetEffectiveStats(),
@@ -61,9 +86,31 @@ public class DamageAllEnemiesSkill : DamageSkillParent
 
         List<BattleCharacter> group;
 
-        group = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target);
+        group = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target, this);
 
-        SkillDamageType damageType = this.skillDetailShell.damageType;
+        SkillDamageType damageType = skillDetailShell.damageType;
+        DamageSubType subType = damageSkillDetailShell.subType;
+
+        if(subType == DamageSubType.Adaptive && damageType != SkillDamageType.Adaptive)
+        {
+            Dictionary<DamageSubType, int> subTypeCounts = user.GetSubAttackStats();
+            subType = DamageSubType.None;
+            List<DamageSubType> physicalSubTypes = new List<DamageSubType> { DamageSubType.Slashing, DamageSubType.Piercing, DamageSubType.Bludgeoning };
+            List<DamageSubType> elementalSubTypes = new List<DamageSubType> { DamageSubType.Fire, DamageSubType.Ice, DamageSubType.Storm, DamageSubType.Acid, DamageSubType.Psychic, DamageSubType.Blood };
+
+            
+            List<DamageSubType> subTypesToCheck = (damageType == SkillDamageType.Physical) ? physicalSubTypes : elementalSubTypes;
+
+            int highestCount = 0;
+            foreach (var kvp in subTypeCounts)
+            {
+                if (kvp.Value > highestCount && subTypesToCheck.Contains(kvp.Key))
+                {
+                    highestCount = kvp.Value;
+                    subType = kvp.Key;
+                }
+            }
+        }
 
         if (damageType == SkillDamageType.Adaptive)
         {
@@ -103,6 +150,8 @@ public class DamageAllEnemiesSkill : DamageSkillParent
             damage = user.ApplyOutgoingDamageModifiers(damage);
 
             int dealt = member.TakeDamage(damage, skillDetailShell.damageType, subType);
+            user.Heal(Mathf.RoundToInt(dealt * damageSkillDetailShell.lifeStealPercent));
+            user.AddThreat(dealt);
             member.ClearIncomingDamageModifiers();
             user.ClearOutgoingDamageModifiers();
 
@@ -119,145 +168,6 @@ public class DamageAllEnemiesSkill : DamageSkillParent
     }
 
 
-    // Slight refactor: better to compute once per target:
-    protected int ComputeActualDamage(
-        CombatStats userStats,
-        CombatStats targetStats,
-        int skillPower,
-        SkillDamageType type,
-        int skillCritChance,
-        int skillCritDamage,
-        DamageSubType subType)
-    {
-        // Base offense/defense (physical or elemental)
-        int baseOff = (type == SkillDamageType.Physical)
-            ? userStats.physicalAttack
-            : userStats.elementalPower;
-
-        int baseDef = (type == SkillDamageType.Physical)
-            ? targetStats.defense
-            : targetStats.elementalResistance;
-
-        // Sub-type bonuses
-        int subOff = GetSubTypeAttack(userStats, subType);
-        int subDef = GetSubTypeDefense(targetStats, subType);
-
-        int casterOffense = baseOff + subOff;
-        int targetDef     = Mathf.CeilToInt(baseDef * mainDefenseCalculated + subDef * subDefenseCalculated); // Sub-defense is partially calculated for flat damage skills
-
-        float baseDamage = skillPower * casterOffense * 0.01f;
-        
-        float defMitigation = (targetDef > 0)
-            ? (targetDef / (defenseScale + targetDef))
-            : targetDef / defenseScale;
-
-        int totalCritChance  = Mathf.Max(0, userStats.critChance + skillCritChance);
-        int totalCritDamage  = Mathf.Max(0, userStats.critDamage + skillCritDamage);
-
-        bool isCrit = Random.Range(0f, 100f) < totalCritChance;
-
-        if (isCrit && defMitigation > 0)
-            //crit ignores 50% of defense mitigation
-            defMitigation *= 0.5f;
-
-        float afterDef = baseDamage * (1f - defMitigation);
-
-        float critMultiplier = 1f;
-        if (isCrit)
-            critMultiplier = totalCritDamage * 0.01f;
-
-        float final = afterDef * critMultiplier;
-        int actual   = Mathf.Max(0, Mathf.RoundToInt(final));
-
-        return actual;
-    }
-
-    protected int EstimateExpectedDamageInternal(
-        CombatStats userStats,
-        CombatStats targetStats,
-        int skillPower,
-        SkillDamageType type,
-        int skillCritChance,
-        int skillCritDamage,
-        DamageSubType subType)
-    {
-        // Base offense/defense (physical or elemental)
-        int baseOff = (type == SkillDamageType.Physical)
-            ? userStats.physicalAttack
-            : userStats.elementalPower;
-
-        int baseDef = (type == SkillDamageType.Physical)
-            ? targetStats.defense
-            : targetStats.elementalResistance;
-
-        // Sub-type bonuses
-        int subOff = GetSubTypeAttack(userStats, subType);
-        int subDef = GetSubTypeDefense(targetStats, subType);
-
-        int casterOffense = baseOff + subOff;
-        int targetDef     = baseDef + subDef;
-        float baseDamage = skillPower * casterOffense * 0.01f;
-
-        float defMitigation = (targetDef > 0)
-            ? (targetDef / (defenseScale + targetDef))
-            : targetDef / defenseScale;
-
-
-        int totalCritChance = Mathf.Max(0, userStats.critChance + skillCritChance);
-        int totalCritDamage = Mathf.Max(0, userStats.critDamage + skillCritDamage);
-
-        float critMultiplier;
-
-        if (totalCritChance >= 100)
-        {
-            critMultiplier = totalCritDamage * 0.01f;
-            if(defMitigation > 0)
-                defMitigation *= 0.5f;
-        }
-        else
-        {
-            critMultiplier = 1f;
-        }
-
-        float afterDef = baseDamage * (1f - defMitigation);
-
-        
-        float expected = afterDef * critMultiplier;
-        return Mathf.Max(0, Mathf.RoundToInt(expected));
-    }
-    protected int GetSubTypeAttack(CombatStats stats, DamageSubType subType)
-    {
-        switch (subType)
-        {
-            case DamageSubType.Bludgeoning: return stats.bludgeoningAttack;
-            case DamageSubType.Slashing:    return stats.slashingAttack;
-            case DamageSubType.Piercing:    return stats.piercingAttack;
-            case DamageSubType.Fire:        return stats.fireAttack;
-            case DamageSubType.Ice:         return stats.iceAttack;
-            case DamageSubType.Storm:       return stats.stormAttack;
-            case DamageSubType.Acid:        return stats.acidAttack;
-            case DamageSubType.Psychic:     return stats.psychicAttack;
-            case DamageSubType.Blood:       return stats.bloodAttack;
-            default:                        return 0;
-        }
-    }
-
-    protected int GetSubTypeDefense(CombatStats stats, DamageSubType subType)
-    {
-        switch (subType)
-        {
-            case DamageSubType.Bludgeoning: return stats.bludgeoningDefense;
-            case DamageSubType.Slashing:    return stats.slashingDefense;
-            case DamageSubType.Piercing:    return stats.piercingDefense;
-            case DamageSubType.Fire:        return stats.fireDefense;
-            case DamageSubType.Ice:         return stats.iceDefense;
-            case DamageSubType.Storm:       return stats.stormDefense;
-            case DamageSubType.Acid:        return stats.acidDefense;
-            case DamageSubType.Psychic:     return stats.psychicDefense;
-            case DamageSubType.Blood:       return stats.bloodDefense;
-            default:                        return 0;
-        }
-    }
 
 }
 

@@ -12,7 +12,7 @@ public class RedirectSkill : Skill
     {
         BeforeSkillExecute(user, target);
 
-        var targets = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target);
+        var targets = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target, this);
 
         
 

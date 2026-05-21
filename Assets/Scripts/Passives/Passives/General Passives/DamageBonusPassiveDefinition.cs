@@ -10,7 +10,7 @@ public class DamageBonusPassiveDefinition : PassivesDefinition
     public override void BeforeDamageSkillExecute(BattleCharacter self, BattleCharacter target, Skill skill)
     {
         if (self == null || skill == null) return;
-        if (skill.damageType == SkillDamageType.None) return;
+        if (skill is not DamageSkillParent) return;
 
         self.AddOutgoingDamageMultiplier(damageBonusPercent);
     }

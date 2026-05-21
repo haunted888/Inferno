@@ -19,6 +19,8 @@ MonoBehaviour:
 '
   targetType: 0
   damageType: 3
+  makesContact: 1
+  BypassAccuracy: 0
   spCost: 100
   hpCost: 0
   delay: 0

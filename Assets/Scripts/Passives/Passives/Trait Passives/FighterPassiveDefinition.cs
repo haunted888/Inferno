@@ -20,7 +20,7 @@ public class FighterPassiveDefinition : PassivesDefinition
     {
         if (skill == null || fighterDefenseBoost == null) return;
 
-        if (skill.damageType != SkillDamageType.None && !self.passives.Contains(fighterDefenseBoost))
+        if (skill.GetAllEffectTypes().Contains(SkillEffectType.Damage) && !self.passives.Contains(fighterDefenseBoost))
         {
             fighterDefenseBoost.setStatBoosts(defenseBoostAmount, resistanceBoostAmount);
             self.QueuePassiveToAdd(fighterDefenseBoost, PassivesDefinition.PassiveHook.OnSkillUsed, self);

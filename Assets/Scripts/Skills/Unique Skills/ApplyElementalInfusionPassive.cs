@@ -10,9 +10,9 @@ public class ApplyElementalInfusionPassive : Skill
 
     public override void Execute(BattleCharacter user, BattleCharacter target)
     {
-        var targets = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target);
+        var targets = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target, this);
 
-
+        var elementalSubTypes = new List<DamageSubType> { DamageSubType.Fire, DamageSubType.Storm, DamageSubType.Ice, DamageSubType.Blood, DamageSubType.Psychic, DamageSubType.Acid };
 
         foreach (var t in targets)
         {
@@ -21,7 +21,7 @@ public class ApplyElementalInfusionPassive : Skill
             int highestCount = 0;
             foreach (var kvp in subTypeCounts)
             {
-                if (kvp.Value > highestCount)
+                if (kvp.Value >= highestCount && elementalSubTypes.Contains(kvp.Key))
                 {
                     highestCount = kvp.Value;
                     subType = kvp.Key;
@@ -29,7 +29,7 @@ public class ApplyElementalInfusionPassive : Skill
             }
             passiveToApply.conversionType = subType;
 
-            String elementName = subType.ToString();
+            string elementName = subType.ToString();
 
             passiveToApply.displayName = "Elemental Infusion: " + elementName;
             passiveToApply.description = "Infuses the target's physical attacks with " + elementName + " damage.";

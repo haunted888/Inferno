@@ -16,12 +16,21 @@ MonoBehaviour:
   description: 
   targetType: 0
   damageType: 3
+  makesContact: 1
+  BypassAccuracy: 0
   spCost: 0
   hpCost: 0
+  delay: 0
   followUpSkills: []
+  priority: 0
+  bonusEffectChance: 1
   traitTags: 
   ammoCost: 0
+  flatAmmoCost: 0
   power: 5
   subType: 0
   skillCritChance: 0
   skillCritDamage: 0
+  damageVariance: 0
+  mainDefenseCalculated: 1
+  subDefenseCalculated: 1

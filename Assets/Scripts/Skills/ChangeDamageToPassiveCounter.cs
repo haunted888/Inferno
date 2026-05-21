@@ -16,7 +16,7 @@ public class ChangeDamageToPassiveCounter : Skill
         if (user == null || target == null || target.IsDead) return;
         if (damageSkillToUse == null || passiveCounterToUse == null) return;
 
-        var targets = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target);
+        var targets = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target, this);
 
 
         int damage = 0;

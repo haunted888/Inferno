@@ -25,7 +25,9 @@ public enum DamageSubType
     Storm,
     Acid,
     Psychic,
-    Blood
+    Blood,
+
+    Adaptive
 }
 
 // Used externally
@@ -35,6 +37,8 @@ public enum SkillTargetType
     AllEnemies,
     SingleAlly,
     AllAllies,
+    SingleTarget,
+    SingleTargetNoSelf,
     Self
 }
 
@@ -79,6 +83,9 @@ public abstract class Skill : ScriptableObject
     [TextArea] public string description;
     public SkillTargetType targetType;
     public SkillDamageType damageType = SkillDamageType.Physical;
+    public int displayPower = 0;
+    public bool makesContact = false; 
+    public bool BypassAccuracy = false;
 
     [Header("Cost")]
     public int spCost = 0;
@@ -311,13 +318,15 @@ public abstract class Skill : ScriptableObject
     {
         List<SkillEffectType> effectTypes = new List<SkillEffectType>();
         List<Skill> allSkills = new List<Skill> { this };
-        while (allSkills.Count > 0) // Arbitrary limit to prevent infinite loops
+        int iterationLimit = 50; // Arbitrary limit to prevent infinite loops
+        while (allSkills.Count > 0 && iterationLimit > 0)
         {
             var current = allSkills[0];
             current.followUpSkills?.ForEach(s => allSkills.Add(s));
             if(current is DamageSkillParent) effectTypes.Add(SkillEffectType.Damage);
             else effectTypes.Add(SkillEffectType.Misc); // Placeholder for non-damage skills until we have more types
             allSkills.RemoveAt(0);
+            iterationLimit--;
         }
         return effectTypes;
     }
@@ -326,4 +335,11 @@ public abstract class Skill : ScriptableObject
     {
         // Default does nothing, override for skills that have effects during resolution phase
     }
+
+    public bool IsSingleTarget()
+    {
+        return targetType == SkillTargetType.SingleEnemy || targetType == SkillTargetType.SingleAlly || targetType == SkillTargetType.SingleTarget || targetType == SkillTargetType.SingleTargetNoSelf;
+    }
+
+    
 }

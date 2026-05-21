@@ -19,13 +19,15 @@ MonoBehaviour:
 '
   targetType: 4
   damageType: 2
+  makesContact: 0
+  BypassAccuracy: 0
   spCost: 40
   hpCost: 0
   delay: 0
   followUpSkills: []
   priority: 0
   bonusEffectChance: 1
-  traitTags: 
+  traitTags: 0400000006000000
   ammoCost: 0
   flatAmmoCost: 0
   passiveToApply: {fileID: 11400000, guid: b97172ecec085f948adaae25829a02d0, type: 2}

@@ -5,7 +5,7 @@ using UnityEngine;
 public static class BattleUtility
 {
 
-    private static List<Skill> skillsLooped = new List<Skill>(); 
+    private static readonly List<Skill> skillsLooped = new List<Skill>(); 
 
     public static List<BattleCharacter> GetTargetsForSkill(Skill skill, BattleCharacter user, BattleCharacter target)
     {
@@ -22,10 +22,14 @@ public static class BattleUtility
         switch (skill.targetType)
         {
             case SkillTargetType.SingleEnemy:
+            case SkillTargetType.SingleTarget:
+            case SkillTargetType.SingleAlly:
+            case SkillTargetType.SingleTargetNoSelf:
+                targetsEnum = new List<BattleCharacter> { target };
+                break;
             case SkillTargetType.AllEnemies:
                 targetsEnum = user.GetEnemies();
                 break;
-            case SkillTargetType.SingleAlly:
             case SkillTargetType.AllAllies:
                 targetsEnum = user.GetAllies();
                 break;
@@ -62,7 +66,8 @@ public static class BattleUtility
     public static List<BattleCharacter> GetTargetsForEffectsCharacters(
         Skill.AffectsCharacters characters,
         BattleCharacter user,
-        BattleCharacter target)
+        BattleCharacter target,
+        Skill skill)
     {
         if (user == null) return new List<BattleCharacter>();
 
@@ -98,6 +103,7 @@ public static class BattleUtility
             if (c == null || c.IsDead) continue;
             if (c.HasLivingSummon()) continue;
             if (c.IsProtectedFromSkills()) continue;
+            if (c.IsDodging() && !skill.BypassAccuracy) continue; 
             candidates.Add(c);
         }
 

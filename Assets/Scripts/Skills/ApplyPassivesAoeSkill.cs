@@ -19,7 +19,7 @@ public class ApplyPassivesAoeSkill : Skill
         List<BattleCharacter> group;
 
         
-        group = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target);
+        group = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target, this);
         
 
         foreach (var member in group)

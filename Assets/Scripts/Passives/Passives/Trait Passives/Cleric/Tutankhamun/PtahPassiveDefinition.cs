@@ -6,11 +6,6 @@ public class PtahPassiveDefinition : PassivesDefinition
     public float activationHealthPercent = .5f;
     public StasisPassiveDefinition passiveToApply;
 
-    public override void BeforeSkillExecuteReceived(BattleCharacter self, BattleCharacter attacker, Skill skill)
-    {
-        base.BeforeSkillExecuteReceived(self, attacker, skill);
-    }
-
     public override void OnAfterDealDamage(BattleCharacter self, BattleCharacter target, int amount, SkillDamageType damageType, DamageSubType subType)
     {
         if (target == null || target.IsDead) return;

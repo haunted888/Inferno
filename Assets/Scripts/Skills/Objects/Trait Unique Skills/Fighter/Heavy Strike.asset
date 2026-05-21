@@ -16,6 +16,8 @@ MonoBehaviour:
   description: deal 20 bludgeoning damage
   targetType: 0
   damageType: 0
+  makesContact: 1
+  BypassAccuracy: 0
   spCost: 20
   hpCost: 0
   delay: 0

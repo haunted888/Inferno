@@ -40,6 +40,9 @@ public struct CombatStats
     public int psychicDefense;
     public int bloodDefense;
 
+    public int accuracy;
+    public int evasion;
+
     public void SetSubAttackBoost(DamageSubType subType, int boostAmount)
     {
         switch (subType)

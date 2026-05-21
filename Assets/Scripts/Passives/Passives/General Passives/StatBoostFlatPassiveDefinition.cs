@@ -66,6 +66,9 @@ public class StatBoostFlatPassiveDefinition : PassivesDefinition
         self.bonusStats.acidDefense += statBoosts.acidDefense;
         self.bonusStats.psychicDefense += statBoosts.psychicDefense;
 
+        self.bonusStats.accuracy += statBoosts.accuracy;
+        self.bonusStats.evasion += statBoosts.evasion;
+
     }
 
     public override void OnResolvePhaseEnd(BattleCharacter self)
@@ -115,6 +118,8 @@ public class StatBoostFlatPassiveDefinition : PassivesDefinition
         if (statBoosts.acidDefense != 0) descriptionReturn += $"Acid Defense {(statBoosts.acidDefense > 0 ? "+" : "-")}{statBoosts.acidDefense}\n";
         if (statBoosts.psychicDefense != 0) descriptionReturn += $"Psychic Defense {(statBoosts.psychicDefense > 0 ? "+" : "-")}{statBoosts.psychicDefense}\n";
 
+        if (statBoosts.accuracy != 0) descriptionReturn += $"Accuracy {(statBoosts.accuracy > 0 ? "+" : "-")}{statBoosts.accuracy}\n";
+        if (statBoosts.evasion != 0) descriptionReturn += $"Evasion {(statBoosts.evasion > 0 ? "+" : "-")}{statBoosts.evasion}\n";
         // Add other stats as needed
 
         return descriptionReturn.TrimEnd(); // Remove trailing newline

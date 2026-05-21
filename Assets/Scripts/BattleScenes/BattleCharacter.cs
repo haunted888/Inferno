@@ -133,8 +133,12 @@ public class BattleCharacter : MonoBehaviour
 
     public void AddThreat(int amount)
     {
-        if (amount <= 0) return;
         threat += amount;
+    }
+
+    public void SetThreat(int newThreat)
+    {
+        threat = newThreat;
     }
 
     // Optional, for later if you want to reset completely
@@ -376,7 +380,10 @@ public class BattleCharacter : MonoBehaviour
             stormDefense        = baseStats.stormDefense + bonusStats.stormDefense,
             acidDefense         = baseStats.acidDefense    + bonusStats.acidDefense,
             psychicDefense      = baseStats.psychicDefense + bonusStats.psychicDefense,
-            bloodDefense        = baseStats.bloodDefense     + bonusStats.bloodDefense
+            bloodDefense        = baseStats.bloodDefense     + bonusStats.bloodDefense,
+
+            accuracy          = baseStats.accuracy + bonusStats.accuracy,
+            evasion           = baseStats.evasion + bonusStats.evasion
         };
 
         if (IsSoaked)
@@ -774,5 +781,18 @@ public class BattleCharacter : MonoBehaviour
                 return true;
         }
         return false;
+    }
+
+    private bool isDodging = false;
+
+    public void SetDodge(int accuracy)
+    {
+        int evasion = GetEffectiveStats().evasion - accuracy;
+        isDodging = UnityEngine.Random.value > Mathf.Max(0, 1f - evasion / (100f + evasion)); //100 is evasion at which you have 50% dodge chance, formula is ev/(100+ev)
+    }
+
+    public bool IsDodging()
+    {
+        return isDodging;
     }
 }

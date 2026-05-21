@@ -793,7 +793,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: enemies.Array.data[1].stats.defense
-      value: 20
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: enemies.Array.data[2].overrideStats
@@ -1045,7 +1045,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: enemies.Array.data[1].stats.elementalResistance
-      value: 20
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 7636867846739461914, guid: 679980608679b214c83f07267e5f16b8, type: 3}
       propertyPath: enemies.Array.data[2].stats.elementalResistance
@@ -3596,31 +3596,28 @@ MonoBehaviour:
     displayName: Tester
     characterAsset: {fileID: 11400000, guid: c5a87f31f7dec4f409ba0877ecdc9a8b, type: 2}
     overrideTraits: 1
-    overrideStats: 0
+    overrideStats: 1
     overrideSkills: 1
     traits:
-    - {fileID: 11400000, guid: 76053455a55feb24892a3496fb58122f, type: 2}
-    - {fileID: 11400000, guid: 8681795ab962c054f8c02dac1f2a24db, type: 2}
-    - {fileID: 11400000, guid: bd9554cf47b436840831ca4ab20cdbf3, type: 2}
-    - {fileID: 11400000, guid: 17698ca8be3f8654390e38aed6e66bd7, type: 2}
+    - {fileID: 11400000, guid: 2a16b74eacbb580499fe9930d904a7ec, type: 2}
     stats:
-      maxHealth: 0
-      maxSp: 0
+      maxHealth: 20
+      maxSp: 10000
       spGeneration: 20
-      speed: 0
-      physicalAttack: 0
-      elementalPower: 0
-      defense: 0
-      elementalResistance: 0
+      speed: 5
+      physicalAttack: 100
+      elementalPower: 10
+      defense: 10
+      elementalResistance: 10
       critChance: 0
-      critDamage: 0
+      critDamage: 150
       bludgeoningAttack: 0
       slashingAttack: 0
       piercingAttack: 0
       bludgeoningDefense: 0
       slashingDefense: 0
       piercingDefense: 0
-      fireAttack: 0
+      fireAttack: 20
       iceAttack: 0
       stormAttack: 0
       acidAttack: 0
@@ -3633,10 +3630,17 @@ MonoBehaviour:
       psychicDefense: 0
       bloodDefense: 0
     skills:
-    - {fileID: 11400000, guid: 7e57754f87b8e6043a67e0aa834e9292, type: 2}
-    - {fileID: 11400000, guid: d33082149cf62bd4689fabc8db06acda, type: 2}
-    - {fileID: 11400000, guid: 3e65948bc6b10f041bc6e4f2d8608dc0, type: 2}
-    level: 0
+    - {fileID: 11400000, guid: 0671416f15ddb724eb6864f8903ba4df, type: 2}
+    - {fileID: 11400000, guid: 9c0806da624119f4fa596204dbac1d4e, type: 2}
+    - {fileID: 11400000, guid: 7c59bf7563709d64cbf723c47f653f24, type: 2}
+    - {fileID: 11400000, guid: a280bda9af148974e93798f8d0551db7, type: 2}
+    - {fileID: 11400000, guid: bd51bfcf044d87845968c58912a77ec5, type: 2}
+    - {fileID: 11400000, guid: a0e08c4d680336045bfa07f56c679382, type: 2}
+    - {fileID: 11400000, guid: 0bfabc69180d1444582448b24b18c15c, type: 2}
+    - {fileID: 11400000, guid: dc3e8f7168f2aec4bb99559995b93cb6, type: 2}
+    - {fileID: 11400000, guid: e51c72907244817488c31df5c70981a8, type: 2}
+    - {fileID: 11400000, guid: ee6951f395d01e54e908c7840bad674b, type: 2}
+    level: 1
     currentXp: 1000000
     passives: []
     talentTreePrefab: {fileID: 2678382236235032911, guid: 704fc9c07b9e8214e9b1ad2842748eaa, type: 3}
@@ -5535,7 +5539,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1913179534}
   m_HandleRect: {fileID: 1913179533}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 11
   m_OnValueChanged:
@@ -11099,7 +11103,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 342623860}
   m_HandleRect: {fileID: 342623859}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 11
   m_OnValueChanged:
@@ -18522,7 +18526,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 807536830}
   m_HandleRect: {fileID: 807536829}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 11
   m_OnValueChanged:
@@ -23731,7 +23735,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000024852068}
+  m_AnchoredPosition: {x: 0, y: 0.000049851435}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2078211892
@@ -24014,8 +24018,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 277122057}
   m_HandleRect: {fileID: 277122056}
   m_Direction: 2
-  m_Value: 1
-  m_Size: 1
+  m_Value: 0
+  m_Size: 0.9995941
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

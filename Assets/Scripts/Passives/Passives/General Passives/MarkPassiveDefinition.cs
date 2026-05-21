@@ -10,7 +10,7 @@ public class MarkPassiveDefinition : PassivesDefinition
     public override void OnSkillReceived(BattleCharacter self, BattleCharacter attacker, Skill skill)
     {
         if (self == null || skill == null) return;
-        if (skill.damageType == SkillDamageType.None) return;
+        if (!skill.GetAllEffectTypes().Contains(SkillEffectType.Damage)) return;
 
         self.AddIncomingDamageMultiplier(damageIncreasePercent);
     }

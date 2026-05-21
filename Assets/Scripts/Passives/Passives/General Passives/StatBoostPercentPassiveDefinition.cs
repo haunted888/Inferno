@@ -74,6 +74,9 @@ public class StatBoostPercentPassiveDefinition : PassivesDefinition
 
         self.bonusStats.critChance += Mathf.CeilToInt(self.baseStats.critChance * Mathf.Abs(statBoostsPercent.critChance) * 0.01f) * (int)Mathf.Sign(statBoostsPercent.critChance);
         self.bonusStats.critDamage += Mathf.CeilToInt(self.baseStats.critDamage * Mathf.Abs(statBoostsPercent.critDamage) * 0.01f) * (int)Mathf.Sign(statBoostsPercent.critDamage);
+
+        self.bonusStats.accuracy += Mathf.CeilToInt(self.baseStats.accuracy * Mathf.Abs(statBoostsPercent.accuracy) * 0.01f) * (int)Mathf.Sign(statBoostsPercent.accuracy);
+        self.bonusStats.evasion += Mathf.CeilToInt(self.baseStats.evasion * Mathf.Abs(statBoostsPercent.evasion) * 0.01f) * (int)Mathf.Sign(statBoostsPercent.evasion);
     }
 
     public override void OnResolvePhaseEnd(BattleCharacter self)
@@ -131,6 +134,9 @@ public class StatBoostPercentPassiveDefinition : PassivesDefinition
         if (statBoostsPercent.critChance != 0) descriptionReturn += $"Crit Chance: {(statBoostsPercent.critChance > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(statBoostsPercent.critChance) * 0.01f * character.baseStats.critChance)}\n";
         if (statBoostsPercent.critDamage != 0) descriptionReturn += $"Crit Damage: {(statBoostsPercent.critDamage > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(statBoostsPercent.critDamage) * 0.01f * character.baseStats.critDamage)}\n";
         
+        if (statBoostsPercent.accuracy != 0) descriptionReturn += $"Accuracy: {(statBoostsPercent.accuracy > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(statBoostsPercent.accuracy) * 0.01f * character.baseStats.accuracy)}\n";
+        if (statBoostsPercent.evasion != 0) descriptionReturn += $"Evasion: {(statBoostsPercent.evasion > 0 ? "+" : "-")}{Mathf.CeilToInt(Mathf.Abs(statBoostsPercent.evasion) * 0.01f * character.baseStats.evasion)}\n";
+
         return descriptionReturn.TrimEnd('\n');
     }
 }

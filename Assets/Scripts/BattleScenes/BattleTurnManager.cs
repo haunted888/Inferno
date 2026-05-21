@@ -331,6 +331,10 @@ public class BattleTurnManager : MonoBehaviour
                             ? GetEnemiesOf(chr)
                             : chosenSkill.targetType == SkillTargetType.SingleAlly || chosenSkill.targetType == SkillTargetType.AllAllies
                                 ? GetAlliesOf(chr)
+                                : chosenSkill.targetType == SkillTargetType.SingleTarget ?
+                                GetEnemiesOf(chr).Concat(GetAlliesOf(chr))
+                                : chosenSkill.targetType == SkillTargetType.SingleTargetNoSelf ?
+                                GetEnemiesOf(chr).Concat(GetAlliesOf(chr, false))
                                 : new List<BattleCharacter> { chr };
 
                     SetOutlineEnabled(targetPool, true);
@@ -536,11 +540,13 @@ public class BattleTurnManager : MonoBehaviour
                             passiveMutationContext
                         );
 
+                        t.SetDodge(action.user.GetEffectiveStats().accuracy);
+
                     }
 
                     
 
-                    SetBattleText($"{action.user.name} uses {action.skill.skillName}!");
+                    SetBattleText($"{action.user.name} uses {action.skill.skillName} on {effectiveTarget.name}!");
 
                     // Players spend SP via UseSkill; enemies ignore SP
                     if (playerParty.Contains(action.user))
@@ -808,10 +814,10 @@ public class BattleTurnManager : MonoBehaviour
         yield break;
 }
 
-    public IEnumerable<BattleCharacter> GetAlliesOf(BattleCharacter c)
+    public IEnumerable<BattleCharacter> GetAlliesOf(BattleCharacter c, bool includeSelf = true)
     {
-        if (playerParty.Contains(c)) return new List<BattleCharacter>(playerParty);
-        if (enemyParty.Contains(c))  return new List<BattleCharacter>(enemyParty);
+        if (playerParty.Contains(c)) return includeSelf ? new List<BattleCharacter>(playerParty) : new List<BattleCharacter>(playerParty).FindAll(ch => ch != c);
+        if (enemyParty.Contains(c))  return includeSelf ? new List<BattleCharacter>(enemyParty) : new List<BattleCharacter>(enemyParty).FindAll(ch => ch != c);
         return new List<BattleCharacter>();
     }
 
@@ -832,22 +838,15 @@ public class BattleTurnManager : MonoBehaviour
         bool clickedIsEnemy = GetEnemiesOf(user).Contains(clicked);
         bool clickedIsSelf  = user == clicked;
 
-        switch (skill.targetType)
+        return skill.targetType switch
         {
-            case SkillTargetType.SingleEnemy:
-            case SkillTargetType.AllEnemies:
-                return clickedIsEnemy;
-
-            case SkillTargetType.SingleAlly:
-            case SkillTargetType.AllAllies:
-                return clickedIsAlly;
-
-            case SkillTargetType.Self:
-                return clickedIsSelf;
-
-            default:
-                return false;
-        }
+            SkillTargetType.SingleEnemy or SkillTargetType.AllEnemies => clickedIsEnemy,
+            SkillTargetType.SingleAlly or SkillTargetType.AllAllies => clickedIsAlly,
+            SkillTargetType.SingleTarget => true,
+            SkillTargetType.SingleTargetNoSelf => !clickedIsSelf,
+            SkillTargetType.Self => clickedIsSelf,
+            _ => false,
+        };
     }
 
     public void HandleCharacterDeath(BattleCharacter c)
@@ -965,8 +964,7 @@ public class BattleTurnManager : MonoBehaviour
             if (skillIndex > 0) skill = enemy.Skills[skillIndex];
 
             if(skill != null){
-                if ((skill.targetType == SkillTargetType.SingleEnemy ||
-                    skill.targetType == SkillTargetType.SingleAlly) &&
+                if (skill.IsSingleTarget() &&
                     (target == null || target.IsDead))
                     continue;
             }
@@ -1015,6 +1013,12 @@ public class BattleTurnManager : MonoBehaviour
                 case SkillTargetType.SingleAlly:
                 case SkillTargetType.AllAllies:
                     candidatesEnum = GetAlliesOf(enemy);
+                    break;
+                case SkillTargetType.SingleTarget:
+                    candidatesEnum = GetEnemiesOf(enemy).Concat(GetAlliesOf(enemy));
+                    break;
+                case SkillTargetType.SingleTargetNoSelf:
+                    candidatesEnum = GetEnemiesOf(enemy).Concat(GetAlliesOf(enemy, false));
                     break;
                 case SkillTargetType.Self:
                     candidatesEnum = new List<BattleCharacter> { enemy };

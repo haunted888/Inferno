@@ -20,7 +20,7 @@ public class FighterDefenseBoostPassive : PassivesDefinition
 
     public override void OnSkillUsed(BattleCharacter self, BattleCharacter target, Skill skill)
     {
-        if(skill.damageType == SkillDamageType.None)
+        if(!skill.GetAllEffectTypes().Contains(SkillEffectType.Damage))
         {
             OnDestroyed(self);
         }

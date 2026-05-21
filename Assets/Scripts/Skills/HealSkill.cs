@@ -22,6 +22,8 @@ public class HealAllySkill : Skill
 
         target.Heal(healing);
 
+        user.AddThreat(healing);
+
         target.ClearIncomingHealingModifiers();
 
         

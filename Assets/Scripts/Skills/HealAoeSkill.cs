@@ -23,6 +23,8 @@ public class HealAllAlliesSkill : Skill
             
             int healing = ally.ApplyIncomingHealingModifiers(healAmount);
 
+            user.AddThreat(healing);
+
             ally.Heal(healing);
 
             ally.ClearIncomingHealingModifiers();

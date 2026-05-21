@@ -16,6 +16,8 @@ MonoBehaviour:
   description: Deal 10 physical damage that ignores all enemy defenses
   targetType: 0
   damageType: 0
+  makesContact: 1
+  BypassAccuracy: 0
   spCost: 20
   hpCost: 0
   delay: 0

@@ -11,7 +11,7 @@ public class BetrayalPassive : PassivesDefinition
         if (self == null || skill == null) return;
         if (betrayed == null || betrayed.IsDead) return;
 
-        if (skill.damageType != SkillDamageType.None)
+        if (skill.GetAllEffectTypes().Contains(SkillEffectType.Damage))
         {   
             betrayed.TakeDamage(Mathf.RoundToInt(betrayed.MaxHealth * damagePercent));
             Debug.Log($"BetrayalPassive triggered for {betrayed.name}.");

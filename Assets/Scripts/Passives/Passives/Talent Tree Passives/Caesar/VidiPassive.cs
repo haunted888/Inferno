@@ -12,8 +12,8 @@ public class VidiPassive : PassivesDefinition
     public override void BeforeDamageSkillExecute(BattleCharacter self, BattleCharacter target, Skill skill)
     {
         self.SetOutgoingDamageMultiplierLimits(OutgoingDamageMultiplierMin, OutgoingDamageMultiplierMax);
-        if (skill.damageType == SkillDamageType.None) return;
-        if (skill.targetType == SkillTargetType.SingleAlly || skill.targetType == SkillTargetType.SingleEnemy)
+        if (skill is not DamageSkillParent) return;
+        if (skill.IsSingleTarget())
         {
             target.SetIncomingDamageMultiplierLimits(IncomingDamageMultiplierMin, IncomingDamageMultiplierMax);
             return;
