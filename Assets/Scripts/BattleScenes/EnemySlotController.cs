@@ -25,26 +25,26 @@ public class EnemySlotController : MonoBehaviour
 
             var inst = Instantiate(def.enemyPrefab, this.transform);
             Debug.Log("Instantiated enemy prefab: " + def.enemyPrefab.name);
-            var chr = inst.GetComponent<BattleCharacter>();
-            if (chr == null) continue;
+            if (!inst.TryGetComponent<BattleCharacter>(out var chr)) continue;
+
+            chr.sourceEnemyDefinition = def;
             
 
             CombatStats stats = def.GetEffectiveStats();
             int maxHp = stats.maxHealth;
             int currentHp = maxHp;
-            
-            // SP for enemies: Not currently used, but can be implemented later if desired. For now, just initialize to 0.
-            //int maxSp = def.GetMaxSp();
-            //int currentSp = 0;    
+            int maxSp = def.GetMaxSp();
+            int currentSp = maxSp;
 
             chr.ApplyStats(stats, currentHp);
             chr.SetName(def.GetDisplayName());
             chr.SetLevel(def.level);
 
-            //chr.SetMaxSp(maxSp, fillToMax: false);
-            //chr.SetSp(currentSp);
+            chr.SetMaxSp(maxSp, fillToMax: false);
+            chr.SetSp(currentSp);
 
             chr.ClearSkills();
+            chr.lastUsedSkill = null; // Ensure lastUsedSkill is reset at start of battle
             foreach (var s in def.GetEffectiveSkills())
                 if (s != null) chr.AddSkill(s);
 

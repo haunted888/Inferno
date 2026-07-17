@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: Extended Magazine
   m_EditorClassIdentifier: Assembly-CSharp::MarksmanIncreaseAmmo
   displayName: Extended Magazine
-  type: 5
+  type: 6
   isInstance: 1
   icon: {fileID: 0}
   description: Increases maximum ammo by 30
+  isStackable: 0
+  stacks: 1
+  counter: 0
   recoverAmmo: 1
   ammoIncrease: 30

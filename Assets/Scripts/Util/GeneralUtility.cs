@@ -30,4 +30,46 @@ public static class GeneralUtility
         }
         return returnArray;
     }
+
+    public static CombatStats CombatStatsSum(CombatStats a, CombatStats b)
+    {
+        return new CombatStats
+        {
+            maxHealth = a.maxHealth + b.maxHealth,
+            maxSp = a.maxSp + b.maxSp,
+            spGeneration = a.spGeneration + b.spGeneration,
+            speed = a.speed + b.speed,
+            physicalAttack = a.physicalAttack + b.physicalAttack,
+            elementalPower = a.elementalPower + b.elementalPower,
+            defense = a.defense + b.defense,
+            elementalResistance = a.elementalResistance + b.elementalResistance,
+            critChance = a.critChance + b.critChance,
+            critDamage = a.critDamage + b.critDamage,
+            accuracy = a.accuracy + b.accuracy,
+            evasion = a.evasion + b.evasion,
+
+            bludgeoningAttack = a.bludgeoningAttack + b.bludgeoningAttack,
+            slashingAttack = a.slashingAttack + b.slashingAttack,
+            piercingAttack = a.piercingAttack + b.piercingAttack,
+
+            bludgeoningDefense = a.bludgeoningDefense + b.bludgeoningDefense,
+            slashingDefense = a.slashingDefense + b.slashingDefense,
+            piercingDefense = a.piercingDefense + b.piercingDefense,
+
+            fireAttack = a.fireAttack + b.fireAttack,
+            iceAttack = a.iceAttack + b.iceAttack,
+            stormAttack = a.stormAttack + b.stormAttack,
+            acidAttack = a.acidAttack + b.acidAttack,
+            psychicAttack = a.psychicAttack + b.psychicAttack,
+            bloodAttack = a.bloodAttack + b.bloodAttack,
+
+            fireDefense = a.fireDefense + b.fireDefense,
+            iceDefense = a.iceDefense + b.iceDefense,
+            stormDefense = a.stormDefense + b.stormDefense,
+            acidDefense = a.acidDefense + b.acidDefense,
+            psychicDefense = a.psychicDefense + b.psychicDefense,
+            bloodDefense = a.bloodDefense + b.bloodDefense,
+
+        };
+    }
 }

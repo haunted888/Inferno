@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b5a3286c060df64c8a56a6f3ed2dc39, type: 3}
   m_Name: Bleeding Passive
   m_EditorClassIdentifier: Assembly-CSharp::BleedingPassiveDefinition
-  displayName: Passive
+  displayName: Bleeding
   type: 2
   isInstance: 1
-  icon: {fileID: 0}
+  icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   description: 
+  isStackable: 0
+  stacks: 1
+  counter: 1
   statusBufferPrefab: {fileID: 11400000, guid: 5a7ed86d813ee80499776ba16996a016, type: 2}
   bleedDamage: 1
-  counter: 1

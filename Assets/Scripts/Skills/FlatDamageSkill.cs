@@ -4,10 +4,10 @@ using System.Collections.Generic;
 [CreateAssetMenu(menuName = "Skills/Flat Damage Skill")]
 public class FlatDamageSkill : DamageSkillParent
 {
-
+    public bool percentMaxHealth = false; // If true, the power is treated as a percentage of the target's max health
     public override int EstimateDamage(BattleCharacter user, BattleCharacter target)
     {
-        return  power; 
+        return  percentMaxHealth ? Mathf.CeilToInt(power * .01f * target.MaxHealth) : power; 
     }
 
     //NOTE: When you add animations, add them directly to the skill and have them execute in this function.
@@ -25,8 +25,6 @@ public class FlatDamageSkill : DamageSkillParent
         var damageSkillDetailShell = skillDetailShell as DamageSkillParent;
         var power = damageSkillDetailShell.power;
         var damageVariance = damageSkillDetailShell.damageVariance;
-        var skillCritChance = damageSkillDetailShell.skillCritChance;
-        var skillCritDamage = damageSkillDetailShell.skillCritDamage;
         
 
 
@@ -72,12 +70,8 @@ public class FlatDamageSkill : DamageSkillParent
         }
 
         int powerRange = Random.Range(power - damageVariance, power + damageVariance);
+        powerRange = percentMaxHealth ? Mathf.CeilToInt(powerRange * .01f * target.MaxHealth) : powerRange;
 
-        int damage = power;
-
-        damage = user.ApplyTraitDamageModifiers(this, target, damage);
-        damage = target.ApplyIncomingDamageModifiers(damage);
-        damage = user.ApplyOutgoingDamageModifiers(damage);
 
         int dealt = target.TakeDamage(powerRange, skillDetailShell.damageType, subType);
         user.Heal(Mathf.RoundToInt(dealt * damageSkillDetailShell.lifeStealPercent));

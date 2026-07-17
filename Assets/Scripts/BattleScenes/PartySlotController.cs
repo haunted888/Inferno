@@ -15,8 +15,7 @@ public class PartySlotController : MonoBehaviour
         foreach (var def in defs)
         {
             var inst = Instantiate(def.characterPrefab, this.transform);
-            var chr  = inst.GetComponent<BattleCharacter>();
-            if (chr == null) continue;
+            if (!inst.TryGetComponent<BattleCharacter>(out var chr)) continue;
 
             
 
@@ -41,9 +40,11 @@ public class PartySlotController : MonoBehaviour
             chr.SetSp(currentSp);
 
             // Traits must be set up before passives/skills since they can be affected by those
+            // Skills should be set up after passives since passives can rely on skills (e.g., RandomLockSkills locks skills)
             chr.ClearTraits();
             chr.ClearPassives();
             chr.ClearSkills();
+            chr.lastUsedSkill = null; // Ensure lastUsedSkill is reset at start of battle
 
             if (def.traits != null)
                 chr.Traits.AddRange(def.traits);
@@ -61,13 +62,13 @@ public class PartySlotController : MonoBehaviour
                     t.SetupForBattle(def, chr);
             }
 
-            foreach (var p in def.passives)
-                if (p != null) chr.AddPassive(p);
-
             foreach (var s in def.GetEffectiveSkills())
                 if (s != null) chr.AddSkill(s);
 
             
+            foreach (var p in def.passives)
+                if (p != null) chr.AddPassive(p);
+
             
 
             if(inst.GetComponent<Outline>() != null)

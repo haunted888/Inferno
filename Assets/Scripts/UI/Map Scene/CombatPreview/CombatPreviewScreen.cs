@@ -18,7 +18,7 @@ public class CombatPreviewScreen : MonoBehaviour
 
         ClickManager.OnNodeRightClicked.AddListener(HandleNodeRightClicked);
         closeButton.onClick.AddListener(() => gameObject.SetActive(false));
-        calculatorButton.onClick.AddListener(openCalculator);
+        calculatorButton.onClick.AddListener(OpenCalculator);
         gameObject.SetActive(false); // Start hidden
     }
 
@@ -46,7 +46,7 @@ public class CombatPreviewScreen : MonoBehaviour
         }
     }
 
-    private void openCalculator()
+    private void OpenCalculator()
     {
         var Transfer = MapCombatTransfer.Instance;
         if (Transfer == null)

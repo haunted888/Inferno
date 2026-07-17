@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MapBattleReturnHandler : MonoBehaviour
@@ -8,6 +9,7 @@ public class MapBattleReturnHandler : MonoBehaviour
         if (transfer == null) return;
 
         transfer.ApplyDestroyedNodesInScene();
+        ApplyRemovedMapNodes();
 
         if (string.IsNullOrEmpty(transfer.combatNodeObjectName) &&
             string.IsNullOrEmpty(transfer.lastSafeNodeName))
@@ -50,4 +52,53 @@ public class MapBattleReturnHandler : MonoBehaviour
         transfer.lastSafeNodeName = "";
     }
 
+    private void ApplyRemovedMapNodes()
+    {
+        var transfer = MapCombatTransfer.Instance;
+        if (transfer == null) return;
+
+        MapNode[] mapNodes = FindObjectsByType<MapNode>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None
+        );
+
+        HashSet<PathNode> removedPathNodes = new HashSet<PathNode>();
+
+        foreach (MapNode mapNode in mapNodes)
+        {
+            if (mapNode == null) continue;
+
+            if (!transfer.IsMapNodeRemoved(mapNode.gameObject.name))
+                continue;
+
+            if (mapNode.location != null)
+                removedPathNodes.Add(mapNode.location);
+
+            mapNode.gameObject.SetActive(false);
+        }
+
+        DisablePathsConnectedToRemovedNodes(removedPathNodes);
+    }
+
+    private void DisablePathsConnectedToRemovedNodes(HashSet<PathNode> removedPathNodes)
+    {
+        if (removedPathNodes == null || removedPathNodes.Count == 0)
+            return;
+
+        SplinePathSegment[] paths = FindObjectsByType<SplinePathSegment>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None
+        );
+
+        foreach (SplinePathSegment path in paths)
+        {
+            if (path == null) continue;
+
+            if (removedPathNodes.Contains(path.nodeA) ||
+                removedPathNodes.Contains(path.nodeB))
+            {
+                path.gameObject.SetActive(false);
+            }
+        }
+    }
 }

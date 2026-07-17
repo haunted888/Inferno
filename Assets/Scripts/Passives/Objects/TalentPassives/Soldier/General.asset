@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: General
   m_EditorClassIdentifier: Assembly-CSharp::GeneralPassive
   displayName: General
-  type: 5
+  type: 6
   isInstance: 1
   icon: {fileID: 0}
   description: 
+  isStackable: 0
+  stacks: 1
+  counter: 0
   heroPassive: {fileID: 11400000, guid: fc317d17f517f564cb1aafe98a1729bc, type: 2}

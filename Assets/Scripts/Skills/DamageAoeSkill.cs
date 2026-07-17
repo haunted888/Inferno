@@ -72,66 +72,75 @@ public class DamageAllEnemiesSkill : DamageSkillParent
     {
         if (user == null) return;
 
-        
-        BeforeSkillExecute(user, target);
-        
-        BeforeDamageSkillExecute(user, target);
-
-        
-        var damageSkillDetailShell = skillDetailShell as DamageSkillParent;
-        var power = damageSkillDetailShell.power;
-        var damageVariance = damageSkillDetailShell.damageVariance;
-        var skillCritChance = damageSkillDetailShell.skillCritChance;
-        var skillCritDamage = damageSkillDetailShell.skillCritDamage;
+        BeforeDamageSkillExecuteOncePerSkill(user, target);
+        var oncePerSkillDamageShell = skillDetailShell as DamageSkillParent;
+        DamageSubType oncePerSkillSubType = oncePerSkillDamageShell.subType;
+        bool hasOncePerSkillSubTypeConversion = oncePerSkillSubType != subType;
 
         List<BattleCharacter> group;
 
         group = BattleUtility.GetTargetsForEffectsCharacters(characters, user, target, this);
-
-        SkillDamageType damageType = skillDetailShell.damageType;
-        DamageSubType subType = damageSkillDetailShell.subType;
-
-        if(subType == DamageSubType.Adaptive && damageType != SkillDamageType.Adaptive)
-        {
-            Dictionary<DamageSubType, int> subTypeCounts = user.GetSubAttackStats();
-            subType = DamageSubType.None;
-            List<DamageSubType> physicalSubTypes = new List<DamageSubType> { DamageSubType.Slashing, DamageSubType.Piercing, DamageSubType.Bludgeoning };
-            List<DamageSubType> elementalSubTypes = new List<DamageSubType> { DamageSubType.Fire, DamageSubType.Ice, DamageSubType.Storm, DamageSubType.Acid, DamageSubType.Psychic, DamageSubType.Blood };
-
-            
-            List<DamageSubType> subTypesToCheck = (damageType == SkillDamageType.Physical) ? physicalSubTypes : elementalSubTypes;
-
-            int highestCount = 0;
-            foreach (var kvp in subTypeCounts)
-            {
-                if (kvp.Value > highestCount && subTypesToCheck.Contains(kvp.Key))
-                {
-                    highestCount = kvp.Value;
-                    subType = kvp.Key;
-                }
-            }
-        }
-
-        if (damageType == SkillDamageType.Adaptive)
-        {
-            Dictionary<DamageSubType, int> subTypeCounts = user.GetSubAttackStats();
-            subType = DamageSubType.None;
-            int highestCount = 0;
-            foreach (var kvp in subTypeCounts)
-            {
-                if (kvp.Value > highestCount)
-                {
-                    highestCount = kvp.Value;
-                    subType = kvp.Key;
-                    damageType = subTypeToDamageType[subType];
-                }
-            }
-        }
         
 
         foreach (var member in group)
         {
             if (member == null || member.IsDead) continue;
+
+            BeforeSkillExecute(user, member);
+
+            if (hasOncePerSkillSubTypeConversion)
+            {
+                var currentDamageShell = skillDetailShell as DamageSkillParent;
+                currentDamageShell.ConvertDamageType(oncePerSkillSubType);
+            }
+
+            BeforeDamageSkillExecute(user, member, false);
+
+            var damageSkillDetailShell = skillDetailShell as DamageSkillParent;
+            var power = damageSkillDetailShell.power;
+            var damageVariance = damageSkillDetailShell.damageVariance;
+            var skillCritChance = damageSkillDetailShell.skillCritChance;
+            var skillCritDamage = damageSkillDetailShell.skillCritDamage;
+
+            SkillDamageType damageType = skillDetailShell.damageType;
+            DamageSubType subType = damageSkillDetailShell.subType;
+
+            if(subType == DamageSubType.Adaptive && damageType != SkillDamageType.Adaptive)
+            {
+                Dictionary<DamageSubType, int> subTypeCounts = user.GetSubAttackStats();
+                subType = DamageSubType.None;
+                List<DamageSubType> physicalSubTypes = new List<DamageSubType> { DamageSubType.Slashing, DamageSubType.Piercing, DamageSubType.Bludgeoning };
+                List<DamageSubType> elementalSubTypes = new List<DamageSubType> { DamageSubType.Fire, DamageSubType.Ice, DamageSubType.Storm, DamageSubType.Acid, DamageSubType.Psychic, DamageSubType.Blood };
+
+                
+                List<DamageSubType> subTypesToCheck = (damageType == SkillDamageType.Physical) ? physicalSubTypes : elementalSubTypes;
+
+                int highestCount = 0;
+                foreach (var kvp in subTypeCounts)
+                {
+                    if (kvp.Value > highestCount && subTypesToCheck.Contains(kvp.Key))
+                    {
+                        highestCount = kvp.Value;
+                        subType = kvp.Key;
+                    }
+                }
+            }
+
+            if (damageType == SkillDamageType.Adaptive)
+            {
+                Dictionary<DamageSubType, int> subTypeCounts = user.GetSubAttackStats();
+                subType = DamageSubType.None;
+                int highestCount = 0;
+                foreach (var kvp in subTypeCounts)
+                {
+                    if (kvp.Value > highestCount)
+                    {
+                        highestCount = kvp.Value;
+                        subType = kvp.Key;
+                        damageType = subTypeToDamageType[subType];
+                    }
+                }
+            }
             
             
             int powerRange = Random.Range(power - damageVariance, power + damageVariance);
@@ -157,11 +166,11 @@ public class DamageAllEnemiesSkill : DamageSkillParent
 
             if(BattleTurnManager.Instance != null)
                 BattleTurnManager.Instance.RegisterDamage(user, member, dealt, skillDetailShell.damageType, subType);
+
+            AfterExecute(user, member);
+            EndExecution();
         }
 
-        AfterExecute(user, target);
-        
-        
         ExecuteFollowUps(user, target);
         
         EndExecution();

@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Long Jab
   m_EditorClassIdentifier: Assembly-CSharp::DamageSkill
   skillName: Long Jab
-  description: deal 15 piercing damage 30% crit chance
+  description: deal 60 piercing damage 30% crit chance
   targetType: 0
   damageType: 0
+  displayPower: 0
   makesContact: 0
   BypassAccuracy: 0
   spCost: 20
@@ -32,5 +33,6 @@ MonoBehaviour:
   skillCritChance: 30
   skillCritDamage: 0
   damageVariance: 0
+  lifeStealPercent: 0
   mainDefenseCalculated: 1
   subDefenseCalculated: 1

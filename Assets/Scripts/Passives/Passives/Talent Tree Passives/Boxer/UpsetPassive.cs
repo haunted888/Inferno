@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Boxer/Upset Passive")]
+[CreateAssetMenu(menuName = "Passives/Characters/Boxer/Upset Passive")]
 public class UpsetPassive : PassivesDefinition
 {
     public float multiplier = 1; // Multiplier for SP recovery, default to 1 for no change

@@ -12,4 +12,6 @@ public class MapNode : MonoBehaviour
             transform.position = location.transform.position;
         }
     }
+
+    
 }

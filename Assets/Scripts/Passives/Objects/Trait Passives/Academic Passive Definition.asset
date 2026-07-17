@@ -13,13 +13,17 @@ MonoBehaviour:
   m_Name: Academic Passive Definition
   m_EditorClassIdentifier: Assembly-CSharp::StatBoostPercentPassiveDefinition
   displayName: Learnings
-  type: 5
+  type: 6
   isInstance: 1
   icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   description: 
+  isStackable: 0
+  stacks: 1
+  counter: 2147483647
   statBoostsPercent:
     maxHealth: 3
     maxSp: 3
+    spGeneration: 0
     speed: 3
     physicalAttack: 3
     elementalPower: 3
@@ -45,5 +49,6 @@ MonoBehaviour:
     acidDefense: 0
     psychicDefense: 0
     bloodDefense: 0
-  duration: 2147483647
+    accuracy: 0
+    evasion: 0
   restoreResources: 0

@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Ra Passive
   m_EditorClassIdentifier: Assembly-CSharp::RaPassiveDefinition
   displayName: Blessing of Ra
-  type: 5
+  type: 6
   isInstance: 1
   icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   description: 
+  isStackable: 0
+  stacks: 1
+  counter: 0
   damagePercent: 0.1

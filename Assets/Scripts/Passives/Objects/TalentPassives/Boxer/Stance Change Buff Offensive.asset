@@ -45,5 +45,5 @@ MonoBehaviour:
     acidDefense: 0
     psychicDefense: 0
     bloodDefense: 0
-  duration: 2
+  counter: 2
   restoreResources: 0

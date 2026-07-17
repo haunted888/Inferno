@@ -13,5 +13,11 @@ MonoBehaviour:
   m_Name: Unfair Play Passive
   m_EditorClassIdentifier: Assembly-CSharp::UnfairPlayPassive
   displayName: Unfair Play
-  type: 5
+  type: 6
+  isInstance: 1
+  icon: {fileID: 0}
+  description: 
+  isStackable: 0
+  stacks: 1
+  counter: 0
   passiveToApply: {fileID: 11400000, guid: 2ef6e641d0859cb4eaccd18e4c13e06d, type: 2}

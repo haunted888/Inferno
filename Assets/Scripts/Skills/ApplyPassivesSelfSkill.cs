@@ -11,11 +11,11 @@ public class ApplyPassivesSelfSkill : Skill
     {
         if (user == null) return;
         if (passivesToApply == null || passivesToApply.Count == 0) return;
-        if (Random.value > skillDetailShell.bonusEffectChance) return;
 
         
         BeforeSkillExecute(user, user);
 
+        if (Random.value > skillDetailShell.bonusEffectChance && bonusEffectChance < 1) return;
 
         for (int i = 0; i < passivesToApply.Count; i++)
         {

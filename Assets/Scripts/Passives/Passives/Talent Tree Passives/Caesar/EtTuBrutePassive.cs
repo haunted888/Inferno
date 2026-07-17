@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Caesar/Et Tu Brute")]
+[CreateAssetMenu(menuName = "Passives/Characters/Caesar/Et Tu Brute")]
 public class EtTuBrutePassive : PassivesDefinition
 {
     

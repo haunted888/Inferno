@@ -28,7 +28,7 @@ MonoBehaviour:
   traitTags: 
   ammoCost: 0
   flatAmmoCost: 0
-  power: 10
+  power: 50
   subType: 3
   skillCritChance: 100
   skillCritDamage: 0

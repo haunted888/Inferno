@@ -9,11 +9,14 @@ public class PassiveStealAOESkill : Skill
 
     public override void Execute(BattleCharacter user, BattleCharacter target)
     {   
-
-        BeforeSkillExecute(user, target);
+        if (user == null || target == null) return;
 
         foreach (var character in target.GetAllies())
         {
+            if (character == null || character.IsDead) continue;
+
+            BeforeSkillExecute(user, character);
+
             List<PassivesDefinition> passivesToSteal = new List<PassivesDefinition>();
             foreach (var passive in character.passives)
             {
@@ -28,6 +31,7 @@ public class PassiveStealAOESkill : Skill
                 user.AddPassive(passive, character);
                 character.RemovePassive(passive);
             }
+            EndExecution();
         }
 
         

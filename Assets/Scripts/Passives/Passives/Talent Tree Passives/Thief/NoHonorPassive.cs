@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Thief/No Honor")]
+[CreateAssetMenu(menuName = "Passives/Characters/Thief/No Honor")]
 public class NoHonorPassive : PassivesDefinition
 {
     public int spRestore = 100;

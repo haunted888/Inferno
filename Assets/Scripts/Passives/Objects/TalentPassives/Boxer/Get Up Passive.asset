@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: Get Up Passive
   m_EditorClassIdentifier: Assembly-CSharp::GetUpPassive
   displayName: Get Up
-  type: 5
+  type: 6
   isInstance: 1
   icon: {fileID: 0}
   description: 
+  isStackable: 0
+  stacks: 1
+  counter: 0
   healthToRestore: 1
   healthPercentToRestore: 0

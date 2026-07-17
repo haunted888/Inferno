@@ -13,7 +13,13 @@ MonoBehaviour:
   m_Name: Poisoned Blade Passive
   m_EditorClassIdentifier: Assembly-CSharp::PoisonedBladePassive
   displayName: Poisoned Blade
-  type: 5
+  type: 6
+  isInstance: 1
+  icon: {fileID: 0}
+  description: 
+  isStackable: 0
+  stacks: 1
+  counter: 0
   convertingDamageType: 0
   conversionType: 7
   poisonPassive: {fileID: 11400000, guid: b7e957fb4df7fc241acbeeedf1684e94, type: 2}

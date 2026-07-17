@@ -24,8 +24,10 @@ public class WriterStealSkill : Skill
         
         user.AddSkill(skillStolen);
         user.RemoveSkill(this);
-        user.sourceDefinition.skills.Add(skillStolen);
-        user.sourceDefinition.skills.Remove(this);
+        if(user.sourceDefinition != null && user.sourceDefinition.LearnSkill(skillStolen))
+        {
+            user.sourceDefinition.skills.Remove(this);
+        }
         
     }
 }

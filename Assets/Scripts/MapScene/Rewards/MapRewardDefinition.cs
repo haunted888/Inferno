@@ -23,7 +23,7 @@ public class MapRewardDefinition
 
     [Header("Item")]
     public ItemDefinition item;
-    public int itemQuantity = 1;
+    [Min(1)] public int itemQuantity = 1;
 
     [Header("Expeditionist Qty")]
     [Min(1)] public int expeditionistQuantity = 1;

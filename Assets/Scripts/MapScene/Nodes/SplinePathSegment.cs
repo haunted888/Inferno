@@ -2,7 +2,9 @@
 using UnityEngine;
 using UnityEngine.Splines;
 using Unity.Mathematics;
+using System.Linq;
 
+[ExecuteAlways]
 [RequireComponent(typeof(SplineContainer))]
 [RequireComponent(typeof(LineRenderer))]
 public class SplinePathSegment : MonoBehaviour
@@ -16,11 +18,50 @@ public class SplinePathSegment : MonoBehaviour
     SplineContainer container;
     LineRenderer line;
 
+    private Vector3 lastNodeAPosition;
+    private Vector3 lastNodeBPosition;
 
     void Awake()
     {
         if (container == null)
             container = GetComponent<SplineContainer>();
+    }
+
+
+    void OnEnable()
+    {
+        Cache();
+        ForceRefresh();
+    }
+
+
+    void Update()
+    {
+        if (Application.isPlaying)
+            return;
+
+        Cache();
+
+        if (nodeA == null || nodeB == null)
+            return;
+
+        if (nodeA.transform.position == lastNodeAPosition &&
+            nodeB.transform.position == lastNodeBPosition)
+            return;
+
+        ForceRefresh();
+    }
+
+    private void ForceRefresh()
+    {
+        if (nodeA == null || nodeB == null)
+            return;
+
+        lastNodeAPosition = nodeA.transform.position;
+        lastNodeBPosition = nodeB.transform.position;
+
+        UpdateKnotLocations();
+        UpdateVisual();
     }
 
     public bool Connects(PathNode from, PathNode to)
@@ -51,9 +92,22 @@ public class SplinePathSegment : MonoBehaviour
         if (line == null) line = GetComponent<LineRenderer>();
     }
 
-    void OnEnable()   { Cache(); UpdateVisual(); }
-    void OnValidate() { Cache(); UpdateVisual(); }
-    void Reset()      { Cache(); UpdateVisual(); }
+
+    public void UpdateKnotLocations()
+    {
+
+
+        var knots = container.Spline;
+        var knotA = knots[0];
+        var knotB = knots[^1];
+
+        knotA.Position = container.transform.InverseTransformPoint(nodeA.transform.position);
+        knotB.Position = container.transform.InverseTransformPoint(nodeB.transform.position);
+
+        knots[0] = knotA;
+        knots[^1] = knotB;
+
+    }
 
     public void UpdateVisual()
     {

@@ -84,7 +84,7 @@ public abstract class DamageSkillParent : Skill
         //
         
         float final = afterDef * critMultiplier;
-        return Mathf.Max(0, Mathf.RoundToInt(final));
+        return Mathf.Max(0, Mathf.CeilToInt(final));
     }
 
 

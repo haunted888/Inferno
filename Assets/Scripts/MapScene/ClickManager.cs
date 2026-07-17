@@ -57,7 +57,7 @@ public class ClickManager : MonoBehaviour
                     //Broadcast pathnode click event
                     if (hitInfo.collider.TryGetComponent(out MapCombatTrigger clickedNode))
                     {
-                        MapEnemyDefinition[] enemies = clickedNode.enemies;
+                        MapEnemyDefinition[] enemies = clickedNode.GetRuntimeEnemies();
                         if(enemies != null){
                             Debug.Log("Right-clicked on non-UI element");
                             OnNodeRightClicked?.Invoke(enemies);

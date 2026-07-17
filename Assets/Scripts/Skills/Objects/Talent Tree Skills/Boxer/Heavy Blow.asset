@@ -12,26 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f8d9f40bf53b604685ac224e51f4bed, type: 3}
   m_Name: Heavy Blow
   m_EditorClassIdentifier: Assembly-CSharp::DamageSkill
-  skillName: Heavy Blow
+  skillName: Knockout Blow
   description: 
   targetType: 0
   damageType: 0
+  displayPower: --
   makesContact: 1
   BypassAccuracy: 0
-  spCost: 20
+  spCost: 50
   hpCost: 0
   delay: 0
   followUpSkills:
-  - {fileID: 11400000, guid: 1ae53f2bab6242c4789aaf290123e771, type: 2}
+  - {fileID: 11400000, guid: 51d8521f118da264aaed0ea425878fa1, type: 2}
   priority: 0
   bonusEffectChance: 1
   traitTags: 
   ammoCost: 0
   flatAmmoCost: 0
-  power: 100
-  subType: 0
+  power: 60
+  subType: 1
   skillCritChance: 0
   skillCritDamage: 0
   damageVariance: 0
+  lifeStealPercent: 0
   mainDefenseCalculated: 1
   subDefenseCalculated: 1

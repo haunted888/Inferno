@@ -8,12 +8,14 @@ public class SerratedBladePassive : DamageConversionClass
 
     private bool applyStatus = false;
 
+    public override bool BeforeDamageSkillExecuteOncePerSkill => true;
+
     public override void BeforeDamageSkillExecute(BattleCharacter self, BattleCharacter target, Skill skill)
     {
         if(skill is not DamageSkillParent) return;
-        if(skill.damageType == convertingDamageType) applyStatus = true;
         if(ShouldConvert(self, skill))
         {
+            applyStatus = true;
             var damageSkill = skill as DamageSkillParent;
             damageSkill.ConvertDamageType(conversionType);
         }
@@ -22,11 +24,15 @@ public class SerratedBladePassive : DamageConversionClass
     public override void OnSkillUsedEnd(BattleCharacter self, BattleCharacter target, Skill skill)
     {
         if(skill is not DamageSkillParent) return;
-        if(applyStatus)
+        applyStatus = false;
+    }
+
+    public override void OnAfterDealDamage(BattleCharacter self, BattleCharacter target, int amount, SkillDamageType damageType, DamageSubType subDamageType)
+    {
+        
+        if(applyStatus && amount > 0 && target != null && !target.IsDead && bleedingPassive != null)
         {
-            //Use AddPasive instead of QueuePassiveToAdd to ensure the bleeding 
             target.AddPassive(bleedingPassive, self);
         }
-        applyStatus = false;
     }
 }

@@ -36,11 +36,8 @@ public class BleedingPassiveDefinition : StatusPassiveDefinition
     public override void OnResolvePhaseEnd(BattleCharacter self)
     {
         if (self == null) return;
-        counter--;
-        if (counter <= 0)
-        {
-            self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
-        }
+
+        base.OnResolvePhaseEnd(self);
     }
 
     public override void OnDestroyed(BattleCharacter self)

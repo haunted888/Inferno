@@ -140,6 +140,8 @@ public class DamageSkill : DamageSkillParent
         target.ClearIncomingDamageModifiers();
         user.ClearOutgoingDamageModifiers();
 
+        Debug.Log(".");
+
         if(BattleTurnManager.Instance != null)
             BattleTurnManager.Instance.RegisterDamage(user, target, dealt, skillDetailShell.damageType, subType);
 

@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Slash Dash
   m_EditorClassIdentifier: Assembly-CSharp::DamageSkill
   skillName: Slash Dash
-  description: Deal 15 slashing damage, increase speed by 30%
+  description: Deal 75 slashing damage, increase speed by 30%
   targetType: 0
   damageType: 0
+  displayPower: --
   makesContact: 1
   BypassAccuracy: 0
   spCost: 20
@@ -28,10 +29,11 @@ MonoBehaviour:
   traitTags: 04000000
   ammoCost: 0
   flatAmmoCost: 0
-  power: 15
+  power: 75
   subType: 2
   skillCritChance: 0
   skillCritDamage: 0
   damageVariance: 0
+  lifeStealPercent: 0
   mainDefenseCalculated: 1
   subDefenseCalculated: 1

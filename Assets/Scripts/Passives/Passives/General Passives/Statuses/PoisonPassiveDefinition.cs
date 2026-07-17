@@ -33,10 +33,7 @@ public class PoisonPassiveDefinition : StatusPassiveDefinition
         self.TakeDamage(poisonDamage, SkillDamageType.Elemental, DamageSubType.Acid);
         SetDisplayText($"{self.name} is hurt by poison!");
 
-        if (counter <= 0)
-        {
-            self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
-        }
+        base.OnResolvePhaseEnd(self);
     }
 
     public override void OnDestroyed(BattleCharacter self)

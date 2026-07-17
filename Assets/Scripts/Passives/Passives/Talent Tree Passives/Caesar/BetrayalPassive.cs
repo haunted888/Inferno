@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Caesar/Betrayal")]
+[CreateAssetMenu(menuName = "Passives/Characters/Caesar/Betrayal")]
 public class BetrayalPassive : PassivesDefinition
 {
     public BattleCharacter betrayed;

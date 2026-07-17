@@ -35,4 +35,6 @@ public abstract class DamageConversionClass : PassivesDefinition
 
         return false;
     }
+
+    public override void OnResolvePhaseEnd(BattleCharacter self) { }
 }

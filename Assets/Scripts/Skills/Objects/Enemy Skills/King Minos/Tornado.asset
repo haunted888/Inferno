@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fa39db172f78ec4c93185ae7d384090, type: 3}
+  m_Name: Tornado
+  m_EditorClassIdentifier: Assembly-CSharp::DecisionValueAtHealthPercent
+  skillName: Tornado
+  description: Deals storm damage to all enemies. 50% chance to daze each character
+    that is hit.
+  targetType: 1
+  damageType: 1
+  displayPower: --
+  makesContact: 0
+  BypassAccuracy: 0
+  spCost: 0
+  hpCost: 0
+  delay: 0
+  followUpSkills:
+  - {fileID: 11400000, guid: 17272b8c90c7a324b826d33fcf2fe979, type: 2}
+  priority: 0
+  bonusEffectChance: 1
+  traitTags: 
+  ammoCost: 0
+  flatAmmoCost: 0
+  healthPercentThreshold: 70
+  valueIfBelowThreshold: 100

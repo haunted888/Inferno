@@ -109,4 +109,98 @@ public static class BattleUtility
 
         return candidates;
     }
+
+
+    public static bool IsTargetValidForSkill(
+        Skill skill,
+        BattleCharacter user,
+        BattleCharacter target)
+    {
+        if (skill == null || user == null || target == null) return false;
+        if (!CanReceiveSkill(target)) return false;
+
+        bool targetIsAlly = user.GetAllies().Contains(target);
+        bool targetIsEnemy = user.GetEnemies().Contains(target);
+        bool targetIsSelf = user == target;
+
+        switch (skill.targetType)
+        {
+            case SkillTargetType.SingleEnemy:
+            case SkillTargetType.AllEnemies:
+                return targetIsEnemy;
+
+            case SkillTargetType.SingleAlly:
+            case SkillTargetType.AllAllies:
+                return targetIsAlly;
+
+            case SkillTargetType.Self:
+                return targetIsSelf;
+            case SkillTargetType.SingleTarget:
+                return targetIsAlly || targetIsEnemy || targetIsSelf;
+            case SkillTargetType.SingleTargetNoSelf:
+                return (targetIsAlly || targetIsEnemy) && !targetIsSelf;
+            default:
+                return false;
+        }
+    }
+
+    public static BattleCharacter GetRandomSelectableTarget(
+        Skill skill,
+        BattleCharacter user,
+        bool prioritizeEnemies = true)
+    {
+        if (skill == null || user == null) return null;
+
+        IEnumerable<BattleCharacter> candidatesEnum;
+
+        switch (skill.targetType)
+        {
+            case SkillTargetType.SingleEnemy:
+            case SkillTargetType.AllEnemies:
+                candidatesEnum = user.GetEnemies();
+                break;
+
+            case SkillTargetType.SingleAlly:
+            case SkillTargetType.AllAllies:
+                candidatesEnum = user.GetAllies();
+                break;
+
+            case SkillTargetType.Self:
+                candidatesEnum = new List<BattleCharacter> { user };
+                break;
+
+            default:
+                return null;
+        }
+
+        var candidates = new List<BattleCharacter>();
+
+        foreach (var candidate in candidatesEnum)
+        {
+            if (IsTargetValidForSkill(skill, user, candidate))
+                candidates.Add(candidate);
+        }
+
+        if (candidates.Count == 0)
+            return null;
+        
+        if (prioritizeEnemies)
+        {
+            var enemyCandidates = candidates.Where(c => user.GetEnemies().Contains(c)).ToList();
+            if (enemyCandidates.Count > 0)
+                candidates = enemyCandidates;
+        }
+
+        return candidates[Random.Range(0, candidates.Count)];
+    }
+
+    public static bool CanReceiveSkill(BattleCharacter target, bool ignoreDeath = false, bool ignoreSummons = false, bool ignoreProtection = false)
+    {
+        if (target == null) return false;
+        if (!ignoreDeath && target.IsDead) return false;
+        if (!ignoreSummons && target.HasLivingSummon()) return false;
+        if (!ignoreProtection && target.IsProtectedFromSkills()) return false;
+
+        return true;
+    }
 }

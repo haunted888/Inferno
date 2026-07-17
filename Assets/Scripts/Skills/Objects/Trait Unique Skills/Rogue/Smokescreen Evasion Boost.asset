@@ -17,7 +17,7 @@ MonoBehaviour:
   isInstance: 1
   icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   description: 
-  counter: 0
+  counter: 2147483647
   statBoosts:
     maxHealth: 0
     maxSp: 0
@@ -48,5 +48,4 @@ MonoBehaviour:
     psychicDefense: 0
     bloodDefense: 0
     accuracy: 0
-    evasion: 10
-  duration: 2147483647
+    evasion: 20

@@ -16,6 +16,10 @@ public class ApplyElementalInfusionPassive : Skill
 
         foreach (var t in targets)
         {
+            if (t == null || t.IsDead) continue;
+
+            BeforeSkillExecute(user, t);
+
             Dictionary<DamageSubType, int> subTypeCounts = user.GetSubAttackStats();
             DamageSubType subType = DamageSubType.None;
             int highestCount = 0;
@@ -35,6 +39,7 @@ public class ApplyElementalInfusionPassive : Skill
             passiveToApply.description = "Infuses the target's physical attacks with " + elementName + " damage.";
 
             t.AddPassive(passiveToApply, user);
+            EndExecution();
         }
 
         ExecuteFollowUps(user, target);

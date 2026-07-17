@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Boxer/Boxer Style Multiplier")]
+[CreateAssetMenu(menuName = "Passives/Characters/Boxer/Boxer Style Multiplier")]
 public class BoxerStyleMultiplierPassive : PassivesDefinition
 {
     public float multiplier = 1.0f; // Multiplier for damage, default to 1 for no change

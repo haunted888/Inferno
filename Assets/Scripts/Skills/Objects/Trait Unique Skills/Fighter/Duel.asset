@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: Duel
   m_EditorClassIdentifier: Assembly-CSharp::DamageSkill
   skillName: Duel
-  description: 'Deal 50 adaptive damage to an enemy; their actions are redirected
+  description: 'Deal 100 adaptive damage to an enemy; their actions are redirected
     to you this turn
 
 '
   targetType: 0
   damageType: 3
+  displayPower: 0
   makesContact: 1
   BypassAccuracy: 0
   spCost: 100
@@ -31,10 +32,11 @@ MonoBehaviour:
   traitTags: 04000000
   ammoCost: 0
   flatAmmoCost: 0
-  power: 50
+  power: 100
   subType: 0
   skillCritChance: 0
   skillCritDamage: 0
   damageVariance: 0
+  lifeStealPercent: 0
   mainDefenseCalculated: 1
   subDefenseCalculated: 1

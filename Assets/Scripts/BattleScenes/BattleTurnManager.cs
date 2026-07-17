@@ -15,7 +15,6 @@ public class QueuedAction
     public BattleCharacter  user;
 
     // Skill
-    public int   skillIndex;
     public Skill skill;
 
     // Item
@@ -62,7 +61,7 @@ public class BattleTurnManager : MonoBehaviour
     private int currentPlayerIndex = 0;
 
     // Player choices
-    private Dictionary<BattleCharacter, int>             chosenSkillIndices = new Dictionary<BattleCharacter, int>();
+    private Dictionary<BattleCharacter, Skill> chosenSkills                 = new Dictionary<BattleCharacter, Skill>();
     private Dictionary<BattleCharacter, BattleCharacter> chosenTargets      = new Dictionary<BattleCharacter, BattleCharacter>();
     private Dictionary<BattleCharacter, ItemDefinition>  chosenItems        = new Dictionary<BattleCharacter, ItemDefinition>();
 
@@ -77,16 +76,16 @@ public class BattleTurnManager : MonoBehaviour
 
     private void QueueSkip(BattleCharacter chr)
     {
-        chosenSkillIndices[chr] = -1;
+        chosenSkills[chr] = null;
         chosenTargets[chr]      = null;
         EnsureCommandOrder(chr);
         currentPlayerIndex++;
     }
 
-    private void QueueSkill(BattleCharacter chr, int skillIndex, BattleCharacter target)
+    private void QueueSkill(BattleCharacter chr, Skill skill, BattleCharacter target)
     {
-        chosenSkillIndices[chr] = skillIndex;
-        chosenTargets[chr]      = target;
+        chosenSkills[chr] = skill;
+        chosenTargets[chr] = target;
         EnsureCommandOrder(chr);
         currentPlayerIndex++;
     }
@@ -111,7 +110,7 @@ public class BattleTurnManager : MonoBehaviour
                 return false;
         }
         commandOrder.RemoveAt(commandOrder.Count - 1);
-        chosenSkillIndices.Remove(lastChar);
+        chosenSkills.Remove(lastChar);
         chosenTargets.Remove(lastChar);
         chosenItems.Remove(lastChar);
 
@@ -133,7 +132,7 @@ public class BattleTurnManager : MonoBehaviour
                 return false;
         }
         commandOrder.RemoveAt(commandOrder.Count - steps - 1);
-        chosenSkillIndices.Remove(lastChar);
+        chosenSkills.Remove(lastChar);
         chosenTargets.Remove(lastChar);
         chosenItems.Remove(lastChar);
 
@@ -196,7 +195,7 @@ public class BattleTurnManager : MonoBehaviour
         while (true)
         {
             state = TurnState.CommandSelect;
-            chosenSkillIndices.Clear();
+            chosenSkills.Clear();
             chosenTargets.Clear();
             chosenItems.Clear();
             commandOrder.Clear();
@@ -239,7 +238,7 @@ public class BattleTurnManager : MonoBehaviour
             if(chr.DelayedCastSkill != null)
             {
                 Debug.Log($"{chr.name} is still casting {chr.DelayedCastSkill.skill.skillName}, {chr.DelayedCastTurns} turns remaining. Automatically skipping turn.");
-                QueueSkill(chr, chr.DelayedCastSkill.skillIndex, chr.DelayedCastSkill.target);
+                QueueSkill(chr, chr.DelayedCastSkill.skill, chr.DelayedCastSkill.target);
                 continue;
             }
 
@@ -312,17 +311,16 @@ public class BattleTurnManager : MonoBehaviour
                         cancelToCommand = true;
                     });
 
-                    UnityAction<BattleCharacter> handler = null;
-                    handler = (clicked) =>
+                    void handler(BattleCharacter clicked)
                     {
                         if (!IsTargetValidForSkill(chosenSkill, chr, clicked))
                             return;
                         if (cancelToCommand)
                             return;
 
-                        chosenTarget     = clicked;
+                        chosenTarget = clicked;
                         waitingForTarget = false;
-                    };
+                    }
 
                     ClickManagerBattle.OnCharacterClicked.AddListener(handler);
 
@@ -357,7 +355,7 @@ public class BattleTurnManager : MonoBehaviour
                             continue;
                     }
 
-                    QueueSkill(chr, chosenIndex, chosenTarget);
+                    QueueSkill(chr, chosenSkill, chosenTarget);
                     continue;
                 }
 
@@ -547,12 +545,17 @@ public class BattleTurnManager : MonoBehaviour
                     
 
                     SetBattleText($"{action.user.name} uses {action.skill.skillName} on {effectiveTarget.name}!");
+                    yield return _waitForSeconds1;
 
-                    // Players spend SP via UseSkill; enemies ignore SP
-                    if (playerParty.Contains(action.user))
-                        action.user.UseSkill(action.skillIndex, effectiveTarget);
-                    else
-                        action.skill.Execute(action.user, effectiveTarget);
+                    action.user.UseSkill(action.skill, effectiveTarget);
+
+                    action.user.lastUsedSkill = action.skill;
+
+                    if(action.skill.combatText != "" && action.skill.combatText != null)
+                    {
+                        SetBattleText(action.skill.combatText);
+                        action.skill.combatText = "";
+                    }
 
                     // Apply passive effects
                     if (action.user.passives != null)
@@ -619,6 +622,10 @@ public class BattleTurnManager : MonoBehaviour
                 }
             }
 
+            foreach(var chr in playerParty.Concat(enemyParty))
+            {
+                chr.UpdatePassives();
+            }
 
             yield return _waitForSeconds1;
             
@@ -672,26 +679,21 @@ public class BattleTurnManager : MonoBehaviour
             };
         }
         
-        foreach (var kvp in chosenSkillIndices)
+        foreach (var kvp in chosenSkills)
         {
             var user = kvp.Key;
-            int skillIndex = kvp.Value;
+            Skill skill = kvp.Value;
 
             if (user == null || user.IsDead) continue;
-
-            
-            Skill skill = null;
-            if (skillIndex >= 0 && skillIndex < user.Skills.Count) skill = user.Skills[skillIndex];
 
             chosenTargets.TryGetValue(user, out BattleCharacter target);
 
             yield return new QueuedAction
             {
-                kind       = ActionKind.Skill,
-                user       = user,
-                skillIndex = skillIndex,
-                skill      = skill,
-                target     = target
+                kind = ActionKind.Skill,
+                user = user,
+                skill = skill,
+                target = target
             };
         }
 
@@ -830,23 +832,7 @@ public class BattleTurnManager : MonoBehaviour
 
     private bool IsTargetValidForSkill(Skill skill, BattleCharacter user, BattleCharacter clicked)
     {
-        if (skill == null || user == null || clicked == null) return false;
-        if (clicked.IsDead) return false;
-        if (IsUntargetableBecauseOfSummon(clicked)) return false;
-
-        bool clickedIsAlly  = GetAlliesOf(user).Contains(clicked);
-        bool clickedIsEnemy = GetEnemiesOf(user).Contains(clicked);
-        bool clickedIsSelf  = user == clicked;
-
-        return skill.targetType switch
-        {
-            SkillTargetType.SingleEnemy or SkillTargetType.AllEnemies => clickedIsEnemy,
-            SkillTargetType.SingleAlly or SkillTargetType.AllAllies => clickedIsAlly,
-            SkillTargetType.SingleTarget => true,
-            SkillTargetType.SingleTargetNoSelf => !clickedIsSelf,
-            SkillTargetType.Self => clickedIsSelf,
-            _ => false,
-        };
+        return BattleUtility.IsTargetValidForSkill(skill, user, clicked);
     }
 
     public void HandleCharacterDeath(BattleCharacter c)
@@ -856,6 +842,20 @@ public class BattleTurnManager : MonoBehaviour
         foreach (var t in c.Traits)
             t.OnDeath(c);
 
+        if (!c.defeatRewardsGranted &&
+            c.sourceEnemyDefinition != null &&
+            enemyParty.Contains(c))
+        {
+            c.defeatRewardsGranted = true;
+
+            if (MapCombatTransfer.Instance != null)
+            {
+                MapCombatTransfer.Instance.AddPendingRewardsFromGroups(
+                    c.sourceEnemyDefinition.defeatRewardGroups
+                );
+            }
+        }
+
         if (c.summoner != null)
         {
             var owner = c.summoner;
@@ -864,13 +864,11 @@ public class BattleTurnManager : MonoBehaviour
             if (owner.hideWhileSummonIsAlive)
             {
                 owner.gameObject.SetActive(true);
-                owner.transform.position = c.transform.position;
-                owner.transform.rotation = c.transform.rotation;
+                owner.transform.SetPositionAndRotation(c.transform.position, c.transform.rotation);
             }
             else
             {
-                owner.transform.position = c.transform.position;
-                owner.transform.rotation = c.transform.rotation;
+                owner.transform.SetPositionAndRotation(c.transform.position, c.transform.rotation);
             }
 
             owner.hideWhileSummonIsAlive = false;
@@ -902,38 +900,20 @@ public class BattleTurnManager : MonoBehaviour
 
         var type = action.skill.targetType;
 
-        if (type == SkillTargetType.Self)
-        {
-            if (IsUntargetableBecauseOfSummon(action.user))
-                return null;
-            return action.user;
-        }
-
         if (type == SkillTargetType.AllEnemies || type == SkillTargetType.AllAllies)
             return action.target;
 
-        bool isAllyTarget = (type == SkillTargetType.SingleAlly);
-        var pool = isAllyTarget ? GetAlliesOf(action.user) : GetEnemiesOf(action.user);
+        if (action.target.HasLivingSummon())
+            return action.target.activeSummon;
 
-        var candidates = new List<BattleCharacter>();
-        foreach (var c in pool)
-        {
-            if (c == null || c.IsDead) continue;
-            if (IsUntargetableBecauseOfSummon(c)) continue;
-            candidates.Add(c);
-        }
-
-        if (candidates.Count == 0)
-            return null;
-
-        if (action.target != null &&
-            !action.target.IsDead &&
-            !IsUntargetableBecauseOfSummon(action.target) &&
-            candidates.Contains(action.target))
+        // Important:
+        // If a target has already been assigned or redirected, allow it as long as it can receive skills.
+        // Do not require it to match the skill's original selectable team/type.
+        if (BattleUtility.CanReceiveSkill(action.target, ignoreProtection: true))
             return action.target;
 
-        int idx = UnityEngine.Random.Range(0, candidates.Count);
-        return candidates[idx];
+        // Only fallback targets must obey normal selection rules.
+        return BattleUtility.GetRandomSelectableTarget(action.skill, action.user);
     }
 
     public void RegisterDamage(BattleCharacter source, BattleCharacter target, int amount, SkillDamageType damageType = SkillDamageType.None, DamageSubType subDamageType = DamageSubType.None)
@@ -961,7 +941,8 @@ public class BattleTurnManager : MonoBehaviour
             EvaluateEnemyAction(enemy, out int skillIndex, out BattleCharacter target);
             
             Skill skill = null;
-            if (skillIndex > 0) skill = enemy.Skills[skillIndex];
+            if (skillIndex >= 0 && skillIndex < enemy.Skills.Count)
+                skill = enemy.Skills[skillIndex];
 
             if(skill != null){
                 if (skill.IsSingleTarget() &&
@@ -969,8 +950,8 @@ public class BattleTurnManager : MonoBehaviour
                     continue;
             }
 
-            chosenSkillIndices[enemy] = skillIndex;
-            chosenTargets[enemy]      = target;
+            chosenSkills[enemy] = skill;
+            chosenTargets[enemy] = target;
         }
     }
 
@@ -1029,12 +1010,15 @@ public class BattleTurnManager : MonoBehaviour
 
             var candidates = new List<BattleCharacter>();
             foreach (var c in candidatesEnum)
-                if (c != null && !c.IsDead) candidates.Add(c);
+            {
+                if (BattleUtility.IsTargetValidForSkill(skill, enemy, c))
+                    candidates.Add(c);
+            }
             if (candidates.Count == 0) continue;
 
             Shuffle(candidates);
 
-            int skillBestValue  = int.MinValue;
+            int skillBestValue  = 0;
             int skillBestThreat = int.MinValue;
             BattleCharacter skillBestTarget = null;
 
@@ -1042,6 +1026,8 @@ public class BattleTurnManager : MonoBehaviour
             {
                 int effectiveThreat = target.Threat;
                 int value = baseValue;
+
+                value += skill.GetSelectionValue(enemy, target);
 
                 int estDamage = skill.GetDamageEstimate(enemy, target);
             
@@ -1052,6 +1038,17 @@ public class BattleTurnManager : MonoBehaviour
                     value += isAoE ? 15 : 10;
                     effectiveThreat += 100000;
                 }
+
+                if(!enemy.HasEnoughResourcesFor(skill))
+                {
+                    value -= 1000;
+                }
+                if(skill.skillDisabledCounter > 0)
+                {
+                    value -= 1000;
+                }
+
+                effectiveThreat = skill.ModifyThreat(effectiveThreat);
 
                 if (value > skillBestValue ||
                    (value == skillBestValue && effectiveThreat > skillBestThreat))
@@ -1323,6 +1320,8 @@ public class BattleTurnManager : MonoBehaviour
             summon = inst.GetComponent<BattleCharacter>();
             if (summon == null) return null;
 
+            summon.sourceEnemyDefinition = enemySummonDef;
+
             CombatStats stats = enemySummonDef.GetEffectiveStats();
             int maxHp = stats.maxHealth;
 
@@ -1359,14 +1358,10 @@ public class BattleTurnManager : MonoBehaviour
         if (battleSlots != null)
             summonerSlotIndex = battleSlots.GetClosestSlotIndex(summonForPlayerSide, summoner.transform.position);
 
-
-        Vector3 originalPosition = summoner.transform.position;
-        Quaternion originalRotation = summoner.transform.rotation;
+        summoner.transform.GetPositionAndRotation(out Vector3 originalPosition, out Quaternion originalRotation);
 
         // Summon takes the summoner's current battle slot
-        summon.transform.position = originalPosition;
-        summon.transform.rotation = originalRotation;
-
+        summon.transform.SetPositionAndRotation(originalPosition, originalRotation);
         if (hideSummonerWhileSummonIsAlive)
         {
             summoner.gameObject.SetActive(false);
@@ -1400,16 +1395,14 @@ public class BattleTurnManager : MonoBehaviour
         if (enemyHealthBarPrefab != null)
         {
             var barObj = Instantiate(enemyHealthBarPrefab);
-            var bar = barObj.GetComponent<WorldSpaceStatusUI>();
-            if (bar != null)
+            if (barObj.TryGetComponent<WorldSpaceStatusUI>(out var bar))
                 bar.Initialize(summon);
 
             barObj.transform.SetParent(summon.transform);
         }
     }
 
-        var outline = summon.GetComponent<Outline>();
-        if (outline != null)
+        if (summon.TryGetComponent<Outline>(out var outline))
             outline.enabled = false;
 
         var partyController = playerPartyParent.GetComponent<PartySlotController>();

@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Backstab
   m_EditorClassIdentifier: Assembly-CSharp::BlankSkill
   skillName: Backstab
-  description: Stab a character in the back for 10 power. If used on an ally, heal
+  description: Stab a character in the back for 50 power. If used on an ally, heal
     for the amount of damage dealt. Always crits.
   targetType: 5
   damageType: 2
-  displayPower: 10
+  displayPower: 50
   makesContact: 1
   BypassAccuracy: 0
   spCost: 20

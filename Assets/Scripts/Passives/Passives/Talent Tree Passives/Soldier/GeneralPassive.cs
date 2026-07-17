@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Soldier/General Passive")]
+[CreateAssetMenu(menuName = "Passives/Characters/Soldier/General Passive")]
 public class GeneralPassive : PassivesDefinition
 {
 

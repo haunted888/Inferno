@@ -7,9 +7,6 @@ public class BoxerThrowInTheTowel : Skill
 
     public override void Execute(BattleCharacter user, BattleCharacter target)
     {
-        
-        BeforeSkillExecute(user, target);
-
         CombatStats stats = user.GetEffectiveStats();
         buffToApply.SetStatBoosts(new CombatStats
         {
@@ -20,8 +17,10 @@ public class BoxerThrowInTheTowel : Skill
         foreach (var a in user.GetAllies())
         {
             if(a == user) continue;
+            BeforeSkillExecute(user, a);
             a.AddPassive(buffToApply, user);
             a.RecoverSp(a.MaxSp);
+            EndExecution();
         }
 
         user.TakeDamage(user.CurrentHealth); // Knock out the user

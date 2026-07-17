@@ -765,7 +765,7 @@ public class CalculatorScreen : MonoBehaviour
             traitTypes = source.traitTypes != null ? new List<CharacterTrait>(source.traitTypes) : new List<CharacterTrait>(),
 
             stats = source.stats,
-            skills = source.skills != null ? new List<Skill>(source.skills) : new List<Skill>(),
+            skills = source.GetSkills(),
 
             level = source.level,
             currentXp = source.currentXp,
@@ -888,7 +888,7 @@ public class CalculatorScreen : MonoBehaviour
         CloseOverlayScreens();
 
         skillListUI.SetActiveCharacter(def);
-        skillListUI.UpdateSkillList(def.skills, true);
+        skillListUI.UpdateSkillList(def.GetSkills(), true);
         skillListContainer.SetActive(true);
     }
 
@@ -960,7 +960,6 @@ public class CalculatorScreen : MonoBehaviour
                         kind = ActionKind.Skill,
                         user = chr,
                         skill = chosenSkill,
-                        skillIndex = chosenSkillIndex,
                         target = chosenTarget
                     });
                 }
@@ -971,7 +970,6 @@ public class CalculatorScreen : MonoBehaviour
                         kind = ActionKind.Skill,
                         user = chr,
                         skill = null,
-                        skillIndex = -1,
                         target = null
                     });
                 }

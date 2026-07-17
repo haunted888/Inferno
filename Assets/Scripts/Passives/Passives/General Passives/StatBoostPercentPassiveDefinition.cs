@@ -1,11 +1,10 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Stat Boost Percent")]
+[CreateAssetMenu(menuName = "Passives/Stat Modifiers/Stat Boost Percent")]
 public class StatBoostPercentPassiveDefinition : PassivesDefinition
 {
     public CombatStats statBoostsPercent;
 
-    public int duration = int.MaxValue; // Duration in turns, default to max for "until end of battle" behavior
     public bool restoreResources = false; // Whether to restore HP/SP based on the new max values when this passive is applied
 
 
@@ -32,6 +31,14 @@ public class StatBoostPercentPassiveDefinition : PassivesDefinition
         {
             if (existingPassive != this && existingPassive.displayName == displayName)
             {
+                if (isStackable && existingPassive is StatBoostPercentPassiveDefinition existingStatBoostPassive)
+                {
+                    existingPassive.stacks += stacks;
+                    CombatStats newStats = GeneralUtility.CombatStatsSum(existingStatBoostPassive.statBoostsPercent, statBoostsPercent);
+                    existingStatBoostPassive.SetStatBoosts(newStats);
+
+                }
+
                 Debug.Log($"Removing duplicate passive: {displayName}");
                 self.RemovePassive(this);
                 break;
@@ -81,12 +88,7 @@ public class StatBoostPercentPassiveDefinition : PassivesDefinition
 
     public override void OnResolvePhaseEnd(BattleCharacter self)
     {
-        if (self == null) return;
-        if(duration > 100000) return;
-        duration--;
-        if (duration <= 0){
-            self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
-        }
+        base.OnResolvePhaseEnd(self);
     }
 
     public override void OnDestroyed(BattleCharacter self)

@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Guerilla Warfare
   m_EditorClassIdentifier: Assembly-CSharp::GuerillaWarfarePassive
   displayName: Guerilla Warfare
-  type: 5
+  type: 6
   isInstance: 1
   icon: {fileID: 0}
   description: 
+  isStackable: 0
+  stacks: 1
+  counter: 0
   passiveToApply: {fileID: 11400000, guid: e458966a5db40e64e82f17735ce633b5, type: 2}

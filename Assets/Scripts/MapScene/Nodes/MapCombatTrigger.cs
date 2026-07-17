@@ -1,11 +1,32 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
+
+[System.Serializable]
+public class MapEnemyDefinitionGroup
+{
+    public MapEnemyDefinition[] options;
+}
+
+[RequireComponent(typeof(MapNode))]
 public class MapCombatTrigger : MonoBehaviour
 {
+
+
+
     private MapNode mapNode;                     // assign in inspector
     [Header("XP Reward")]
     public int xpReward = 0;
     public MapEnemyDefinition[] enemies;        // assign in inspectorpublic MapEnemyDefinition[] enemies;
+    [Header("Random Enemy Groups")]
+    public MapEnemyDefinitionGroup[] randomEnemyGroups;
+
+    [Min(0)]
+    public int toSelectRandPerGroup = 0;
+
+    private List<MapEnemyDefinition> runtimeEnemies;
+
     public MapRewardGroup[] rewardGroups;
     
 
@@ -15,6 +36,11 @@ public class MapCombatTrigger : MonoBehaviour
     void Awake()
     {
         mapNode = GetComponent<MapNode>();
+    }
+
+    void Start()
+    {
+        EnsureRuntimeEnemies();
     }
 
     void OnEnable()
@@ -58,7 +84,15 @@ public class MapCombatTrigger : MonoBehaviour
             return;
         }
 
-        transfer.SetupEnemies(enemies);
+        EnsureRuntimeEnemies();
+
+        if (runtimeEnemies == null)
+        {
+            Debug.LogError($"Runtime enemies could not be initialized for {name}.");
+            return;
+        }
+
+        transfer.SetupEnemies(runtimeEnemies.ToArray());
 
         transfer.SetPendingRewardsFromGroups(rewardGroups);
         transfer.lastBattleXpReward = xpReward;
@@ -101,6 +135,39 @@ public class MapCombatTrigger : MonoBehaviour
                 return true;
         }
         return false;
+    }
+
+    private void EnsureRuntimeEnemies()
+    {
+        if (runtimeEnemies != null)
+            return;
+
+        var transfer = MapCombatTransfer.Instance;
+
+        if (transfer == null)
+        {
+            // Do not initialize runtimeEnemies yet.
+            // MapCombatTransfer may not have run Awake yet.
+            return;
+        }
+
+        Debug.Log($"Ensuring runtime enemies for node {name}...");
+        runtimeEnemies = transfer.GetOrCreateCombatNodeEnemies(
+            gameObject.name,
+            enemies,
+            randomEnemyGroups,
+            toSelectRandPerGroup
+        );
+    }
+
+    public MapEnemyDefinition[] GetRuntimeEnemies()
+    {
+        EnsureRuntimeEnemies();
+
+        if (runtimeEnemies != null)
+            return runtimeEnemies.ToArray();
+
+        return enemies != null ? enemies.ToArray() : new MapEnemyDefinition[0];
     }
 
 }

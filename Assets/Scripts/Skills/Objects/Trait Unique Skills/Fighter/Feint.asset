@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Feint
   m_EditorClassIdentifier: Assembly-CSharp::DamageSkill
   skillName: Feint
-  description: Deal 10 physical damage that ignores all enemy defenses
+  description: Deal 50 physical damage that ignores all enemy defenses
   targetType: 0
   damageType: 0
+  displayPower: 0
   makesContact: 1
   BypassAccuracy: 0
   spCost: 20
@@ -27,10 +28,11 @@ MonoBehaviour:
   traitTags: 04000000
   ammoCost: 0
   flatAmmoCost: 0
-  power: 10
+  power: 50
   subType: 1
   skillCritChance: 0
   skillCritDamage: 0
   damageVariance: 0
+  lifeStealPercent: 0
   mainDefenseCalculated: 0
   subDefenseCalculated: 0

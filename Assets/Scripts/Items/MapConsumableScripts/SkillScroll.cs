@@ -20,14 +20,8 @@ public class TeachSkillMap : ItemConsumableInMap
         {
             if (member == null) return;
             if (member.health <= 0) return; // cannot teach dead
-            if (!member.traitTypes.Intersect(skillToTeach.traitTags).Any()) return; // Ensure member has required traits
 
-            // Ensure member.skills exists and avoid duplicates
-            var current = member.skills != null ? new List<Skill>(member.skills) : new List<Skill>();
-            if (current.Contains(skillToTeach)) return;
-
-            current.Add(skillToTeach);
-            member.skills = current;
+            if(member.LearnSkill(skillToTeach)) return;
 
             
             member.ApplyMapItemUseTraitEffects(item);
@@ -47,13 +41,11 @@ public class TeachSkillMap : ItemConsumableInMap
         if (member == null) return;
         if (member.health <= 0) return; // cannot teach dead
 
-        var current = member.skills != null ? new List<Skill>(member.skills) : new List<Skill>();
-        if (current.Contains(skillToTeach)) return;
-
-        if (!member.traitTypes.Intersect(skillToTeach.traitTags).Any() && skillToTeach.traitTags.Count > 0) return; // Ensure member has required traits
-
-        current.Add(skillToTeach);
-        member.skills = current;
+        if(!member.LearnSkill(skillToTeach))
+        {
+            Debug.LogWarning($"Failed to teach skill {skillToTeach.skillName} to {member.GetDisplayName()} - check trait requirements and existing skills.");
+            return;
+        }
 
         member.ApplyMapItemUseTraitEffects(item);
         

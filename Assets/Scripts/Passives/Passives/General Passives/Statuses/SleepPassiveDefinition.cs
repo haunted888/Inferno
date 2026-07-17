@@ -25,13 +25,16 @@ public class SleepPassiveDefinition : StatusPassiveDefinition
     public override void OnResolvePhaseEnd(BattleCharacter self)
     {
         if (self == null) return;
-        counter--;
-        if (counter <= 0)
+
+        if (counter <= 1)
         {
-            
+            counter = 0;
             SetDisplayText($"{self.name} wakes up!");
             self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
+            return;
         }
+
+        base.OnResolvePhaseEnd(self);
     }
 
     public override void OnDestroyed(BattleCharacter self)

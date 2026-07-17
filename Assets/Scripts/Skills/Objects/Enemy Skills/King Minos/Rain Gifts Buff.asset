@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9b93bfd8a5502c49a961b4514b8c0e7, type: 3}
+  m_Name: Rain Gifts Buff
+  m_EditorClassIdentifier: Assembly-CSharp::StatBoostPercentPassiveDefinition
+  displayName: Plutus' Boon
+  type: 1
+  isInstance: 1
+  icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  description: 
+  isStackable: 0
+  stacks: 1
+  counter: 0
+  statBoostsPercent:
+    maxHealth: 0
+    maxSp: 0
+    spGeneration: 100
+    speed: 20
+    physicalAttack: 20
+    elementalPower: 20
+    defense: 20
+    elementalResistance: 20
+    critChance: 0
+    critDamage: 0
+    bludgeoningAttack: 0
+    slashingAttack: 0
+    piercingAttack: 0
+    bludgeoningDefense: 0
+    slashingDefense: 0
+    piercingDefense: 0
+    fireAttack: 0
+    iceAttack: 0
+    stormAttack: 0
+    acidAttack: 0
+    psychicAttack: 0
+    bloodAttack: 0
+    fireDefense: 0
+    iceDefense: 0
+    stormDefense: 0
+    acidDefense: 0
+    psychicDefense: 0
+    bloodDefense: 0
+    accuracy: 0
+    evasion: 0
+  restoreResources: 0

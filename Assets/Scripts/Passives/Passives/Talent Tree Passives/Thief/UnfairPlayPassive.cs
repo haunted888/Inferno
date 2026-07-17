@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Thief/Unfair Play")]
+[CreateAssetMenu(menuName = "Passives/Characters/Thief/Unfair Play")]
 public class UnfairPlayPassive : PassivesDefinition
 {
     public TempStatBoostPercent passiveToApply;

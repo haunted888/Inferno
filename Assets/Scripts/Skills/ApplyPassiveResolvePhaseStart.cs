@@ -11,7 +11,7 @@ public class ApplyPassiveResolvePhaseStart : Skill
     {
         if (user == null || target == null || target.IsDead) return;
         if (passivesToApply == null || passivesToApply.Count == 0) return;
-        if (Random.value > skillDetailShell.bonusEffectChance) return;
+        if (Random.value > skillDetailShell.bonusEffectChance && bonusEffectChance < 1) return;
 
         
 

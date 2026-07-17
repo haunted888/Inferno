@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bee834a593fe8ec48b85aa97ed138a05, type: 3}
+  m_Name: Labyrinth Trap
+  m_EditorClassIdentifier: Assembly-CSharp::RandomizeTarget
+  skillName: Labyrinth Trap
+  description: Locks 5 moves of random enemy for 3 turns.
+  targetType: 0
+  damageType: 2
+  displayPower: --
+  makesContact: 0
+  BypassAccuracy: 0
+  spCost: 60
+  hpCost: 0
+  delay: 0
+  followUpSkills:
+  - {fileID: 11400000, guid: 03a623ddbbb72124a975b7f6c281064e, type: 2}
+  priority: 0
+  bonusEffectChance: 1
+  traitTags: 
+  ammoCost: 0
+  flatAmmoCost: 0

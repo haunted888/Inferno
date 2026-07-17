@@ -13,10 +13,13 @@ MonoBehaviour:
   m_Name: Sekhmet Passive
   m_EditorClassIdentifier: Assembly-CSharp::SerratedBladePassive
   displayName: Blessing of Sekhmet
-  type: 5
+  type: 6
   isInstance: 1
   icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   description: 
+  isStackable: 0
+  stacks: 1
+  counter: 0
   convertingDamageType: 0
   conversionType: 9
   bleedingPassive: {fileID: 11400000, guid: ca9ae26470a6b4c43b51242f60effb5d, type: 2}

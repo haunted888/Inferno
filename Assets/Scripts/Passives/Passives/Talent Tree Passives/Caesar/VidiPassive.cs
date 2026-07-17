@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Caesar/Vidi")]
+[CreateAssetMenu(menuName = "Passives/Characters/Caesar/Vidi")]
 public class VidiPassive : PassivesDefinition
 {
     
@@ -13,14 +13,8 @@ public class VidiPassive : PassivesDefinition
     {
         self.SetOutgoingDamageMultiplierLimits(OutgoingDamageMultiplierMin, OutgoingDamageMultiplierMax);
         if (skill is not DamageSkillParent) return;
-        if (skill.IsSingleTarget())
-        {
-            target.SetIncomingDamageMultiplierLimits(IncomingDamageMultiplierMin, IncomingDamageMultiplierMax);
-            return;
-        }
-        foreach (var ally in target.GetAllies())
-        {
-            ally.SetIncomingDamageMultiplierLimits(IncomingDamageMultiplierMin, IncomingDamageMultiplierMax);
-        }
+        if (target == null) return;
+
+        target.SetIncomingDamageMultiplierLimits(IncomingDamageMultiplierMin, IncomingDamageMultiplierMax);
     }
 }

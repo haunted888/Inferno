@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f8d9f40bf53b604685ac224e51f4bed, type: 3}
+  m_Name: Basic Shot+
+  m_EditorClassIdentifier: Assembly-CSharp::DamageSkill
+  skillName: Basic Shot+
+  description: Deal 100 piercing damage
+  targetType: 0
+  damageType: 0
+  displayPower: 100
+  makesContact: 0
+  BypassAccuracy: 0
+  spCost: 20
+  hpCost: 0
+  delay: 0
+  followUpSkills: []
+  priority: 0
+  bonusEffectChance: 1
+  traitTags: 0500000006000000
+  ammoCost: 0.05
+  flatAmmoCost: 0
+  power: 100
+  subType: 3
+  skillCritChance: 0
+  skillCritDamage: 0
+  damageVariance: 0
+  lifeStealPercent: 0
+  mainDefenseCalculated: 1
+  subDefenseCalculated: 1

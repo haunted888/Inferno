@@ -16,17 +16,24 @@ MonoBehaviour:
   description: 
   targetType: 0
   damageType: 0
+  displayPower: --
+  makesContact: 0
+  BypassAccuracy: 0
   spCost: 0
   hpCost: 0
   delay: 0
   followUpSkills:
   - {fileID: 11400000, guid: 59647e3e03ccc4741a20a992417fd510, type: 2}
+  priority: 0
   bonusEffectChance: 1
   traitTags: 
   ammoCost: 0
   flatAmmoCost: 0
-  power: 10
+  power: 50
   subType: 3
   skillCritChance: 0
   skillCritDamage: 0
   damageVariance: 0
+  lifeStealPercent: 0
+  mainDefenseCalculated: 1
+  subDefenseCalculated: 1

@@ -73,4 +73,15 @@ public class TalentTreeUIController : MonoBehaviour
         member.InitializeTalents();
         RefreshAll();
     }
+
+    public TalentDefinition GetTalentById(string id)
+    {
+        foreach (var n in nodes)
+        {
+            if (n != null && n.talent != null && n.talent.id == id)
+                return n.talent;
+         }
+
+        return null;
+    }
 }

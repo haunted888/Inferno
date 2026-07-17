@@ -1,12 +1,9 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Stat Boost Flat")]
+[CreateAssetMenu(menuName = "Passives/Stat Modifiers/Stat Boost Flat")]
 public class StatBoostFlatPassiveDefinition : PassivesDefinition
 {
     public CombatStats statBoosts;
-
-    public int duration = int.MaxValue; // Duration in turns, default to max for "until end of battle" behavior
-
 
     public void SetStatBoosts(
         CombatStats statBoostFlat)
@@ -22,6 +19,14 @@ public class StatBoostFlatPassiveDefinition : PassivesDefinition
         {
             if (existingPassive != this && existingPassive.displayName == displayName)
             {
+
+                if (isStackable && existingPassive is StatBoostFlatPassiveDefinition existingStatBoostPassive)
+                {
+                    existingPassive.stacks += stacks;
+                    CombatStats newStats = GeneralUtility.CombatStatsSum(existingStatBoostPassive.statBoosts, statBoosts);
+                    existingStatBoostPassive.SetStatBoosts(newStats);
+
+                }
                 self.RemovePassive(this);
                 break;
             }
@@ -73,12 +78,7 @@ public class StatBoostFlatPassiveDefinition : PassivesDefinition
 
     public override void OnResolvePhaseEnd(BattleCharacter self)
     {
-        if (self == null) return;
-        if(duration > 100000) return;
-        duration--;
-        if (duration <= 0){
-            self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
-        }
+        base.OnResolvePhaseEnd(self);
     }
 
     public override string GetDescription(BattleCharacter character)

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Temp Stat Boost Percent")]
+[CreateAssetMenu(menuName = "Passives/Stat Modifiers/Temp Stat Boost Percent")]
 public class TempStatBoostPercent : PassivesDefinition
 {
     public float attackBoostPercent = 0.00f;
@@ -9,7 +9,7 @@ public class TempStatBoostPercent : PassivesDefinition
     public float elementalResistanceBoostPercent = 0.00f;
 
 
-    public void setStatBoosts(
+    public void SetStatBoosts(
         float attackBoostPercent, 
         float elementalPowerBoostPercent, 
         float defenseBoostPercent, 
@@ -29,6 +29,16 @@ public class TempStatBoostPercent : PassivesDefinition
         {
             if (existingPassive != this && existingPassive.displayName == displayName)
             {
+
+                if (isStackable && existingPassive is TempStatBoostPercent existingStatBoostPassive)
+                {
+                    existingPassive.stacks += stacks;
+                    existingStatBoostPassive.attackBoostPercent += attackBoostPercent;
+                    existingStatBoostPassive.elementalPowerBoostPercent += elementalPowerBoostPercent;
+                    existingStatBoostPassive.defenseBoostPercent += defenseBoostPercent;
+                    existingStatBoostPassive.elementalResistanceBoostPercent += elementalResistanceBoostPercent;
+
+                }
                 self.RemovePassive(this);
                 break;
             }

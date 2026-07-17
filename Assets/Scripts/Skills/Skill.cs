@@ -81,9 +81,10 @@ public abstract class Skill : ScriptableObject
 
     public string skillName;
     [TextArea] public string description;
+    //if skill prepares followup skills targeting different targets, use all not single
     public SkillTargetType targetType;
     public SkillDamageType damageType = SkillDamageType.Physical;
-    public int displayPower = 0;
+    public string displayPower = "--";
     public bool makesContact = false; 
     public bool BypassAccuracy = false;
 
@@ -111,13 +112,17 @@ public abstract class Skill : ScriptableObject
 
     private bool triggeredOnCommandPhaseStart = false;
 
+    [NonSerialized] public string combatText = "";
+
+    [NonSerialized] public int skillDisabledCounter = 0; // If > 0, skill is disabled
+
 
     public virtual void OnCreated(BattleCharacter self)
     {
         if (skillDetailShell != null) return;
         
-        Destroy(skillDetailShell);
         skillDetailShell = Instantiate(this);
+        Debug.Log($"OnCreated called for skill {skillName}, detail shell: {skillDetailShell}");
         
         foreach (var s in followUpSkills)
         {
@@ -166,19 +171,34 @@ public abstract class Skill : ScriptableObject
         return 0; // Default for non-damage skills
     }
 
-    public void BeforeDamageSkillExecute(BattleCharacter user, BattleCharacter target)
+    public void BeforeDamageSkillExecute(BattleCharacter user, BattleCharacter target, bool includeOncePerSkillPassives = true)
     {
+        if (user == null) return;
 
         for (int i = 0; i < user.passives.Count; i++)
         {
             var p = user.passives[i];
             if (p == null) continue;
+            if (!includeOncePerSkillPassives && p.BeforeDamageSkillExecuteOncePerSkill) continue;
+            p.BeforeDamageSkillExecute(user, target, this);
+        }
+    }
+
+    public void BeforeDamageSkillExecuteOncePerSkill(BattleCharacter user, BattleCharacter target)
+    {
+        if (user == null) return;
+
+        for (int i = 0; i < user.passives.Count; i++)
+        {
+            var p = user.passives[i];
+            if (p == null || !p.BeforeDamageSkillExecuteOncePerSkill) continue;
             p.BeforeDamageSkillExecute(user, target, this);
         }
     }
 
     public void BeforeHealingSkillExecute(BattleCharacter user, BattleCharacter target)
     {
+        if (user == null) return;
 
         for (int i = 0; i < user.passives.Count; i++)
         {
@@ -292,8 +312,11 @@ public abstract class Skill : ScriptableObject
         }
     }
 
+    // This method is called before the skill or followup executes, allowing passives to modify the skill's behavior or effects (e.g. zero luck passive reducing bonus effect chance)
     public void BeforeSkillExecute(BattleCharacter user, BattleCharacter target)
     {
+        if (user == null) return;
+
         PassiveMutationUtility.InvokePassivesWithMutation(
             user,
             () => user.passives,
@@ -302,16 +325,15 @@ public abstract class Skill : ScriptableObject
             user.passiveMutationContext
         );
 
-        foreach (var t in BattleUtility.GetTargetsForSkill(this, user, target))
-        {
-            PassiveMutationUtility.InvokePassivesWithMutation(
-                t,
-                () => t.passives,
-                p => p.BeforeSkillExecuteReceived(t, user, this),
-                PassivesDefinition.PassiveHook.BeforeSkillExecuteReceived,
-                t.passiveMutationContext
-            );
-        }
+        if (target == null) return;
+
+        PassiveMutationUtility.InvokePassivesWithMutation(
+            target,
+            () => target.passives,
+            p => p.BeforeSkillExecuteReceived(target, user, this),
+            PassivesDefinition.PassiveHook.BeforeSkillExecuteReceived,
+            target.passiveMutationContext
+        );
     }
 
     public List<SkillEffectType> GetAllEffectTypes()
@@ -341,5 +363,21 @@ public abstract class Skill : ScriptableObject
         return targetType == SkillTargetType.SingleEnemy || targetType == SkillTargetType.SingleAlly || targetType == SkillTargetType.SingleTarget || targetType == SkillTargetType.SingleTargetNoSelf;
     }
 
-    
+    public void ClearCosts()
+    {
+        spCost = 0;
+        hpCost = 0f;
+        ammoCost = 0f;
+        flatAmmoCost = 0;
+    }
+
+    public virtual int GetSelectionValue(BattleCharacter user, BattleCharacter target)
+    {
+        return 0;
+    }
+
+    public virtual int ModifyThreat(int threat)
+    {
+        return threat; // Default implementation does not modify threat
+    }
 }

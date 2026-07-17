@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Smokescreen
   m_EditorClassIdentifier: Assembly-CSharp::ApplyPassivesSelfSkill
   skillName: Smokescreen
-  description: 
+  description: Increases evasion by 20
   targetType: 6
   damageType: 2
   displayPower: 0

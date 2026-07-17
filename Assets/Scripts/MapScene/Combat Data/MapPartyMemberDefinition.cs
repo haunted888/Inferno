@@ -3,23 +3,16 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
-using NUnit.Framework.Internal;
 
 [System.Serializable]
-public class MapPartyMemberDefinition
+public class MapPartyMemberDefinition : MapCharacterDefinition
 {
     public GameObject characterPrefab;
-    public string displayName = "Unnamed";
-
-    [Header("Character Asset")]
-    public CharacterTemplate characterAsset;
 
     [Header("Traits")]
 
     [Header("Inspector Overrides")]
     public bool overrideTraits = false;
-    public bool overrideStats  = false;
-    public bool overrideSkills = false;
 
     [Header("Traits (used if overrideTraits = true or no asset)")]
     public List<TraitDefinition> traits = new List<TraitDefinition>();
@@ -43,31 +36,8 @@ public class MapPartyMemberDefinition
         1600, // level 13
     };
 
-    [Header("Stats (max values, editable)")]
-    public CombatStats stats = new CombatStats
-    {
-        maxHealth          = 100,
-        maxSp              = 10,
-        spGeneration       = 20,
-        speed              = 10,
-        physicalAttack     = 100,
-        elementalPower     = 100,
-        defense            = 0,
-        elementalResistance= 0,
-        critChance         = 5,
-        critDamage         = 150
-    };
-
-    private CombatStats baseStats = new CombatStats();
-    private CombatStats levelUpStats = new CombatStats();
-
-    [Header("Skills (used if overrideSkills = true or no asset)")]
-    public List<Skill> skills;
-
-    
     [Header("Progression")]
     public const int MaxLevel = 13;
-    [Range(1, MaxLevel)] public int level = 1;
     [Min(0)] public int currentXp = 0;
 
     [Header("Bonus stat")] //Base level up stats and substat allocation
@@ -83,11 +53,7 @@ public class MapPartyMemberDefinition
 
     
     [NonSerialized] public bool initializedFromAssetTraits  = false;
-    [NonSerialized] public bool initializedFromAssetStats  = false;
-    [NonSerialized] public bool initializedFromAssetSkills = false;
     [NonSerialized] public bool initializedTalents = false;
-
-    public PassivesDefinition[] passives; // optional; can be empty
 
 
     // --- Talents ---
@@ -112,40 +78,13 @@ public class MapPartyMemberDefinition
     public bool CanLearn(TalentDefinition t) =>
         t != null && !HasTalent(t.id) && talentPoints >= t.cost;
 
-    void Awake()
-    {
-        SetupLevelMultiplierHashtable();
-    }
-
-    public void EnsureInitializedFromAsset()
+    public override void EnsureInitializedFromAsset()
     {
         if (characterAsset == null)
             return;
 
-
-        if (!initializedFromAssetStats)
-        {
-            
-            if(!overrideStats){
-                stats = characterAsset.baseStats;
-                Debug.Log(displayName + " max sp is " + stats.maxSp);
-                stats.maxHealth = Mathf.Max(1, stats.maxHealth);
-                stats.maxSp     = Mathf.Max(0, stats.maxSp);
-            }
-
-            baseStats = stats;
-            levelUpStats = new CombatStats();
-
-            initializedFromAssetStats = true;
-        }
-            
-
-        if (!initializedFromAssetSkills && !overrideSkills &&
-            characterAsset.skills != null && characterAsset.skills.Count > 0)
-        {
-            skills = new List<Skill>(characterAsset.skills);
-            initializedFromAssetSkills = true;
-        }
+        InitializeStatsFromAsset();
+        InitializeSkillsFromAsset();
         
         if (!initializedSubStats)
         {
@@ -181,27 +120,6 @@ public class MapPartyMemberDefinition
 
 
     }
-
-    public string GetDisplayName()
-    {
-        if (!string.IsNullOrEmpty(displayName))
-            return displayName;
-
-        if (characterAsset != null && !string.IsNullOrEmpty(characterAsset.displayName))
-            return characterAsset.displayName;
-
-        return "Unnamed";
-    }
-
-    public int GetMaxHealth()
-    {
-        return Mathf.Max(1, stats.maxHealth);
-    }
-    
-    public int GetMaxSp()
-    {
-        return Mathf.Max(0, stats.maxSp);
-    }
     
     public bool HasTrait(CharacterTrait trait)
     {
@@ -212,15 +130,10 @@ public class MapPartyMemberDefinition
         return traitTypes ?? new List<CharacterTrait>();
     }
 
-    public CombatStats GetEffectiveStats()
+
+    public override List<Skill> GetEffectiveSkills()
     {
-        var result = stats;
-        result.maxHealth = Mathf.Max(1, result.maxHealth);
-        return result;
-    }
-    public List<Skill> GetEffectiveSkills()
-    {
-        return skills ?? new List<Skill>();
+        return GetSkills() ?? new List<Skill>();
     }
 
 
@@ -234,11 +147,8 @@ public class MapPartyMemberDefinition
         // skills
         if (t.grantSkills != null && t.grantSkills.Length > 0)
         {
-            var list = skills != null ? new List<Skill>(skills)
-                                    : new List<Skill>();
             foreach (var s in t.grantSkills)
-                if (s != null && !list.Contains(s)) list.Add(s);
-            skills = list;
+                LearnSkill(s);
         }
 
         // passives (array may not exist yet)
@@ -265,9 +175,7 @@ public class MapPartyMemberDefinition
         // remove granted skills/passives if present
         if (t.grantSkills != null && t.grantSkills.Length > 0 && skills != null)
         {
-            var list = new List<Skill>(skills);
-            foreach (var s in t.grantSkills) if (s != null) list.Remove(s);
-            skills = list;
+            foreach (var s in t.grantSkills) if (s != null) ForgetSkill(s);
         }
         if (t.grantPassives != null && t.grantPassives.Length > 0 && passives != null)
         {
@@ -279,45 +187,6 @@ public class MapPartyMemberDefinition
         learnedTalentIds.Remove(t.id);
         talentPoints += t.cost;
     }
-
-    // helper: adds (sign=+1) or subtracts (sign=-1) all fields of CombatStats
-    void ApplyStatsDelta(CombatStats d, int sign = 1)
-    {
-        if (d.Equals(null)) return;
-
-        stats.maxHealth            += sign * d.maxHealth;
-        stats.maxSp                += sign * d.maxSp;
-        stats.speed                += sign * d.speed;
-        stats.physicalAttack       += sign * d.physicalAttack;
-        stats.elementalPower       += sign * d.elementalPower;
-        stats.defense              += sign * d.defense;
-        stats.elementalResistance  += sign * d.elementalResistance;
-        stats.critChance           += sign * d.critChance;
-        stats.critDamage           += sign * d.critDamage;
-
-        stats.bludgeoningAttack    += sign * d.bludgeoningAttack;
-        stats.slashingAttack       += sign * d.slashingAttack;
-        stats.piercingAttack       += sign * d.piercingAttack;
-
-        stats.bludgeoningDefense   += sign * d.bludgeoningDefense;
-        stats.slashingDefense      += sign * d.slashingDefense;
-        stats.piercingDefense      += sign * d.piercingDefense;
-
-        stats.fireAttack           += sign * d.fireAttack;
-        stats.iceAttack            += sign * d.iceAttack;
-        stats.stormAttack          += sign * d.stormAttack;
-        stats.acidAttack           += sign * d.acidAttack;
-        stats.psychicAttack        += sign * d.psychicAttack;
-        stats.bloodAttack          += sign * d.bloodAttack;
-
-        stats.fireDefense          += sign * d.fireDefense;
-        stats.iceDefense           += sign * d.iceDefense;
-        stats.stormDefense         += sign * d.stormDefense;
-        stats.acidDefense          += sign * d.acidDefense;
-        stats.psychicDefense       += sign * d.psychicDefense;
-        stats.bloodDefense         += sign * d.bloodDefense;
-
-    }
     public void InitializeTalentPointsIfFresh(int defaultPoints = 1)
     {
         // only set if they're “fresh” (no prior spends) and points are non-positive
@@ -325,13 +194,44 @@ public class MapPartyMemberDefinition
             talentPoints = defaultPoints;
     }
 
-    public void ResetProgression()
+    public override void ResetProgression()
     {
-        level = 1;
         currentXp = 0;
 
+        base.ResetProgression();
+        
+        if (talentTreePrefab != null)
+            talentTreePrefab.RefundAll();
+        talentPoints = 1; // reset to default pool
+
+    }
+
+    public void ResetLevels()
+    {
+        
+        currentXp += GetXpRequiredForNextLevel(level);
+        level = 1;
+
+        // Reset stats to base + asset (without level-up or talent bonuses)
         ApplyStatsDelta(levelUpStats, -1);
         levelUpStats = new CombatStats();
+
+        // Reset talents
+        var talentList = new List<TalentDefinition>();
+        foreach(var t in learnedTalentIds)
+        {
+            var def = talentTreePrefab != null ? talentTreePrefab.GetTalentById(t) : null;
+            if (def != null) talentList.Add(def);
+        }
+        if (talentTreePrefab != null)
+            talentTreePrefab.RefundAll();
+        talentPoints = 1; // reset to default pool
+
+        foreach (var p in passives ?? Array.Empty<PassivesDefinition>())
+        {
+            if (p != null)
+                p.OnResetLevels(this, talentList);
+        }
 
     }
 
@@ -353,8 +253,21 @@ public class MapPartyMemberDefinition
         if (amount <= 0) return;
         if (level >= MaxLevel) return;
 
+        
+        foreach (var p in passives ?? Array.Empty<PassivesDefinition>())
+        {
+            if (p != null)
+                amount = p.OnGainXp(this, amount);
+        }
+
         currentXp += amount;
 
+
+    }
+
+    public void ResetXp()
+    {
+        currentXp = 0;
     }
 
     public bool TryToLevelUp()
@@ -394,109 +307,29 @@ public class MapPartyMemberDefinition
         return totalXp;
     }
 
-    private readonly float levelUpBaseMultiplier = .06f;
-    private readonly float levelUpLevelMultiplier = 0.02f;
-    public void ApplyLevelUpEffects()
+    public override void ApplyLevelUpEffects()
     {
         talentPoints += 1; // add 1 talent point per level-up
-
-        // apply level-up stats
-        CombatStats delta = new CombatStats
-        {
-            maxHealth          = Mathf.RoundToInt(baseStats.maxHealth * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            maxSp              = Mathf.RoundToInt(baseStats.maxSp * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            speed              = Mathf.RoundToInt(baseStats.speed * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            physicalAttack     = Mathf.RoundToInt(baseStats.physicalAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            elementalPower     = Mathf.RoundToInt(baseStats.elementalPower * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            defense            = Mathf.RoundToInt(baseStats.defense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            elementalResistance= Mathf.RoundToInt(baseStats.elementalResistance * (levelUpBaseMultiplier + level * levelUpLevelMultiplier))
-        };
-
-        ApplyStatsDelta(delta, +1);
-
-        levelUpStats.maxHealth += delta.maxHealth;
-        levelUpStats.maxSp     += delta.maxSp;
-        levelUpStats.speed     += delta.speed;
-        levelUpStats.physicalAttack     += delta.physicalAttack;
-        levelUpStats.elementalPower     += delta.elementalPower;
-        levelUpStats.defense              += delta.defense;
-        levelUpStats.elementalResistance  += delta.elementalResistance;
-        levelUpStats.critChance           += delta.critChance;
-        levelUpStats.critDamage           += delta.critDamage;
-
-        health = stats.maxHealth;
-        sp = stats.maxSp;
-        
+        base.ApplyLevelUpEffects();
     }
 
-    public void ApplyLevelUpEffects(int level)
+    public override void ApplyLevelUpEffects(int level)
     {
         talentPoints += 1; // add 1 talent point per level-up
+        base.ApplyLevelUpEffects(level);
+    }
 
-        // apply level-up stats
-        CombatStats delta = new CombatStats
-        {
-            maxHealth          = Mathf.RoundToInt(baseStats.maxHealth * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            maxSp              = Mathf.RoundToInt(baseStats.maxSp * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            speed              = Mathf.RoundToInt(baseStats.speed * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            physicalAttack     = Mathf.RoundToInt(baseStats.physicalAttack * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            elementalPower     = Mathf.RoundToInt(baseStats.elementalPower * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            defense            = Mathf.RoundToInt(baseStats.defense * (levelUpBaseMultiplier + level * levelUpLevelMultiplier)),
-            elementalResistance= Mathf.RoundToInt(baseStats.elementalResistance * (levelUpBaseMultiplier + level * levelUpLevelMultiplier))
-        };
-
-        ApplyStatsDelta(delta, +1);
-
-        levelUpStats.maxHealth += delta.maxHealth;
-        levelUpStats.maxSp     += delta.maxSp;
-        levelUpStats.speed     += delta.speed;
-        levelUpStats.physicalAttack     += delta.physicalAttack;
-        levelUpStats.elementalPower     += delta.elementalPower;
-        levelUpStats.defense              += delta.defense;
-        levelUpStats.elementalResistance  += delta.elementalResistance;
-        levelUpStats.critChance           += delta.critChance;
-        levelUpStats.critDamage           += delta.critDamage;
-
+    protected override void OnLevelUpDeltaApplied(CombatStats delta)
+    {
         health = stats.maxHealth;
         sp = stats.maxSp;
-        
     }
 
     public void ApplyLevelUpBonusStats(CombatStats delta)
     {
         ApplyStatsDelta(delta, +1);
 
-
-        levelUpStats.maxHealth += delta.maxHealth;
-        levelUpStats.maxSp     += delta.maxSp;
-        levelUpStats.speed     += delta.speed;
-        levelUpStats.physicalAttack     += delta.physicalAttack;
-        levelUpStats.elementalPower     += delta.elementalPower;
-        levelUpStats.defense              += delta.defense;
-        levelUpStats.elementalResistance  += delta.elementalResistance;
-        levelUpStats.critChance           += delta.critChance;
-        levelUpStats.critDamage           += delta.critDamage;
-
-        levelUpStats.bludgeoningAttack    += delta.bludgeoningAttack;
-        levelUpStats.slashingAttack       += delta.slashingAttack;
-        levelUpStats.piercingAttack       += delta.piercingAttack;
-        levelUpStats.bludgeoningDefense   += delta.bludgeoningDefense;
-        levelUpStats.slashingDefense      += delta.slashingDefense;
-        levelUpStats.piercingDefense      += delta.piercingDefense;
-        levelUpStats.fireAttack           += delta.fireAttack;
-        levelUpStats.iceAttack            += delta.iceAttack;
-        levelUpStats.stormAttack          += delta.stormAttack;
-        levelUpStats.acidAttack           += delta.acidAttack;
-        levelUpStats.psychicAttack        += delta.psychicAttack;
-        levelUpStats.bloodAttack          += delta.bloodAttack;
-        levelUpStats.fireDefense          += delta.fireDefense;
-        levelUpStats.iceDefense           += delta.iceDefense;
-        levelUpStats.stormDefense         += delta.stormDefense;
-        levelUpStats.acidDefense          += delta.acidDefense;
-        levelUpStats.psychicDefense       += delta.psychicDefense;
-        levelUpStats.bloodDefense         += delta.bloodDefense;
-
-
+        AddToLevelUpStats(delta);
 
         health += delta.maxHealth;
         sp += delta.maxSp;
@@ -788,5 +621,66 @@ public class MapPartyMemberDefinition
         {
             trait.OnMapItemUsed(this, item);
         }
+    }
+
+    public bool LearnSkill(Skill skillToTeach, bool ignoreTraitRequirements = false)
+    {
+        if (skillToTeach == null) return false;
+        var current = skills != null ? new List<Skill>(skills) : new List<Skill>();
+        if (current.Contains(skillToTeach)) return false;
+
+        var activeTraits = new List<CharacterTrait>(traitTypes);
+
+        foreach (var p in passives ?? Array.Empty<PassivesDefinition>())
+        {
+            if (p == null || p is not GhostTrait) continue;
+            var ghostTrait = (GhostTrait)p;
+            activeTraits.Add(ghostTrait.traitType);
+        }
+
+        if (!ignoreTraitRequirements && !activeTraits.Intersect(skillToTeach.traitTags).Any() && skillToTeach.traitTags.Count > 0) return false; // Ensure member has required traits
+
+        current.Add(skillToTeach);
+        skills = current;
+        return true;
+    }
+
+    public void ForgetSkill(Skill skillToForget)
+    {
+        if (skillToForget == null) return;
+        var current = skills != null ? new List<Skill>(skills) : new List<Skill>();
+        if (!current.Contains(skillToForget)) return;
+
+        current.Remove(skillToForget);
+        skills = current;
+    }
+
+    public List<Skill> GetSkills(bool ignoreTraitRequirements = false)
+    {
+        var skillList = new List<Skill>();
+
+        var activeTraits = new List<CharacterTrait>(traitTypes);
+
+        foreach (var p in passives)
+        {
+            if (p == null) continue;
+
+            p.OnGetSkills(skillList, skills);
+
+            if (p is GhostTrait ghostTrait)
+                activeTraits.Add(ghostTrait.traitType);
+            
+        }
+
+        foreach (var s in skills ?? new List<Skill>())
+        {
+            if (s == null) continue;
+            if (ignoreTraitRequirements || s.traitTags.Count == 0 || activeTraits.Intersect(s.traitTags).Any())
+            {
+                if (!skillList.Contains(s)) skillList.Add(s);
+            }
+        }
+
+        return skillList;
     }
 }

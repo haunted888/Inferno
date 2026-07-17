@@ -9,6 +9,8 @@ public class WorldSpaceStatusUI : MonoBehaviour
     public TMP_Text nameText;
     public Slider hpSlider;
     public TMP_Text hpText;
+    public Slider spSlider;
+    public TMP_Text spText;
     public Vector3 worldOffset = new Vector3(0, 2f, 0);
     public PassiveContainerManagerUI passiveContainerManagerUI;
     public Transform rectTransform;
@@ -28,6 +30,13 @@ public class WorldSpaceStatusUI : MonoBehaviour
             hpSlider.value = target.CurrentHealth;
         }
 
+        if (target != null && spSlider != null)
+        {
+            spSlider.minValue = 0;
+            spSlider.maxValue = target.MaxSp;
+            spSlider.value = target.CurrentSp;
+        }
+
         target.OnPassivesChanged.AddListener(OnPassivesChanged);
         OnPassivesChanged(target.passives.ToArray());
         UpdateTexts();
@@ -43,6 +52,9 @@ public class WorldSpaceStatusUI : MonoBehaviour
 
         if (hpSlider != null)
             hpSlider.value = target.CurrentHealth;
+
+        if (spSlider != null)
+            spSlider.value = target.CurrentSp;
 
         UpdateTexts();
 
@@ -60,6 +72,8 @@ public class WorldSpaceStatusUI : MonoBehaviour
             nameText.text = target.name;
         if (hpText != null && target != null)
             hpText.text = $"{target.CurrentHealth}/{target.MaxHealth}";
+        if (spText != null && target != null)
+            spText.text = $"{target.CurrentSp}/{target.MaxSp}";
     }
 
     private void OnPassivesChanged(PassivesDefinition[] passives)

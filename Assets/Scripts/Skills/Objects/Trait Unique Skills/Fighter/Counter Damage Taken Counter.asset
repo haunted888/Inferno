@@ -13,10 +13,12 @@ MonoBehaviour:
   m_Name: Counter Damage Taken Counter
   m_EditorClassIdentifier: Assembly-CSharp::DamageTakenCounter
   displayName: CounterDamageTakenCounter
-  type: 5
+  type: 6
   isInstance: 1
   icon: {fileID: 0}
   description: 
+  isStackable: 0
+  stacks: 1
   counter: 0
   multiplier: 2
   damageTypeToCount: 0

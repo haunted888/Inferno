@@ -7,6 +7,8 @@ public class StasisPassiveDefinition : PassivesDefinition
     [Header("'User is ____ and cannot act!'")]
     [TextArea] public string turnSkipDisplayText = "in stasis";
 
+    public override void OnResolvePhaseEnd(BattleCharacter self) { }
+
     public override void OnDestroyed(BattleCharacter self)
     {
         counter--;

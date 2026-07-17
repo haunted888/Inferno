@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Caesar/Caesar")]
+[CreateAssetMenu(menuName = "Passives/Characters/Caesar/Caesar")]
 public class CaesarPassive : PassivesDefinition
 {
     public float attackBoostPercent = 0.1f;
@@ -25,7 +25,7 @@ public class CaesarPassive : PassivesDefinition
             } 
             else if (userActed && action?.user != null && allies.Contains(action.user) && action.user != self && !action.user.IsDead)
             {
-                passiveBoost.setStatBoosts(
+                passiveBoost.SetStatBoosts(
                     attackBoostPercent,
                     elementalPowerBoostPercent,
                     defenseBoostPercent,

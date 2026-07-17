@@ -9,6 +9,7 @@ public enum PassivesTypes
     StatusEffect,
     Buff,
     Debuff,
+    Equipment,
     Protected
 }
 
@@ -50,13 +51,21 @@ public abstract class PassivesDefinition : ScriptableObject
     public Sprite icon;
     
     [Header("Description")]
-    [TextArea] public string description;
+    [TextArea (minLines: 3, maxLines: 10)] public string description;
 
+    
+    [Header("Stacking")]
+    public bool isStackable = false; // Whether this passive can stack with others of the same type
+    public int stacks = 1; // Number of stacks for this passive, if stackable
+
+    [Header("Duration")]
     public int counter = 0;
 
     private string displayText = "";
 
     [NonSerialized]public BattleCharacter applicator = null;
+
+
 
     // Passive stats
     public virtual void GetStatBoosts(BattleCharacter self) {  }
@@ -66,7 +75,17 @@ public abstract class PassivesDefinition : ScriptableObject
     public virtual void OnBattleEnd(BattleCharacter self, bool playerWon) { }
     public virtual void OnCommandPhaseStart(BattleCharacter self) { }
     public virtual void OnResolvePhaseStart(BattleCharacter self) { }
-    public virtual void OnResolvePhaseEnd(BattleCharacter self) { }
+    public virtual void OnResolvePhaseEnd(BattleCharacter self)
+    {
+        if (self == null) return;
+        if (counter <= 0 || counter > 100000) return;
+
+        counter--;
+        if (counter <= 0)
+        {
+            self.QueuePassiveToRemove(this, PassiveHook.OnResolvePhaseEnd);
+        }
+    }
 
     // Combat event hooks
     public virtual void OnAfterDealDamage(BattleCharacter self, BattleCharacter target, int amount, SkillDamageType damageType, DamageSubType subDamageType) { }
@@ -82,6 +101,12 @@ public abstract class PassivesDefinition : ScriptableObject
     public virtual void OnSkillReceivedEnd(BattleCharacter self, BattleCharacter attacker, Skill skill) { }
     public virtual void OnActionEnd(BattleCharacter self, BattleCharacter target) { }
     public virtual void OnActionOrdered(QueuedAction action, List<QueuedAction> actions) { }
+
+    // Out of combat hooks
+    public virtual void OnGetSkills(List<Skill> effectiveSkills, List<Skill> skills) { }
+    public virtual void OnResetLevels(MapPartyMemberDefinition self, List<TalentDefinition> talents) { }
+    public virtual int OnGainXp(MapPartyMemberDefinition self, int xpGained) { return xpGained; }
+    public virtual bool BeforeDamageSkillExecuteOncePerSkill => false;
 
     // Existence hooks
     public virtual void OnCreated(BattleCharacter self) { }

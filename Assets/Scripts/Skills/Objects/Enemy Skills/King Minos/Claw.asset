@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed712e108d4850641b1a04df1c281f17, type: 3}
+  m_Name: Claw
+  m_EditorClassIdentifier: Assembly-CSharp::DecisionValueBelowHealthPercent
+  skillName: Claw
+  description: Can be cast if Minos is below 40% health. Applies 2 bleeding.
+  targetType: 0
+  damageType: 0
+  displayPower: 50
+  makesContact: 0
+  BypassAccuracy: 0
+  spCost: 0
+  hpCost: 0
+  delay: 0
+  followUpSkills:
+  - {fileID: 11400000, guid: 1d963162c79e20a4e996fb35bf1bd046, type: 2}
+  priority: 0
+  bonusEffectChance: 1
+  traitTags: 
+  ammoCost: 0
+  flatAmmoCost: 0
+  healthPercentThreshold: 40
+  valueIfBelowThreshold: 0
+  valueIfAboveThreshold: -100

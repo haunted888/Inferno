@@ -24,4 +24,6 @@ public class LongzhongPlanCounter : PassivesDefinition
     {
         return $"Currently at stage {counter} of the Longzhong plan.";
     }
+
+    public override void OnResolvePhaseEnd(BattleCharacter self) { }
 }

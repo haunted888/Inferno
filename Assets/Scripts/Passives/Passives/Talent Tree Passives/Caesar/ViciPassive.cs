@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Caesar/Vici")]
+[CreateAssetMenu(menuName = "Passives/Characters/Caesar/Vici")]
 public class ViciPassive : PassivesDefinition
 {
     public override void OnBattleEnd(BattleCharacter self, bool playerWon)

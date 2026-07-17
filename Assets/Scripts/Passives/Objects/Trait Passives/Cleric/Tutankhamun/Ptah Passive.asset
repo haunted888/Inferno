@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: Ptah Passive
   m_EditorClassIdentifier: Assembly-CSharp::PtahPassiveDefinition
   displayName: Blessing of Ptah
-  type: 5
+  type: 6
   isInstance: 1
   icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   description: 
+  isStackable: 0
+  stacks: 1
+  counter: 0
   activationHealthPercent: 0.5
   passiveToApply: {fileID: 11400000, guid: 79557bbe52d492a4ea2e1e5fcdd52a1d, type: 2}

@@ -8,11 +8,16 @@ public class CalculatorEnemyEntryUI : MonoBehaviour
 {
     public TMP_Text nameText;
 
-    [Header("HP")]
+    [Header("HP/SP")]
     public Slider hpBar;
     public Slider hpBarPreview;
     public TMP_Text hpText;
     public TMP_Text hpPreviewText;
+
+    public Slider spBar;
+    public Slider spBarPreview;
+    public TMP_Text spText;
+    public TMP_Text spPreviewText;
 
     [Header("Skills")]
     public Button skillButton;
@@ -43,14 +48,22 @@ public class CalculatorEnemyEntryUI : MonoBehaviour
 
         storedDef.EnsureInitializedFromAsset();
 
-        // Max HP only (enemies do not have SP)
+        // Max HP / Max SP (shown full)
         int maxHp = !storedDef.stats.IsUnityNull() ? storedDef.stats.maxHealth : 0;
+        int maxSp = !storedDef.stats.IsUnityNull() ? storedDef.stats.maxSp : 0;
 
         if (hpBar != null)
         {
             hpBar.minValue = 0;
             setMaxHP(maxHp);
             setHP(maxHp);
+        }
+
+        if (spBar != null)
+        {
+            spBar.minValue = 0;
+            setMaxSP(maxSp);
+            setSP(maxSp);
         }
 
         if (skillButton != null)
@@ -83,11 +96,14 @@ public class CalculatorEnemyEntryUI : MonoBehaviour
         if (hpBar != null)
         {
             hpBar.maxValue = max;
-            hpBarPreview.maxValue = max;
+            if (hpBarPreview != null)
+                hpBarPreview.maxValue = max;
         }
 
-        if (hpText != null)
+        if (hpText != null && hpBar != null)
             hpText.text = $"{hpBar.value}/{max}";
+
+        if (hpPreviewText != null && hpBarPreview != null)
             hpPreviewText.text = $"{hpBarPreview.value}/{max}";
     }
     void setHP(int current)
@@ -95,13 +111,49 @@ public class CalculatorEnemyEntryUI : MonoBehaviour
         if (hpBar != null)
         {
             hpBar.value = current;
-            hpBarPreview.value = current;
+            if (hpBarPreview != null)
+                hpBarPreview.value = current;
         }
 
-        if (hpText != null)
+        if (hpText != null && hpBar != null)
             hpText.text = $"{current}/{hpBar.maxValue}";
+
+        if (hpPreviewText != null && hpBarPreview != null)
             hpPreviewText.text = $"{current}/{hpBarPreview.maxValue}";
     }
+
+    void setMaxSP(int max)
+    {
+        if (spBar != null)
+        {
+            spBar.maxValue = max;
+            if (spBarPreview != null)
+                spBarPreview.maxValue = max;
+        }
+
+        if (spText != null && spBar != null)
+            spText.text = $"{spBar.value}/{max}";
+
+        if (spPreviewText != null && spBarPreview != null)
+            spPreviewText.text = $"{spBarPreview.value}/{max}";
+    }
+
+    void setSP(int current)
+    {
+        if (spBar != null)
+        {
+            spBar.value = current;
+            if (spBarPreview != null)
+                spBarPreview.value = current;
+        }
+
+        if (spText != null && spBar != null)
+            spText.text = $"{current}/{spBar.maxValue}";
+
+        if (spPreviewText != null && spBarPreview != null)
+            spPreviewText.text = $"{current}/{spBarPreview.maxValue}";
+    }
+
     public void SetTurnOrder(int order)
     {
         if (turnOrderText != null)

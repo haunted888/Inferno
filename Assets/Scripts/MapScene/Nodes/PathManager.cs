@@ -19,6 +19,8 @@ public class PathfindingManager : MonoBehaviour
 
     public PathNode LastNodeBeforeMove { get; private set; }
 
+    private bool isMoving = false;
+
     private SplinePathSegment[] SplinePathSegments;
 
     private HashSet<PathNode> visitedNodes = new HashSet<PathNode>();
@@ -59,6 +61,12 @@ public class PathfindingManager : MonoBehaviour
 
     void HandleNodeClicked(PathNode clickedNode)
     {
+        if(isMoving)
+        {
+            Debug.Log("Currently moving. Click ignored.");
+            return;
+        }
+
         if (startNode == null || clickedNode == null)
             return;
         
@@ -86,7 +94,14 @@ public class PathfindingManager : MonoBehaviour
 
         LastNodeBeforeMove = startNode;
 
+        // Trigger exit event
+        
+        if (clickedNode.TryGetComponent<MapNodeBranchPruner>(out var pruner))
+            pruner.Prune();
+
         // Move player along path of splines
+        isMoving = true;
+
         StopAllCoroutines();
         StartCoroutine(MovePlayerAlongPath(path));
 
@@ -180,6 +195,8 @@ public class PathfindingManager : MonoBehaviour
         }
         
         startNode = path[path.Count - 1];
+
+        isMoving = false;
 
         OnArrivedAtNode?.Invoke(startNode);
         PersistPathStateToTransfer();

@@ -52,6 +52,9 @@ public class MapCombatTransfer : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         BootstrapCampMembers();
+
+        //NOTE: MOVE TO ONGAMESTART
+        removedMapNodeNames.Clear();
     }
 
     public void SetupEnemies(MapEnemyDefinition[] defs)
@@ -241,6 +244,23 @@ public class MapCombatTransfer : MonoBehaviour
         }
     }
 
+
+    private readonly HashSet<string> removedMapNodeNames = new HashSet<string>();
+
+    public void RegisterRemovedMapNode(string mapNodeName)
+    {
+        if (string.IsNullOrEmpty(mapNodeName)) return;
+
+        removedMapNodeNames.Add(mapNodeName);
+    }
+
+    public bool IsMapNodeRemoved(string mapNodeName)
+    {
+        if (string.IsNullOrEmpty(mapNodeName)) return false;
+
+        return removedMapNodeNames.Contains(mapNodeName);
+    }
+
     void BootstrapCampMembers()
     {
         var manager = campUIManager;
@@ -276,6 +296,7 @@ public class MapCombatTransfer : MonoBehaviour
         pendingEnemies.Clear();
         visitedNodeNames.Clear();
         destroyedNodeNames.Clear();
+        combatNodeEnemiesByNode.Clear();
         currentMapNodeName = "";
 
         lastSafeNodeName = "";
@@ -364,6 +385,30 @@ public class MapCombatTransfer : MonoBehaviour
         pendingRewards.Add(reward);
     }
 
+    public void AddPendingRewardsFromGroups(IEnumerable<MapRewardGroup> groups)
+    {
+        if (groups == null) return;
+
+        foreach (var group in groups)
+        {
+            if (group == null || group.options == null || group.options.Length == 0)
+                continue;
+
+            var candidates = new List<MapRewardDefinition>();
+            foreach (var opt in group.options)
+            {
+                if (opt != null)
+                    candidates.Add(opt);
+            }
+
+            if (candidates.Count == 0)
+                continue;
+
+            int index = UnityEngine.Random.Range(0, candidates.Count);
+            pendingRewards.Add(candidates[index]);
+        }
+    }
+
     private void AddCampMember(MapPartyMemberDefinition def)
     {
         if (def == null) return;
@@ -441,7 +486,8 @@ public class MapCombatTransfer : MonoBehaviour
             if(equippedToMember.TryGetValue(oldItem, out var holder) && holder == member)
                 equippedToMember.Remove(oldItem);
 
-            oldItem.heldEquippable?.OnUnequip(member);
+            if(oldItem.heldEquippable != null)
+                oldItem.heldEquippable.OnUnequip(member);
             AddItem(oldItem, 1);   // return previous item to inventory
         }
 
@@ -489,6 +535,63 @@ public class MapCombatTransfer : MonoBehaviour
         if (money < amount) return false;
         money -= amount;
         return true;
+    }
+
+    private readonly Dictionary<string, List<MapEnemyDefinition>> combatNodeEnemiesByNode = new Dictionary<string, List<MapEnemyDefinition>>();
+
+    public List<MapEnemyDefinition> GetOrCreateCombatNodeEnemies(
+        string nodeName,
+        MapEnemyDefinition[] fixedEnemies,
+        MapEnemyDefinitionGroup[] randomGroups,
+        int toSelectRandPerGroup)
+    {
+        Debug.Log($"Getting combat node enemies for node {nodeName} with {fixedEnemies?.Length ?? 0} fixed and {randomGroups?.Length ?? 0} random groups (selecting {toSelectRandPerGroup} per group)");
+        if (string.IsNullOrEmpty(nodeName))
+            nodeName = Guid.NewGuid().ToString();
+
+        if (combatNodeEnemiesByNode.TryGetValue(nodeName, out var existing))
+            return new List<MapEnemyDefinition>(existing);
+
+        var generated = new List<MapEnemyDefinition>();
+
+        if (fixedEnemies != null)
+        {
+            foreach (var enemy in fixedEnemies)
+            {
+                if (enemy != null)
+                    generated.Add(enemy);
+            }
+        }
+
+        if (randomGroups != null && toSelectRandPerGroup > 0)
+        {
+            foreach (var group in randomGroups)
+            {
+                if (group == null || group.options == null || group.options.Length == 0)
+                    continue;
+
+                var candidates = new List<MapEnemyDefinition>();
+
+                foreach (var enemy in group.options)
+                {
+                    if (enemy != null)
+                        candidates.Add(enemy);
+                }
+
+                int amountToSelect = Mathf.Min(toSelectRandPerGroup, candidates.Count);
+
+                for (int i = 0; i < amountToSelect; i++)
+                {
+                    int index = UnityEngine.Random.Range(0, candidates.Count);
+                    generated.Add(candidates[index]);
+                    candidates.RemoveAt(index);
+                    Debug.Log($"Randomly selected enemy {generated.Last().displayName} for node {nodeName}");
+                }
+            }
+        }
+
+        combatNodeEnemiesByNode[nodeName] = new List<MapEnemyDefinition>(generated);
+        return new List<MapEnemyDefinition>(generated);
     }
 
 }

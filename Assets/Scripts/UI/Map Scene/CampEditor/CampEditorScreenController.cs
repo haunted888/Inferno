@@ -226,7 +226,7 @@ public class CampEditorScreenController : MonoBehaviour
         currentScreen = CurrentScreen.Skill;
         if (skillScreenRoot != null) skillScreenRoot.SetActive(true);
         if (skillScreenScrollRect != null) skillScreenScrollRect.verticalNormalizedPosition = 1f;
-        if (skillListUI != null && current != null) skillListUI.UpdateSkillList(current.skills);
+        if (skillListUI != null && current != null) skillListUI.UpdateSkillList(current.GetSkills());
     }
     void OpenInventoryScreen()
     {

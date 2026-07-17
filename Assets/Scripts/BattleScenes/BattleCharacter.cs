@@ -4,6 +4,13 @@ using System;
 using System.Xml.XPath;
 using UnityEngine.Events;
 
+public enum ResourceType
+{
+    HP,
+    SP,
+    Ammo
+}
+
 public class BattleCharacter : MonoBehaviour
 {
     [Min(1)]
@@ -48,6 +55,9 @@ public class BattleCharacter : MonoBehaviour
     [NonSerialized] public CombatStats bonusStats = new CombatStats();
 
     public MapPartyMemberDefinition sourceDefinition;  // null for enemies created from MapEnemyDefinition
+    public MapEnemyDefinition sourceEnemyDefinition;
+
+    [NonSerialized] public bool defeatRewardsGranted = false;
 
     public List<TraitDefinition> Traits { get; } = new List<TraitDefinition>();
     public List<CharacterTrait> traitTypes = new List<CharacterTrait>();
@@ -59,6 +69,9 @@ public class BattleCharacter : MonoBehaviour
     public List<QueuedAction> currentActionOrder;
 
     [NonSerialized] public bool hideWhileSummonIsAlive;
+
+    [NonSerialized] public Skill lastUsedSkill;
+    
     
 
     void Awake()
@@ -220,18 +233,18 @@ public class BattleCharacter : MonoBehaviour
     [SerializeField] private List<Skill> skills = new List<Skill>();
     public IReadOnlyList<Skill> Skills => skills;
 
-    public void UseSkill(int index, BattleCharacter target)
+    public void UseSkill(int skillIndex, BattleCharacter target)
     {
-        if (index < 0 || index >= skills.Count)
-        {
-            Debug.LogWarning($"{name} tried to use skill at index {index}, but it is out of range.");
-            return;
-        }
+        if (skillIndex < 0 || skillIndex >= Skills.Count) return;
+        UseSkill(Skills[skillIndex], target);
+    }
 
-        Skill skill = skills[index];
+    public void UseSkill(Skill skill, BattleCharacter target)
+    {
+
         if (skill == null)
         {
-            Debug.LogWarning($"{name} has a null skill at index {index}.");
+            Debug.LogWarning($"{name} has null skill, cannot execute.");
             return;
         }
 
@@ -309,6 +322,11 @@ public class BattleCharacter : MonoBehaviour
         } 
     }
 
+    public void UpdatePassives()
+    {
+        OnPassivesChanged?.Invoke(passives.ToArray());
+    }
+
     public void ClearSkills() => skills.Clear();
     public void AddSkill(Skill s)
     {
@@ -316,6 +334,7 @@ public class BattleCharacter : MonoBehaviour
         var skill = Instantiate(s);
         skills.Add(skill);
         skill.OnCreated(this);
+        Debug.Log(skill.skillDetailShell);
     }
     public void RemoveSkill(Skill s)
     {
@@ -515,6 +534,10 @@ public class BattleCharacter : MonoBehaviour
     {
         if (skill == null) return true;
 
+        Debug.Log($"Checking if {name} has enough resources for {skill.skillName}.");
+
+        Debug.Log($"{skill.skillDetailShell}");
+
         if (currentSp < skill.skillDetailShell.spCost) return false;
 
         if (currentHealth < skill.skillDetailShell.hpCost) return false;
@@ -669,6 +692,11 @@ public class BattleCharacter : MonoBehaviour
     }
 
     public IReadOnlyList<QueuedAction> GetCurrentActionOrder()
+    {
+        return currentActionOrder;
+    }
+
+    public List<QueuedAction> GetCurrentActionOrderMutable()
     {
         return currentActionOrder;
     }

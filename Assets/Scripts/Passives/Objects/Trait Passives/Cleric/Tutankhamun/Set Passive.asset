@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: Set Passive
   m_EditorClassIdentifier: Assembly-CSharp::SetPassiveDefinition
   displayName: Blessing of Set
-  type: 5
+  type: 6
   isInstance: 1
   icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   description: 
+  isStackable: 0
+  stacks: 1
+  counter: 0
   passiveToApply: {fileID: 11400000, guid: 70254316a9bf6904aac47c1cc8c30fa9, type: 2}
   possibleStatsToBoost: 0c0000000d0000000e000000110000000f00000010000000

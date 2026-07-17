@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8cc942ca55e5d7429a503b460e06295, type: 3}
+  m_Name: 1Blessings of Amun-Ra0
+  m_EditorClassIdentifier: Assembly-CSharp::TalentDefinition
+  id: 1
+  displayName: Blessings of Amun-Ra
+  description: 'Tutankhamun gets blessed by the god he invested the most elemental
+    stats into at the beginning of battle.
+
+
+    Fire - Ra: Ra deals fire damage
+    to a random enemy equal to Tutankhamun''s fire attack at the end of each turn.
+
+
+    Ice
+    - Ptah: Enemies brought to half-health by Tutankhamun are entombed in a frozen
+    pyramid by Ptah, becoming unable to act and immune to skills for one turn.
+
+
+    Storm
+    - Set: At the start of every turn Set increases the a random elemental resistance
+    substat of a random ally by Tutankhamun''s storm defense stat.
+
+
+    Acid - Osiris:
+    If Tutankhamun takes lethal damage, Osiris protects him, letting him survive
+    with 1 health.
+
+
+    Blood - Sekhmet: Sekhmet converts all of Tutankhamun''s
+    physical damage skills to blood damage and causes these skills to inflict bleed
+    on enemies hit.
+
+
+    Psychic - Aten: Aten applies ten stacks of burn to Tutankhamun.
+    The next two strongest gods come to your aid, granting you their blessings.'
+  cost: 0
+  statBonus:
+    maxHealth: 0
+    maxSp: 0
+    spGeneration: 0
+    speed: 0
+    physicalAttack: 0
+    elementalPower: 0
+    defense: 0
+    elementalResistance: 0
+    critChance: 0
+    critDamage: 0
+    bludgeoningAttack: 0
+    slashingAttack: 0
+    piercingAttack: 0
+    bludgeoningDefense: 0
+    slashingDefense: 0
+    piercingDefense: 0
+    fireAttack: 0
+    iceAttack: 0
+    stormAttack: 0
+    acidAttack: 0
+    psychicAttack: 0
+    bloodAttack: 0
+    fireDefense: 0
+    iceDefense: 0
+    stormDefense: 0
+    acidDefense: 0
+    psychicDefense: 0
+    bloodDefense: 0
+    accuracy: 0
+    evasion: 0
+  grantSkills: []
+  grantPassives: []

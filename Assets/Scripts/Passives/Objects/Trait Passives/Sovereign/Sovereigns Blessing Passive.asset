@@ -45,4 +45,4 @@ MonoBehaviour:
     acidDefense: 0
     psychicDefense: 0
     bloodDefense: 0
-  duration: 1
+  counter: 1

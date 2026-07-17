@@ -6,6 +6,7 @@ public class HealAllySkill : Skill
 {
     [Header("Heal Skill")]
     public int healAmount = 15;
+    public bool asPercent = false;
 
     public override void Execute(BattleCharacter user, BattleCharacter target)
     {
@@ -15,8 +16,8 @@ public class HealAllySkill : Skill
         BeforeSkillExecute(user, target);
 
         BeforeHealingSkillExecute(user, target);
-
         
+        _ = asPercent ? Mathf.CeilToInt(target.MaxHealth * (healAmount / 100f)) : healAmount;
 
         int healing = target.ApplyIncomingHealingModifiers(healAmount);
 

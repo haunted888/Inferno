@@ -1,7 +1,7 @@
 using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Passives/Soldier/Guerilla Warfare Passive")]
+[CreateAssetMenu(menuName = "Passives/Characters/Soldier/Guerilla Warfare Passive")]
 public class GuerillaWarfarePassive : PassivesDefinition
 {
     public StatBoostPercentPassiveDefinition passiveToApply;

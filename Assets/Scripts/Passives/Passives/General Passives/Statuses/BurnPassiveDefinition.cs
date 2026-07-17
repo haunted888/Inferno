@@ -37,11 +37,7 @@ public class BurnPassiveDefinition : StatusPassiveDefinition
         self.TakeDamage(burnDamage, SkillDamageType.Elemental, DamageSubType.Fire);
         SetDisplayText($"{self.name} is hurt by their burn!");
 
-        counter--;
-        if (counter <= 0)
-        {
-            self.QueuePassiveToRemove(this, PassivesDefinition.PassiveHook.OnResolvePhaseEnd);
-        }
+        base.OnResolvePhaseEnd(self);
     }
 
     

@@ -16,6 +16,7 @@ MonoBehaviour:
   description: 
   targetType: 0
   damageType: 0
+  displayPower: --
   makesContact: 1
   BypassAccuracy: 0
   spCost: 5
@@ -28,10 +29,11 @@ MonoBehaviour:
   traitTags: 
   ammoCost: 0
   flatAmmoCost: 0
-  power: 1
+  power: 10
   subType: 1
   skillCritChance: 0
   skillCritDamage: 0
   damageVariance: 0
+  lifeStealPercent: 0
   mainDefenseCalculated: 1
   subDefenseCalculated: 1
